@@ -7,11 +7,26 @@ class MetronomeImpl implements Metronome {
   int _bpm;
   int _beatCounter = 0;
   final int _beatsPerMeasure = 4;
+
   final StreamController<Tick> _metronomeStreamController =
       StreamController<Tick>.broadcast();
-  Timer? _timer;
+
+  final Stopwatch _clock = Stopwatch();
+
+  Timer? _scheduler;
+
   bool _isRunning = false;
-  MetronomeImpl({int bpm = 60}) : _bpm = bpm;
+
+  double _beatDuration = 0;
+  double _nextBeatTime = 0;
+
+  static const Duration _schedulerInterval = Duration(milliseconds: 25);
+
+  static const double _lookAhead = 0.1; // seconds
+
+  MetronomeImpl({int bpm = 60}) : _bpm = bpm {
+    _updateBeatDuration();
+  }
 
   @override
   int get beatsPerMeasure => _beatsPerMeasure;
@@ -24,42 +39,39 @@ class MetronomeImpl implements Metronome {
 
   @override
   Future<void> dispose() async {
-    if (_timer != null) {
-      stop();
-    }
-    _metronomeStreamController.close();
+    stop();
+    await _metronomeStreamController.close();
   }
 
   @override
   void setBpm(int bpm) {
     _bpm = bpm;
-    if (_isRunning) {
-      final intervalInMs = _calculateIntervalInMs();
-      _timer?.cancel();
-      _timer = null;
-      _timer = Timer.periodic(
-        Duration(milliseconds: intervalInMs),
-        (_) => _handleTick(),
-      );
-    }
+    _updateBeatDuration();
   }
 
   @override
   void start() {
     if (_isRunning) return;
-    final intervalInMs = _calculateIntervalInMs();
-    _handleTick();
-    _timer = Timer.periodic(
-      Duration(milliseconds: intervalInMs),
-      (_) => _handleTick(),
-    );
+
     _isRunning = true;
+
+    _beatCounter = 0;
+    _nextBeatTime = 0;
+
+    _clock
+      ..reset()
+      ..start();
+
+    _scheduler = Timer.periodic(_schedulerInterval, _schedulerLoop);
   }
 
   @override
   void stop() {
-    _timer?.cancel();
-    _timer = null;
+    _scheduler?.cancel();
+    _scheduler = null;
+
+    _clock.stop();
+
     _isRunning = false;
     _beatCounter = 0;
   }
@@ -67,16 +79,28 @@ class MetronomeImpl implements Metronome {
   @override
   Stream<Tick> tickStream() => _metronomeStreamController.stream;
 
-  int _calculateIntervalInMs() {
-    return (60000 / bpm).round();
+  void _updateBeatDuration() {
+    _beatDuration = 60.0 / _bpm;
   }
 
-  void _handleTick() {
+  void _schedulerLoop(Timer _) {
+    final elapsed = _clock.elapsedMicroseconds / 1e6;
+
+    while (_nextBeatTime < elapsed + _lookAhead) {
+      _emitTick();
+      _beatCounter++;
+      _nextBeatTime += _beatDuration;
+    }
+  }
+
+  void _emitTick() {
     final int measureIndex = _beatCounter % _beatsPerMeasure;
 
     _metronomeStreamController.add(
-      Tick(tickType: TickType.regular, measureIndex: measureIndex),
+      Tick(
+        tickType: measureIndex == 0 ? TickType.accent : TickType.regular,
+        measureIndex: measureIndex,
+      ),
     );
-    _beatCounter++;
   }
 }
