@@ -29,11 +29,11 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
       add(MetronomeTicked(tick: tick));
     });
     on<MetronomeTicked>((event, emit) {
-      final audioToBePlayed =
-          event.tick.measureIndex == 0 && state.accentOnFirstBeat
+      final tickSoundFilePath =
+          event.tick is AccentTick
               ? Assets.accentTickSoundFilePath
               : Assets.tickSoundFilePath;
-      _audioPlayer.playAudio(audioToBePlayed);
+      _audioPlayer.playAudio(tickSoundFilePath);
       emit(state.copyWith(tick: event.tick));
     });
     on<MetronomePlayed>((event, emit) {

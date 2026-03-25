@@ -4,17 +4,21 @@ import 'package:metronome/domain/metronome.dart';
 import 'package:metronome/domain/tick.dart';
 
 class MetronomeImpl implements Metronome {
-  int _bpm;
-  int _beatCounter = 0;
-  final int _beatsPerMeasure = 4;
+  late int _bpm;
+  late int _beatCounter;
+  late int _beatsPerBar;
   final StreamController<Tick> _metronomeStreamController =
       StreamController<Tick>.broadcast();
   Timer? _timer;
   bool _isRunning = false;
-  MetronomeImpl({int bpm = 60}) : _bpm = bpm;
+  MetronomeImpl({int bpm = 60, int beatsPerBar = 4}) {
+    _bpm = bpm;
+    _beatsPerBar = beatsPerBar;
+    _beatCounter = 0;
+  }
 
   @override
-  int get beatsPerMeasure => _beatsPerMeasure;
+  int get beatsPerBar => _beatsPerBar;
 
   @override
   int get bpm => _bpm;
@@ -72,11 +76,19 @@ class MetronomeImpl implements Metronome {
   }
 
   void _handleTick() {
-    final int measureIndex = _beatCounter % _beatsPerMeasure;
-
-    _metronomeStreamController.add(
-      Tick(tickType: TickType.regular, measureIndex: measureIndex),
-    );
+    final int tickIndex = _beatCounter % beatsPerBar;
+    final Tick tick;
+    if (tickIndex == 0) {
+      tick = AccentTick(barIndex: tickIndex);
+    } else {
+      tick = RegularTick(barIndex: tickIndex);
+    }
+    _metronomeStreamController.add(tick);
     _beatCounter++;
+  }
+
+  @override
+  void setBeatsPerBar(int beatsPerBar) {
+    // TODO: implement setBeatsPerBar
   }
 }
