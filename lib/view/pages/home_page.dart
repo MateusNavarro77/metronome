@@ -5,6 +5,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metronome/blocs/metronome/metronome_bloc.dart';
 import 'package:metronome/blocs/theme/theme_bloc.dart';
+import 'package:metronome/domain/metronome.dart';
+import 'package:metronome/ffi.dart';
 import 'package:metronome/view/widgets/app_package_data.dart';
 
 import 'package:metronome/view/widgets/measure_bar.dart';
@@ -19,6 +21,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late StreamSubscription<MetronomeState> sub;
+  bool _isPlaying = false;
+  int _bpm = 60;
   @override
   void initState() {
     super.initState();
@@ -121,6 +125,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           },
                         );
                       },
+                    ),
+                    Slider(
+                      min: 30,
+                      max: 700,
+                      value: _bpm.toDouble(),
+                      onChanged: (value) {
+                        setState(() {
+                          _bpm = value.toInt();
+                        });
+                      },
+                    ),
+                    Text(_bpm.toString()),
+                    TextButton(
+                      onPressed: () {
+                        if(_isPlaying){
+                          MetronomeFFI.stop();
+                        }else{
+                          MetronomeFFI.start(_bpm.toDouble());
+                        }
+                        setState(() {
+                          _isPlaying =!_isPlaying;
+                        });
+                      },
+                      child: Text(_isPlaying ? 'Pausar' : 'Tocar'),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
