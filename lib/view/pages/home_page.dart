@@ -69,12 +69,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     BlocBuilder<MetronomeBloc, MetronomeState>(
                       buildWhen:
                           (previous, current) =>
-                              previous.tick?.measureIndex !=
-                              current.tick?.measureIndex,
+                              previous.tick?.barIndex !=
+                              current.tick?.barIndex,
                       builder: (context, state) {
                         return MeasureBar(
                           notesPerMeasure: 4,
-                          currentIndex: state.tick?.measureIndex,
+                          currentIndex: state.tick?.barIndex,
                         );
                       },
                     ),
