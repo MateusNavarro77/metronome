@@ -29,9 +29,9 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
     on<MetronomeTicked>((event, emit) {
       emit(state.copyWith(tick: event.tick));
     });
-    on<MetronomePlayed>((event, emit) {
-      _metronome.start();
-      emit(state.copyWith(isRunning: _metronome.isRunning));
+    on<MetronomePlayed>((event, emit) async {
+      emit(state.copyWith(isRunning: true));
+      await _metronome.start();
     });
     on<MetronomePaused>((event, emit) {
       _metronome.stop();

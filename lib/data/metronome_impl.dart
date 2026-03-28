@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ffi';
+import 'dart:isolate';
 
 import 'package:flutter/rendering.dart';
 import 'package:metronome/domain/metronome.dart';
@@ -65,10 +66,11 @@ class MetronomeImpl implements Metronome {
   }
 
   @override
-  void start() {
+  Future<void> start() async {
     if (_isRunning) return;
-    MetronomeFFI.start(_bpm.toDouble());
     _isRunning = true;
+    final bpm = _bpm.toDouble();
+    await Isolate.run(() => MetronomeFFI.start(bpm));
   }
 
   @override

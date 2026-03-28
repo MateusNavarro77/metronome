@@ -23,6 +23,7 @@ public:
 
     Metronome(double bpm_) : bpm(bpm_) {
         samplesPerBeat = sampleRate * 60.0 / bpm;
+        sampleCounter = samplesPerBeat;
     }
 
     void setUseAccentTick(bool useAccentTick){
