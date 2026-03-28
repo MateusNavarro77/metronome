@@ -131,6 +131,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       max: 700,
                       value: _bpm.toDouble(),
                       onChanged: (value) {
+                        MetronomeFFI.setBpm(value);
                         setState(() {
                           _bpm = value.toInt();
                         });

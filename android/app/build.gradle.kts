@@ -36,19 +36,18 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags += ""
+                arguments("-DANDROID_STL=c++_shared")
             }
         }
     }
 
-    // ✅ Correct placement (INSIDE android)
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
         }
     }
 
-    // ✅ Simple buildTypes (no signing for now)
     buildTypes {
         //getByName("release") {
         //    isMinifyEnabled = false
@@ -56,9 +55,14 @@ android {
 
         //}
     }
+    buildFeatures{
+        prefab = true
+    }
 }
+dependencies {
+    implementation("com.google.oboe:oboe:1.10.0")
 
-// ✅ Flutter block must stay OUTSIDE android
+}
 flutter {
     source = "../.."
 }

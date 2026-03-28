@@ -6,12 +6,13 @@ add_library(
     metronome
     SHARED
     metronome.cpp
+    metronome.h
 )
 
-add_subdirectory(oboe)
+find_package(oboe REQUIRED CONFIG)
 
 target_link_libraries(
     metronome
-    oboe
+    oboe::oboe
     log
 )
