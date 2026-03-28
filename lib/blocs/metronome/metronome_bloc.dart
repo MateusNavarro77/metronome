@@ -5,6 +5,7 @@ import 'package:metronome/domain/audio_player.dart';
 import 'package:metronome/domain/metronome.dart';
 import 'package:metronome/domain/tick.dart';
 import 'package:metronome/shared/assets.dart';
+import 'package:metronome/shared/constants.dart';
 
 part 'metronome_event.dart';
 part 'metronome_state.dart';
@@ -19,7 +20,7 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
          MetronomeState(
            bpm: metronome.bpm,
            isRunning: metronome.isRunning,
-           accentOnFirstBeat: true,
+           accentOnFirstBeat: false,
          ),
        ) {
     _tickStreamSub = _metronome.tickStream().listen((tick) {
@@ -58,7 +59,9 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
       }
     });
     on<MetronomeAccentFirstBeatToggled>((event, emit) {
-      emit(state.copyWith(accentOnFirstBeat: !state.accentOnFirstBeat));
+      final useAccentTick = !state.accentOnFirstBeat;
+      _metronome.setUseAccentTick(useAccentTick);
+      emit(state.copyWith(accentOnFirstBeat: useAccentTick));
     });
   }
   @override
@@ -68,6 +71,6 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
   }
 
   bool _isValidBpmRange(int bpm) {
-    return 1 <= bpm && bpm <= 350;
+    return kMinBpm <= bpm && bpm <= kMaxBpm;
   }
 }

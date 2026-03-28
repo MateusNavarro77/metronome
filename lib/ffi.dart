@@ -29,6 +29,8 @@ class MetronomeFFI {
     void Function(Pointer<NativeFunction<Void Function(Int32)>>)
   >('set_tick_callback');
 
+  static final _setUseAccentTick = _lib
+      .lookupFunction<Void Function(Bool), void Function(bool)>('set_use_accent_tick');
   static void start(double bpm) => _start(bpm);
   static void stop() => _stop();
   static void setBpm(double bpm) => _setBpm(bpm);
@@ -36,4 +38,5 @@ class MetronomeFFI {
   static void setTickCallback(
       Pointer<NativeFunction<Void Function(Int32)>> callback) =>
       _setTickCallback(callback);
+  static void setUseAccentTick(bool useAccentTick) => _setUseAccentTick(useAccentTick);
 }

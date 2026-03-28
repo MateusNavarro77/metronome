@@ -9,5 +9,6 @@ abstract interface class Metronome implements Disposable {
   void start();
   void setBpm(int bpm);
   void setBeatsPerBar(int beatsPerBar);
+  void setUseAccentTick(bool useAccentTick);
   Stream<Tick> tickStream();
 }

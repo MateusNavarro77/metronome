@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:metronome/domain/metronome.dart';
 import 'package:metronome/domain/tick.dart';
 import 'package:metronome/ffi.dart';
+import 'package:metronome/shared/constants.dart';
 
 class MetronomeImpl implements Metronome {
   late int _bpm;
@@ -16,7 +17,7 @@ class MetronomeImpl implements Metronome {
 
   late final NativeCallable<Void Function(Int32)> _tickCallable;
 
-  MetronomeImpl({int bpm = 60, int beatsPerBar = 4}) {
+  MetronomeImpl({int bpm = kDefaultBpm, int beatsPerBar = kDefaultBeatsPerBar}) {
     _bpm = bpm;
     _beatsPerBar = beatsPerBar;
 
@@ -84,4 +85,11 @@ class MetronomeImpl implements Metronome {
     _beatsPerBar = beatsPerBar;
     MetronomeFFI.setBeatsPerBar(beatsPerBar);
   }
+  
+  @override
+  void setUseAccentTick(bool useAccentTick) {
+    MetronomeFFI.setUseAccentTick(useAccentTick);
+  }
+  
+ 
 }

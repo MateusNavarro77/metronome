@@ -9,9 +9,12 @@ public:
     double bpm = 120.0;
     double sampleRate = 48000.0;
     int beatsPerBar = 4;
-
+    bool useAccentTick = false;
+    const float accentTickFrequency = 1500.0;
+    const float regularTickFrequency = 1000.0;
     double samplesPerBeat;
     double sampleCounter = 0;
+
 
     int clickRemaining = 0;
     double frequency = 1000.0;
@@ -22,6 +25,9 @@ public:
         samplesPerBeat = sampleRate * 60.0 / bpm;
     }
 
+    void setUseAccentTick(bool useAccentTick){
+        this->useAccentTick = useAccentTick;
+    }
     void setBpm(double newBpm) {
         bpm = newBpm;
         samplesPerBeat = sampleRate * 60.0 / bpm;
@@ -30,6 +36,7 @@ public:
     void setBeatsPerBar(int newBeatsPerBar) {
         beatsPerBar = newBeatsPerBar;
     }
+
 
     DataCallbackResult onAudioReady(AudioStream *stream,
                                     void *audioData,
@@ -44,7 +51,7 @@ public:
 
                 clickRemaining = 200;
 
-                frequency = (beat % beatsPerBar == 0) ? 1500.0 : 1000.0;
+                frequency = calculateTickFrequency(beat);
                 
                 if (tickCallback) {
                     tickCallback(beat % beatsPerBar);
@@ -73,6 +80,12 @@ public:
 
         return DataCallbackResult::Continue;
     }
+    private:double calculateTickFrequency(int currentBeat){
+        if (useAccentTick && (currentBeat % beatsPerBar == 0)) {
+            return accentTickFrequency;
+        }
+        return regularTickFrequency;
+    }
 };
 
 // Global instance
@@ -86,7 +99,6 @@ void start_metronome(double bpm) {
     if (gStream) return;
 
     gMetronome = new Metronome(bpm);
-
     AudioStreamBuilder builder;
     builder.setDirection(Direction::Output);
     builder.setPerformanceMode(PerformanceMode::LowLatency);
@@ -128,6 +140,11 @@ void set_beats_per_bar(int beatsPerBar) {
     }
 }
 
+void set_use_accent_tick(bool useAccentTick){
+    if(gMetronome){
+        gMetronome->setUseAccentTick(useAccentTick);
+    }
+}
 void set_tick_callback(TickCallback callback) {
     gTickCallback = callback;
     if (gMetronome) {
