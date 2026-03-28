@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:metronome/domain/audio_player.dart';
 import 'package:metronome/domain/metronome.dart';
 import 'package:metronome/domain/tick.dart';
-import 'package:metronome/shared/assets.dart';
 import 'package:metronome/shared/constants.dart';
 
 part 'metronome_event.dart';
