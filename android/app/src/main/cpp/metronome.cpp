@@ -8,6 +8,7 @@ class Metronome : public AudioStreamCallback {
 public:
     double bpm = 120.0;
     double sampleRate = 48000.0;
+    int beatsPerBar = 4;
 
     double samplesPerBeat;
     double sampleCounter = 0;
@@ -15,6 +16,7 @@ public:
     int clickRemaining = 0;
     double frequency = 1000.0;
     int beat = 0;
+    TickCallback tickCallback = nullptr; 
 
     Metronome(double bpm_) : bpm(bpm_) {
         samplesPerBeat = sampleRate * 60.0 / bpm;
@@ -23,6 +25,10 @@ public:
     void setBpm(double newBpm) {
         bpm = newBpm;
         samplesPerBeat = sampleRate * 60.0 / bpm;
+    }
+
+    void setBeatsPerBar(int newBeatsPerBar) {
+        beatsPerBar = newBeatsPerBar;
     }
 
     DataCallbackResult onAudioReady(AudioStream *stream,
@@ -38,7 +44,12 @@ public:
 
                 clickRemaining = 200;
 
-                frequency = (beat % 4 == 0) ? 1500.0 : 1000.0;
+                frequency = (beat % beatsPerBar == 0) ? 1500.0 : 1000.0;
+                
+                if (tickCallback) {
+                    tickCallback(beat % beatsPerBar);
+                }
+
                 beat++;
             }
 
@@ -67,6 +78,7 @@ public:
 // Global instance
 static Metronome *gMetronome = nullptr;
 static AudioStream *gStream = nullptr;
+static TickCallback gTickCallback = nullptr;
 
 extern "C" {
 
@@ -87,6 +99,7 @@ void start_metronome(double bpm) {
 
     gMetronome->sampleRate = gStream->getSampleRate();
     gMetronome->setBpm(bpm);
+    gMetronome->tickCallback = gTickCallback;
 
     gStream->requestStart();
 }
@@ -106,6 +119,19 @@ void stop_metronome() {
 void set_bpm(double bpm) {
     if (gMetronome) {
         gMetronome->setBpm(bpm);
+    }
+}
+
+void set_beats_per_bar(int beatsPerBar) {
+    if (gMetronome) {
+        gMetronome->setBeatsPerBar(beatsPerBar);
+    }
+}
+
+void set_tick_callback(TickCallback callback) {
+    gTickCallback = callback;
+    if (gMetronome) {
+        gMetronome->tickCallback = callback;
     }
 }
 
