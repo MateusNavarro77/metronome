@@ -21,8 +21,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late StreamSubscription<MetronomeState> sub;
-  bool _isPlaying = false;
-  int _bpm = 60;
+
   @override
   void initState() {
     super.initState();
@@ -78,7 +77,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         );
                       },
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -126,31 +125,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         );
                       },
                     ),
-                    Slider(
-                      min: 30,
-                      max: 700,
-                      value: _bpm.toDouble(),
-                      onChanged: (value) {
-                        MetronomeFFI.setBpm(value);
-                        setState(() {
-                          _bpm = value.toInt();
-                        });
-                      },
-                    ),
-                    Text(_bpm.toString()),
-                    TextButton(
-                      onPressed: () {
-                        if(_isPlaying){
-                          MetronomeFFI.stop();
-                        }else{
-                          MetronomeFFI.start(_bpm.toDouble());
-                        }
-                        setState(() {
-                          _isPlaying =!_isPlaying;
-                        });
-                      },
-                      child: Text(_isPlaying ? 'Pausar' : 'Tocar'),
-                    ),
+                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [

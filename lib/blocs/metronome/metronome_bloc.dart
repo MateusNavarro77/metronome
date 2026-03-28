@@ -10,15 +10,11 @@ part 'metronome_event.dart';
 part 'metronome_state.dart';
 
 class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
-  int _someCounter = 0;
   final Metronome _metronome;
-  final AudioPlayer _audioPlayer;
   late StreamSubscription<Tick> _tickStreamSub;
   MetronomeBloc({
     required Metronome metronome,
-    required AudioPlayer audioPlayer,
-  }) : _audioPlayer = audioPlayer,
-       _metronome = metronome,
+  }) : _metronome = metronome,
        super(
          MetronomeState(
            bpm: metronome.bpm,
@@ -30,11 +26,6 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
       add(MetronomeTicked(tick: tick));
     });
     on<MetronomeTicked>((event, emit) {
-      //final tickSoundFilePath =
-      //    event.tick is AccentTick
-      //        ? Assets.accentTickSoundFilePath
-      //        : Assets.tickSoundFilePath;
-      //_audioPlayer.playAudio(tickSoundFilePath);
       emit(state.copyWith(tick: event.tick));
     });
     on<MetronomePlayed>((event, emit) {

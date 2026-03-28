@@ -24,16 +24,13 @@ void main() async {
         BlocProvider<ThemeBloc>(create: (context) => ThemeBloc()),
         BlocProvider<MetronomeBloc>(
           create: (context) {
-            final audioPlayer = AudioPlayerImpl();
-            audioPlayer.initialize();
             return MetronomeBloc(
               metronome: MetronomeImpl(),
-              audioPlayer: audioPlayer,
             );
           },
         ),
       ],
-      child: AppWidget(),
+      child: const AppWidget(),
     ),
   );
 }
