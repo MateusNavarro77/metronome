@@ -5,6 +5,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metronome/blocs/metronome/metronome_bloc.dart';
 import 'package:metronome/blocs/theme/theme_bloc.dart';
+import 'package:metronome/domain/metronome.dart';
+import 'package:metronome/ffi.dart';
+import 'package:metronome/shared/constants.dart';
 import 'package:metronome/view/widgets/app_package_data.dart';
 
 import 'package:metronome/view/widgets/measure_bar.dart';
@@ -19,6 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late StreamSubscription<MetronomeState> sub;
+
   @override
   void initState() {
     super.initState();
@@ -65,16 +69,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     BlocBuilder<MetronomeBloc, MetronomeState>(
                       buildWhen:
                           (previous, current) =>
-                              previous.tick?.measureIndex !=
-                              current.tick?.measureIndex,
+                              previous.tick?.barIndex != current.tick?.barIndex,
                       builder: (context, state) {
                         return MeasureBar(
                           notesPerMeasure: 4,
-                          currentIndex: state.tick?.measureIndex,
+                          currentIndex: state.tick?.barIndex,
                         );
                       },
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -104,16 +107,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ),
                       ],
                     ),
-                    Text('BPM'),
-                    SizedBox(height: 20),
+                    const Text('BPM'),
+                    const SizedBox(height: 20),
                     BlocBuilder<MetronomeBloc, MetronomeState>(
                       buildWhen:
                           (previous, current) => previous.bpm != current.bpm,
                       builder: (context, state) {
                         return Slider(
                           value: state.bpm.toDouble(),
-                          min: 1,
-                          max: 350,
+                          min: kMinBpm.toDouble(),
+                          max: kMaxBpm.toDouble(),
                           onChanged: (value) {
                             context.read<MetronomeBloc>().add(
                               MetronomeBpmChanged(bpm: value.round()),
@@ -122,6 +125,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         );
                       },
                     ),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [

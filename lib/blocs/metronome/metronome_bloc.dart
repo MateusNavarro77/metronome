@@ -1,44 +1,35 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:metronome/domain/audio_player.dart';
 import 'package:metronome/domain/metronome.dart';
 import 'package:metronome/domain/tick.dart';
-import 'package:metronome/shared/assets.dart';
+import 'package:metronome/shared/constants.dart';
 
 part 'metronome_event.dart';
 part 'metronome_state.dart';
 
 class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
   final Metronome _metronome;
-  final AudioPlayer _audioPlayer;
   late StreamSubscription<Tick> _tickStreamSub;
   MetronomeBloc({
     required Metronome metronome,
-    required AudioPlayer audioPlayer,
-  }) : _audioPlayer = audioPlayer,
-       _metronome = metronome,
+  }) : _metronome = metronome,
        super(
          MetronomeState(
            bpm: metronome.bpm,
            isRunning: metronome.isRunning,
-           accentOnFirstBeat: true,
+           accentOnFirstBeat: false,
          ),
        ) {
     _tickStreamSub = _metronome.tickStream().listen((tick) {
       add(MetronomeTicked(tick: tick));
     });
     on<MetronomeTicked>((event, emit) {
-      final audioToBePlayed =
-          event.tick.measureIndex == 0 && state.accentOnFirstBeat
-              ? Assets.accentTickSoundFilePath
-              : Assets.tickSoundFilePath;
-      _audioPlayer.playAudio(audioToBePlayed);
       emit(state.copyWith(tick: event.tick));
     });
-    on<MetronomePlayed>((event, emit) {
-      _metronome.start();
-      emit(state.copyWith(isRunning: _metronome.isRunning));
+    on<MetronomePlayed>((event, emit) async {
+      emit(state.copyWith(isRunning: true));
+      await _metronome.start();
     });
     on<MetronomePaused>((event, emit) {
       _metronome.stop();
@@ -66,7 +57,9 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
       }
     });
     on<MetronomeAccentFirstBeatToggled>((event, emit) {
-      emit(state.copyWith(accentOnFirstBeat: !state.accentOnFirstBeat));
+      final useAccentTick = !state.accentOnFirstBeat;
+      _metronome.setUseAccentTick(useAccentTick);
+      emit(state.copyWith(accentOnFirstBeat: useAccentTick));
     });
   }
   @override
@@ -76,6 +69,6 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
   }
 
   bool _isValidBpmRange(int bpm) {
-    return 1 <= bpm && bpm <= 350;
+    return kMinBpm <= bpm && bpm <= kMaxBpm;
   }
 }

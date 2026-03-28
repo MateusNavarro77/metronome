@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:metronome/blocs/metronome/metronome_bloc.dart';
 import 'package:metronome/blocs/theme/theme_bloc.dart';
-import 'package:metronome/data/audio_player_impl.dart';
 import 'package:metronome/data/metronome_impl.dart';
 import 'package:metronome/view/app_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// ignore: depend_on_referenced_packages
+
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -24,16 +23,13 @@ void main() async {
         BlocProvider<ThemeBloc>(create: (context) => ThemeBloc()),
         BlocProvider<MetronomeBloc>(
           create: (context) {
-            final audioPlayer = AudioPlayerImpl();
-            audioPlayer.initialize();
             return MetronomeBloc(
               metronome: MetronomeImpl(),
-              audioPlayer: audioPlayer,
             );
           },
         ),
       ],
-      child: AppWidget(),
+      child: const AppWidget(),
     ),
   );
 }

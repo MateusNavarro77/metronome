@@ -1,20 +1,50 @@
 import 'dart:async';
+import 'dart:ffi';
+import 'dart:isolate';
 
+import 'package:flutter/rendering.dart';
 import 'package:metronome/domain/metronome.dart';
 import 'package:metronome/domain/tick.dart';
+import 'package:metronome/ffi.dart';
+import 'package:metronome/shared/constants.dart';
 
 class MetronomeImpl implements Metronome {
-  int _bpm;
-  int _beatCounter = 0;
-  final int _beatsPerMeasure = 4;
+  late int _bpm;
+  late int _beatsPerBar;
+  bool _isRunning = false;
+
   final StreamController<Tick> _metronomeStreamController =
       StreamController<Tick>.broadcast();
-  Timer? _timer;
-  bool _isRunning = false;
-  MetronomeImpl({int bpm = 60}) : _bpm = bpm;
+
+  late final NativeCallable<Void Function(Int32)> _tickCallable;
+
+  MetronomeImpl({int bpm = kDefaultBpm, int beatsPerBar = kDefaultBeatsPerBar}) {
+    _bpm = bpm;
+    _beatsPerBar = beatsPerBar;
+
+    // Create a native callable that can be called from the C++ audio thread
+    _tickCallable = NativeCallable<Void Function(Int32)>.listener(_onNativeTick);
+    
+    // Register the callback with the native side
+    MetronomeFFI.setTickCallback(_tickCallable.nativeFunction);
+  }
+
+  void _onNativeTick(int beatIndex) {
+    // This is called from the UI isolate, but triggered by the native side
+    final Tick tick;
+    // The native index is beat % 4, but we should use _beatsPerBar if we want flexibility.
+    // However, the current C++ code is hardcoded to 4 beats.
+    debugPrint('tick $beatIndex');
+    if (beatIndex == 0) {
+      tick = AccentTick(barIndex: beatIndex);
+    } else {
+      tick = RegularTick(barIndex: beatIndex);
+    }
+    _metronomeStreamController.add(tick);
+  }
 
   @override
-  int get beatsPerMeasure => _beatsPerMeasure;
+  int get beatsPerBar => _beatsPerBar;
 
   @override
   int get bpm => _bpm;
@@ -24,59 +54,44 @@ class MetronomeImpl implements Metronome {
 
   @override
   Future<void> dispose() async {
-    if (_timer != null) {
-      stop();
-    }
-    _metronomeStreamController.close();
+    stop();
+    _tickCallable.close();
+    await _metronomeStreamController.close();
   }
 
   @override
   void setBpm(int bpm) {
     _bpm = bpm;
-    if (_isRunning) {
-      final intervalInMs = _calculateIntervalInMs();
-      _timer?.cancel();
-      _timer = null;
-      _timer = Timer.periodic(
-        Duration(milliseconds: intervalInMs),
-        (_) => _handleTick(),
-      );
-    }
+    MetronomeFFI.setBpm(bpm.toDouble());
   }
 
   @override
-  void start() {
+  Future<void> start() async {
     if (_isRunning) return;
-    final intervalInMs = _calculateIntervalInMs();
-    _handleTick();
-    _timer = Timer.periodic(
-      Duration(milliseconds: intervalInMs),
-      (_) => _handleTick(),
-    );
     _isRunning = true;
+    final bpm = _bpm.toDouble();
+    await Isolate.run(() => MetronomeFFI.start(bpm));
   }
 
   @override
   void stop() {
-    _timer?.cancel();
-    _timer = null;
+    MetronomeFFI.stop();
     _isRunning = false;
-    _beatCounter = 0;
   }
 
   @override
   Stream<Tick> tickStream() => _metronomeStreamController.stream;
 
-  int _calculateIntervalInMs() {
-    return (60000 / bpm).round();
+  @override
+  void setBeatsPerBar(int beatsPerBar) {
+    _beatsPerBar = beatsPerBar;
+    MetronomeFFI.setBeatsPerBar(beatsPerBar);
   }
-
-  void _handleTick() {
-    final int measureIndex = _beatCounter % _beatsPerMeasure;
-
-    _metronomeStreamController.add(
-      Tick(tickType: TickType.regular, measureIndex: measureIndex),
-    );
-    _beatCounter++;
+  
+  @override
+  void setUseAccentTick(bool useAccentTick) {
+    MetronomeFFI.setUseAccentTick(useAccentTick);
   }
+  
+ 
 }
