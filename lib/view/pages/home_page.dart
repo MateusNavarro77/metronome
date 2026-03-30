@@ -5,8 +5,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metronome/blocs/metronome/metronome_bloc.dart';
 import 'package:metronome/blocs/theme/theme_bloc.dart';
-import 'package:metronome/domain/metronome.dart';
-import 'package:metronome/ffi.dart';
 import 'package:metronome/shared/constants.dart';
 import 'package:metronome/view/widgets/app_package_data.dart';
 
@@ -153,22 +151,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               (previous, current) =>
                                   previous.isRunning != current.isRunning,
                           builder: (context, state) {
-                            return FloatingActionButton(
-                              onPressed: () {
-                                if (state.isRunning) {
-                                  context.read<MetronomeBloc>().add(
-                                    MetronomePaused(),
-                                  );
-                                  return;
-                                }
-                                context.read<MetronomeBloc>().add(
-                                  MetronomePlayed(),
-                                );
-                              },
-                              child:
-                                  state.isRunning
-                                      ? Icon(Icons.pause)
-                                      : Icon(Icons.play_arrow),
+                            return SizedBox(
+                              width: 80,
+                              height: 80,
+                              child: FittedBox(
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    if (state.isRunning) {
+                                      context.read<MetronomeBloc>().add(
+                                        MetronomePaused(),
+                                      );
+                                      return;
+                                    }
+                                    context.read<MetronomeBloc>().add(
+                                      MetronomePlayed(),
+                                    );
+                                  },
+                                  child:
+                                      state.isRunning
+                                          ? Icon(Icons.pause)
+                                          : Icon(Icons.play_arrow),
+                                ),
+                              ),
                             );
                           },
                         ),
