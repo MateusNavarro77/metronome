@@ -23,9 +23,7 @@ void main() async {
         BlocProvider<ThemeBloc>(create: (context) => ThemeBloc()),
         BlocProvider<MetronomeBloc>(
           create: (context) {
-            return MetronomeBloc(
-              metronome: MetronomeImpl(),
-            );
+            return MetronomeBloc(metronome: MetronomeImpl());
           },
         ),
       ],
