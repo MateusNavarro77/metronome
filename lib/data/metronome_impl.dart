@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:ffi';
-import 'dart:isolate';
 
 import 'package:flutter/rendering.dart';
 import 'package:metronome/domain/metronome.dart';
@@ -18,13 +17,20 @@ class MetronomeImpl implements Metronome {
 
   late final NativeCallable<Void Function(Int32)> _tickCallable;
 
-  MetronomeImpl({int bpm = kDefaultBpm, int beatsPerBar = kDefaultBeatsPerBar}) {
+  MetronomeImpl({
+    int bpm = kDefaultBpm,
+    int beatsPerBar = kDefaultBeatsPerBar,
+  }) {
     _bpm = bpm;
     _beatsPerBar = beatsPerBar;
 
     // Create a native callable that can be called from the C++ audio thread
-    _tickCallable = NativeCallable<Void Function(Int32)>.listener(_onNativeTick);
-    
+    _tickCallable = NativeCallable<Void Function(Int32)>.listener(
+      _onNativeTick,
+    );
+
+    MetronomeFFI.init(bpm.toDouble());
+
     // Register the callback with the native side
     MetronomeFFI.setTickCallback(_tickCallable.nativeFunction);
   }
@@ -57,6 +63,7 @@ class MetronomeImpl implements Metronome {
     stop();
     _tickCallable.close();
     await _metronomeStreamController.close();
+    MetronomeFFI.shutdown();
   }
 
   @override
@@ -69,13 +76,12 @@ class MetronomeImpl implements Metronome {
   Future<void> start() async {
     if (_isRunning) return;
     _isRunning = true;
-    final bpm = _bpm.toDouble();
-    await Isolate.run(() => MetronomeFFI.start(bpm));
+    MetronomeFFI.play();
   }
 
   @override
   void stop() {
-    MetronomeFFI.stop();
+    MetronomeFFI.pause();
     _isRunning = false;
   }
 
@@ -87,11 +93,9 @@ class MetronomeImpl implements Metronome {
     _beatsPerBar = beatsPerBar;
     MetronomeFFI.setBeatsPerBar(beatsPerBar);
   }
-  
+
   @override
   void setUseAccentTick(bool useAccentTick) {
     MetronomeFFI.setUseAccentTick(useAccentTick);
   }
-  
- 
 }

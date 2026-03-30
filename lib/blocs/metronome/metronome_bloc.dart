@@ -11,16 +11,15 @@ part 'metronome_state.dart';
 class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
   final Metronome _metronome;
   late StreamSubscription<Tick> _tickStreamSub;
-  MetronomeBloc({
-    required Metronome metronome,
-  }) : _metronome = metronome,
-       super(
-         MetronomeState(
-           bpm: metronome.bpm,
-           isRunning: metronome.isRunning,
-           accentOnFirstBeat: false,
-         ),
-       ) {
+  MetronomeBloc({required Metronome metronome})
+    : _metronome = metronome,
+      super(
+        MetronomeState(
+          bpm: metronome.bpm,
+          isRunning: metronome.isRunning,
+          accentOnFirstBeat: false,
+        ),
+      ) {
     _tickStreamSub = _metronome.tickStream().listen((tick) {
       add(MetronomeTicked(tick: tick));
     });
