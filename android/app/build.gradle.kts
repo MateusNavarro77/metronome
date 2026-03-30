@@ -18,6 +18,19 @@ android {
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 
+    flavorDimensions += "default"
+    productFlavors {
+        create("dev") {
+            dimension = "default"
+            applicationIdSuffix = ".dev"
+            resValue("string", "app_name", "Metronome Dev")
+        }
+        create("prod") {
+            dimension = "default"
+            resValue("string", "app_name", "Metronome")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -83,12 +96,13 @@ android {
         val appName = "metronome"
         val versionName = variant.versionName
         val buildType = variant.buildType.name
+        val flavorName = variant.flavorName
 
         variant.outputs.forEach { output ->
             if (output is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
                 val abi = output.getFilter(com.android.build.OutputFile.ABI)
                 val abiSuffix = if (abi != null) "_${abi}" else ""
-                output.outputFileName = "${appName}_v${versionName}_${buildType}${abiSuffix}.apk"
+                output.outputFileName = "${appName}_${flavorName}_v${versionName}_${buildType}${abiSuffix}.apk"
             }
         }
     }
@@ -98,21 +112,34 @@ android {
 tasks.whenTaskAdded {
     if (name.startsWith("bundle")) {
         doLast {
+            val taskName = name.lowercase()
             val buildType = when {
-                name.contains("Release") -> "release"
-                name.contains("Debug") -> "debug"
-                name.contains("Profile") -> "profile"
+                taskName.contains("release") -> "release"
+                taskName.contains("debug") -> "debug"
+                taskName.contains("profile") -> "profile"
                 else -> "unknown"
+            }
+            val flavorName = when {
+                taskName.contains("dev") -> "dev"
+                taskName.contains("prod") -> "prod"
+                else -> ""
             }
             val appName = "metronome"
             val versionName = flutter.versionName
 
             // Find and rename the AAB file
-            val bundleDir = project.layout.buildDirectory.dir("outputs/bundle/${buildType}").get().asFile
+            val flavorBuildType = if (flavorName.isNotEmpty()) {
+                "${flavorName}${buildType.replaceFirstChar { it.uppercase() }}"
+            } else {
+                buildType
+            }
+
+            val bundleDir = project.layout.buildDirectory.dir("outputs/bundle/${flavorBuildType}").get().asFile
             if (bundleDir.exists()) {
                 bundleDir.listFiles()?.forEach { file ->
                     if (file.name.endsWith(".aab")) {
-                        val newPath = "${appName}_v${versionName}_${buildType}.aab"
+                        val flavorSuffix = if (flavorName.isNotEmpty()) "_${flavorName}" else ""
+                        val newPath = "${appName}${flavorSuffix}_v${versionName}_${buildType}.aab"
                         val newFile = File(bundleDir, newPath)
                         file.renameTo(newFile)
                     }

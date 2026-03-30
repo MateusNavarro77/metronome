@@ -22,19 +22,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late StreamSubscription<MetronomeState> sub;
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      sub = context.read<MetronomeBloc>().stream.listen((event) {
-        if (event.isRunning) {
-          WakelockPlus.enable();
-        } else {
-          WakelockPlus.disable();
-        }
-      });
+      sub = context
+          .read<MetronomeBloc>()
+          .stream
+          .distinct((previous, next) => previous.isRunning == next.isRunning)
+          .listen((event) {
+            debugPrint('isRunning: ${event.isRunning}');
+            if (event.isRunning) {
+              WakelockPlus.enable();
+            } else {
+              WakelockPlus.disable();
+            }
+          });
     });
   }
 
@@ -145,6 +149,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           },
                         ),
                         BlocBuilder<MetronomeBloc, MetronomeState>(
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.isRunning != current.isRunning,
                           builder: (context, state) {
                             return FloatingActionButton(
                               onPressed: () {
