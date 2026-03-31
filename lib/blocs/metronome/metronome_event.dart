@@ -27,3 +27,9 @@ class MetronomeBpmDecremented extends MetronomeEvent {
 }
 
 class MetronomeAccentFirstBeatToggled extends MetronomeEvent {}
+
+class MetronomeBeatsPerBarChanged extends MetronomeEvent {
+  final int beatsPerBar;
+
+  MetronomeBeatsPerBarChanged({required this.beatsPerBar});
+}

@@ -18,6 +18,7 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
           bpm: metronome.bpm,
           isRunning: metronome.isRunning,
           accentOnFirstBeat: false,
+          beatsPerBar: metronome.beatsPerBar,
         ),
       ) {
     _tickStreamSub = _metronome.tickStream().listen((tick) {
@@ -59,6 +60,10 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
       final useAccentTick = !state.accentOnFirstBeat;
       _metronome.setUseAccentTick(useAccentTick);
       emit(state.copyWith(accentOnFirstBeat: useAccentTick));
+    });
+    on<MetronomeBeatsPerBarChanged>((event, emit) {
+      _metronome.setBeatsPerBar(event.beatsPerBar);
+      emit(state.copyWith(beatsPerBar: event.beatsPerBar));
     });
   }
   @override

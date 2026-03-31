@@ -71,10 +71,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     BlocBuilder<MetronomeBloc, MetronomeState>(
                       buildWhen:
                           (previous, current) =>
-                              previous.tick?.barIndex != current.tick?.barIndex,
+                              previous.tick?.barIndex != current.tick?.barIndex ||
+                              previous.beatsPerBar != current.beatsPerBar,
                       builder: (context, state) {
                         return MeasureBar(
-                          notesPerMeasure: 4,
+                          notesPerMeasure: state.beatsPerBar,
                           currentIndex: state.tick?.barIndex,
                         );
                       },
@@ -127,6 +128,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         );
                       },
                     ),
+                    const SizedBox(height: 20),
+                    const Text('Time Signature'),
+                    BlocBuilder<MetronomeBloc, MetronomeState>(
+                      buildWhen: (previous, current) => previous.beatsPerBar != current.beatsPerBar,
+                      builder: (context, state) {
+                        return SizedBox(
+                          width: 100,
+
+                          child: DropdownButton<int>(
+                            isExpanded: true,
+                            value: state.beatsPerBar,
+                            items: const [
+                              DropdownMenuItem(value: 2, child: Text('2/4')),
+                              DropdownMenuItem(value: 3, child: Text('3/4')),
+                              DropdownMenuItem(value: 4, child: Text('4/4')),
+                              DropdownMenuItem(value: 5, child: Text('5/4')),
+                              DropdownMenuItem(value: 6, child: Text('6/8')),
+                              DropdownMenuItem(value: 7, child: Text('7/8')),
+                              DropdownMenuItem(value: 9, child: Text('9/8')),
+                              DropdownMenuItem(value: 12, child: Text('12/8')),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                context.read<MetronomeBloc>().add(
+                                  MetronomeBeatsPerBarChanged(beatsPerBar: value),
+                                );
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
