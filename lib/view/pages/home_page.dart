@@ -62,9 +62,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.large(
+        child: Icon(Icons.touch_app,color: colorScheme.onSurface,),
+        backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
+        onPressed: () {
+          
+      },),
       body: SafeArea(
+
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Stack(
             children: [
               Center(
@@ -355,18 +362,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ]
                 : null,
       ),
-      child: SizedBox(
-        width: 80,
-        height: 80,
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: onPressed,
-            child:
-                isPlaying
-                    ? const Icon(Icons.pause, size: 28)
-                    : const Icon(Icons.play_arrow, size: 28),
-          ),
-        ),
+      child: FloatingActionButton.large(
+        onPressed: onPressed,
+        child:
+            isPlaying
+                ? const Icon(Icons.pause, size: 64)
+                : const Icon(Icons.play_arrow, size: 64),
       ),
     );
   }
