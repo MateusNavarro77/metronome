@@ -104,8 +104,9 @@ abstract class AppTheme {
       // ── Icon Buttons ──
       iconButtonTheme: IconButtonThemeData(
         style: ButtonStyle(
-          backgroundColor:
-              WidgetStatePropertyAll(colorScheme.surfaceContainerHigh),
+          backgroundColor: WidgetStatePropertyAll(
+            colorScheme.surfaceContainerHigh,
+          ),
           foregroundColor: WidgetStatePropertyAll(colorScheme.onSurface),
           shape: const WidgetStatePropertyAll(CircleBorder()),
           padding: const WidgetStatePropertyAll(EdgeInsets.all(12)),
@@ -142,9 +143,10 @@ abstract class AppTheme {
 
       // ── Bottom Sheet (Glassmorphism) ──
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: isDark
-            ? colorScheme.surfaceContainerHigh.withValues(alpha: 0.85)
-            : colorScheme.surfaceContainerLow.withValues(alpha: 0.92),
+        backgroundColor:
+            isDark
+                ? colorScheme.surfaceContainerHigh.withValues(alpha: 0.85)
+                : colorScheme.surfaceContainerLow.withValues(alpha: 0.92),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -156,9 +158,7 @@ abstract class AppTheme {
       cardTheme: CardThemeData(
         color: colorScheme.surfaceContainerHigh,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
       // ── Tooltip ──
@@ -167,10 +167,7 @@ abstract class AppTheme {
           color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
         ),
-        textStyle: TextStyle(
-          color: colorScheme.onSurface,
-          fontSize: 12,
-        ),
+        textStyle: TextStyle(color: colorScheme.onSurface, fontSize: 12),
       ),
     );
   }

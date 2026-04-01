@@ -34,19 +34,21 @@ class MeasureBar extends StatelessWidget {
             height: isActive ? _dotSize + 2 : _dotSize,
             width: isActive ? _dotSize + 2 : _dotSize,
             decoration: BoxDecoration(
-              color: isActive
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+              color:
+                  isActive
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
               shape: BoxShape.circle,
-              boxShadow: isActive
-                  ? [
-                      BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.6),
-                        blurRadius: 14,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : null,
+              boxShadow:
+                  isActive
+                      ? [
+                        BoxShadow(
+                          color: colorScheme.primary.withValues(alpha: 0.6),
+                          blurRadius: 14,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                      : null,
             ),
           ),
         );

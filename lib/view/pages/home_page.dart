@@ -73,9 +73,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   children: [
                     // ── Measure Bar ──
                     BlocBuilder<MetronomeBloc, MetronomeState>(
-                      buildWhen: (previous, current) =>
-                          previous.tick?.barIndex != current.tick?.barIndex ||
-                          previous.beatsPerBar != current.beatsPerBar,
+                      buildWhen:
+                          (previous, current) =>
+                              previous.tick?.barIndex !=
+                                  current.tick?.barIndex ||
+                              previous.beatsPerBar != current.beatsPerBar,
                       builder: (context, state) {
                         return MeasureBar(
                           notesPerMeasure: state.beatsPerBar,
@@ -116,8 +118,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                     icon: Icons.remove,
                                     onPressed: () {
                                       context.read<MetronomeBloc>().add(
-                                            MetronomeBpmDecremented(),
-                                          );
+                                        MetronomeBpmDecremented(),
+                                      );
                                     },
                                   ),
 
@@ -133,17 +135,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                     icon: Icons.add,
                                     onPressed: () {
                                       context.read<MetronomeBloc>().add(
-                                            MetronomeBpmIncremented(),
-                                          );
+                                        MetronomeBpmIncremented(),
+                                      );
                                     },
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                'BPM',
-                                style: textTheme.labelMedium,
-                              ),
+                              Text('BPM', style: textTheme.labelMedium),
                             ],
                           ),
                         );
@@ -154,8 +153,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
                     // ── Slider ──
                     BlocBuilder<MetronomeBloc, MetronomeState>(
-                      buildWhen: (previous, current) =>
-                          previous.bpm != current.bpm,
+                      buildWhen:
+                          (previous, current) => previous.bpm != current.bpm,
                       builder: (context, state) {
                         return Slider(
                           value: state.bpm.toDouble(),
@@ -163,8 +162,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           max: kMaxBpm.toDouble(),
                           onChanged: (value) {
                             context.read<MetronomeBloc>().add(
-                                  MetronomeBpmChanged(bpm: value.round()),
-                                );
+                              MetronomeBpmChanged(bpm: value.round()),
+                            );
                           },
                         );
                       },
@@ -177,10 +176,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     //   'TIME SIGNATURE',
                     //   style: textTheme.labelMedium,
                     // ),
-                     const SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     BlocBuilder<MetronomeBloc, MetronomeState>(
-                      buildWhen: (previous, current) =>
-                          previous.beatsPerBar != current.beatsPerBar,
+                      buildWhen:
+                          (previous, current) =>
+                              previous.beatsPerBar != current.beatsPerBar,
                       builder: (context, state) {
                         return GestureDetector(
                           onTap: () async {
@@ -190,9 +190,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             );
                             if (result != null && context.mounted) {
                               context.read<MetronomeBloc>().add(
-                                    MetronomeBeatsPerBarChanged(
-                                        beatsPerBar: result),
-                                  );
+                                MetronomeBeatsPerBarChanged(
+                                  beatsPerBar: result,
+                                ),
+                              );
                             }
                           },
                           child: Container(
@@ -235,10 +236,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           builder: (context, state) {
                             return _buildControlButton(
                               context,
-                              icon: state is ThemeDark
-                                  ? Icons.light_mode_outlined
-                                  : Icons.dark_mode_outlined,
-                              onPressed: () => context.read<ThemeBloc>().add(
+                              icon:
+                                  state is ThemeDark
+                                      ? Icons.light_mode_outlined
+                                      : Icons.dark_mode_outlined,
+                              onPressed:
+                                  () => context.read<ThemeBloc>().add(
                                     ThemeToggled(),
                                   ),
                             );
@@ -247,22 +250,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
                         // Play / Pause ("Pulse Button")
                         BlocBuilder<MetronomeBloc, MetronomeState>(
-                          buildWhen: (previous, current) =>
-                              previous.isRunning != current.isRunning,
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.isRunning != current.isRunning,
                           builder: (context, state) {
                             return _buildPulseButton(
                               context,
                               isPlaying: state.isRunning,
                               onPressed: () {
                                 if (state.isRunning) {
-                                  context
-                                      .read<MetronomeBloc>()
-                                      .add(MetronomePaused());
+                                  context.read<MetronomeBloc>().add(
+                                    MetronomePaused(),
+                                  );
                                   return;
                                 }
-                                context
-                                    .read<MetronomeBloc>()
-                                    .add(MetronomePlayed());
+                                context.read<MetronomeBloc>().add(
+                                  MetronomePlayed(),
+                                );
                               },
                             );
                           },
@@ -270,9 +274,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
                         // Accent toggle
                         BlocBuilder<MetronomeBloc, MetronomeState>(
-                          buildWhen: (previous, current) =>
-                              previous.accentOnFirstBeat !=
-                              current.accentOnFirstBeat,
+                          buildWhen:
+                              (previous, current) =>
+                                  previous.accentOnFirstBeat !=
+                                  current.accentOnFirstBeat,
                           builder: (context, state) {
                             return Column(
                               mainAxisSize: MainAxisSize.min,
@@ -281,15 +286,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   value: state.accentOnFirstBeat,
                                   onChanged: (value) {
                                     context.read<MetronomeBloc>().add(
-                                          MetronomeAccentFirstBeatToggled(),
-                                        );
+                                      MetronomeAccentFirstBeatToggled(),
+                                    );
                                   },
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  'ACCENT',
-                                  style: textTheme.labelSmall,
-                                ),
+                                Text('ACCENT', style: textTheme.labelSmall),
                               ],
                             );
                           },
@@ -326,10 +328,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: Icon(icon),
-    );
+    return IconButton(onPressed: onPressed, icon: Icon(icon));
   }
 
   /// The primary CTA — neon green with glow when active.
@@ -345,15 +344,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       curve: Curves.easeOut,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        boxShadow: isPlaying
-            ? [
-                BoxShadow(
-                  color: colorScheme.primary.withValues(alpha: 0.45),
-                  blurRadius: 24,
-                  spreadRadius: 4,
-                ),
-              ]
-            : null,
+        boxShadow:
+            isPlaying
+                ? [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.45),
+                    blurRadius: 24,
+                    spreadRadius: 4,
+                  ),
+                ]
+                : null,
       ),
       child: SizedBox(
         width: 80,
@@ -361,9 +361,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         child: FittedBox(
           child: FloatingActionButton(
             onPressed: onPressed,
-            child: isPlaying
-                ? const Icon(Icons.pause, size: 28)
-                : const Icon(Icons.play_arrow, size: 28),
+            child:
+                isPlaying
+                    ? const Icon(Icons.pause, size: 28)
+                    : const Icon(Icons.play_arrow, size: 28),
           ),
         ),
       ),

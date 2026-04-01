@@ -32,8 +32,8 @@ class _AppPackageDataState extends State<AppPackageData> {
     return Text(
       'v$appVersion+$buildNumber',
       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     );
   }
 }

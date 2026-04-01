@@ -36,10 +36,11 @@ class TimeSignaturePicker extends StatelessWidget {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => TimeSignaturePicker(
-        currentBeatsPerBar: currentBeatsPerBar,
-        onSelected: (value) => Navigator.of(context).pop(value),
-      ),
+      builder:
+          (context) => TimeSignaturePicker(
+            currentBeatsPerBar: currentBeatsPerBar,
+            onSelected: (value) => Navigator.of(context).pop(value),
+          ),
     );
   }
 
@@ -54,8 +55,7 @@ class TimeSignaturePicker extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHigh.withValues(alpha: 0.85),
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: SafeArea(
             top: false,
@@ -69,7 +69,9 @@ class TimeSignaturePicker extends StatelessWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.4,
+                      ),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -87,11 +89,12 @@ class TimeSignaturePicker extends StatelessWidget {
                     spacing: 10,
                     runSpacing: 10,
                     alignment: WrapAlignment.center,
-                    children: _options.map((option) {
-                      final isSelected =
-                          option.beatsPerBar == currentBeatsPerBar;
-                      return _buildChip(context, option, isSelected);
-                    }).toList(),
+                    children:
+                        _options.map((option) {
+                          final isSelected =
+                              option.beatsPerBar == currentBeatsPerBar;
+                          return _buildChip(context, option, isSelected);
+                        }).toList(),
                   ),
                   const SizedBox(height: 12),
                 ],
@@ -118,38 +121,40 @@ class TimeSignaturePicker extends StatelessWidget {
         width: 72,
         height: 56,
         decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary.withValues(alpha: 0.15)
-              : colorScheme.surfaceContainerHighest,
+          color:
+              isSelected
+                  ? colorScheme.primary.withValues(alpha: 0.15)
+                  : colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(
-                  color: colorScheme.primary.withValues(alpha: 0.6),
-                  width: 1.5,
-                )
-              : Border.all(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  width: 1,
-                ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: 0.2),
-                    blurRadius: 12,
-                    spreadRadius: 0,
+          border:
+              isSelected
+                  ? Border.all(
+                    color: colorScheme.primary.withValues(alpha: 0.6),
+                    width: 1.5,
+                  )
+                  : Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    width: 1,
                   ),
-                ]
-              : null,
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: colorScheme.primary.withValues(alpha: 0.2),
+                      blurRadius: 12,
+                      spreadRadius: 0,
+                    ),
+                  ]
+                  : null,
         ),
         alignment: Alignment.center,
         child: Text(
           option.label,
           style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                color: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              ),
+            color:
+                isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          ),
         ),
       ),
     );
@@ -160,8 +165,5 @@ class _TimeSignatureOption {
   final int beatsPerBar;
   final String label;
 
-  const _TimeSignatureOption({
-    required this.beatsPerBar,
-    required this.label,
-  });
+  const _TimeSignatureOption({required this.beatsPerBar, required this.label});
 }
