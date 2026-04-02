@@ -113,47 +113,54 @@ class TimeSignaturePicker extends StatelessWidget {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return GestureDetector(
-      onTap: () => onSelected(option.beatsPerBar),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        width: 72,
-        height: 56,
-        decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? colorScheme.primary.withValues(alpha: 0.15)
-                  : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border:
-              isSelected
-                  ? Border.all(
-                    color: colorScheme.primary.withValues(alpha: 0.6),
-                    width: 1.5,
-                  )
-                  : Border.all(
-                    color: Colors.white.withValues(alpha: 0.08),
-                    width: 1,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      width: 72,
+      height: 56,
+      decoration: BoxDecoration(
+        color:
+            isSelected
+                ? colorScheme.primary.withValues(alpha: 0.15)
+                : colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+        border:
+            isSelected
+                ? Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.6),
+                  width: 1.5,
+                )
+                : Border.all(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  width: 1,
+                ),
+        boxShadow:
+            isSelected
+                ? [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.2),
+                    blurRadius: 12,
+                    spreadRadius: 0,
                   ),
-          boxShadow:
-              isSelected
-                  ? [
-                    BoxShadow(
-                      color: colorScheme.primary.withValues(alpha: 0.2),
-                      blurRadius: 12,
-                      spreadRadius: 0,
-                    ),
-                  ]
-                  : null,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          option.label,
-          style: Theme.of(context).textTheme.titleSmall!.copyWith(
-            color:
-                isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ]
+                : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => onSelected(option.beatsPerBar),
+          borderRadius: BorderRadius.circular(12),
+          child: Center(
+            child: Text(
+              option.label,
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                color:
+                    isSelected
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
           ),
         ),
       ),

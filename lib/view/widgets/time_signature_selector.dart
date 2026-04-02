@@ -27,8 +27,8 @@ class TimeSignatureSelector extends StatelessWidget {
               );
               if (result != null && context.mounted) {
                 context.read<MetronomeBloc>().add(
-                      MetronomeBeatsPerBarChanged(beatsPerBar: result),
-                    );
+                  MetronomeBeatsPerBarChanged(beatsPerBar: result),
+                );
               }
             },
             child: Padding(
