@@ -15,38 +15,39 @@ class TimeSignatureSelector extends StatelessWidget {
       buildWhen:
           (previous, current) => previous.beatsPerBar != current.beatsPerBar,
       builder: (context, state) {
-        return GestureDetector(
-          onTap: () async {
-            final result = await TimeSignaturePicker.show(
-              context,
-              state.beatsPerBar,
-            );
-            if (result != null && context.mounted) {
-              context.read<MetronomeBloc>().add(
-                MetronomeBeatsPerBarChanged(beatsPerBar: result),
+        return Material(
+          color: colorScheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(12),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () async {
+              final result = await TimeSignaturePicker.show(
+                context,
+                state.beatsPerBar,
               );
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _beatsPerBarToLabel(state.beatsPerBar),
-                  style: textTheme.titleSmall,
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.unfold_more,
-                  color: colorScheme.onSurfaceVariant,
-                  size: 20,
-                ),
-              ],
+              if (result != null && context.mounted) {
+                context.read<MetronomeBloc>().add(
+                      MetronomeBeatsPerBarChanged(beatsPerBar: result),
+                    );
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _beatsPerBarToLabel(state.beatsPerBar),
+                    style: textTheme.titleSmall,
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.unfold_more,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 20,
+                  ),
+                ],
+              ),
             ),
           ),
         );
