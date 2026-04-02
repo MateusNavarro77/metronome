@@ -11,6 +11,8 @@ part 'metronome_state.dart';
 class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
   final Metronome _metronome;
   late StreamSubscription<Tick> _tickStreamSub;
+  final List<DateTime> _tapTimes = [];
+
   MetronomeBloc({required Metronome metronome})
     : _metronome = metronome,
       super(
@@ -30,6 +32,32 @@ class MetronomeBloc extends Bloc<MetronomeEvent, MetronomeState> {
     on<MetronomePlayed>((event, emit) async {
       emit(state.copyWith(isRunning: true));
       await _metronome.start();
+    });
+    on<MetronomeTapped>((event, emit) {
+      final now = DateTime.now();
+      if (_tapTimes.isNotEmpty &&
+          now.difference(_tapTimes.last).inSeconds >= 2) {
+        _tapTimes.clear();
+      }
+      _tapTimes.add(now);
+
+      if (_tapTimes.length > 5) {
+        _tapTimes.removeAt(0);
+      }
+
+      if (_tapTimes.length == 5) {
+        final totalDuration =
+            _tapTimes.last.difference(_tapTimes.first).inMilliseconds;
+        final averageIntervalMs = totalDuration / 4;
+        final calculatedBpm = (60000 / averageIntervalMs).round();
+
+        final clampedBpm = calculatedBpm.clamp(kMinBpm, kMaxBpm);
+
+        if (_isValidBpmRange(clampedBpm)) {
+          _metronome.setBpm(clampedBpm);
+          emit(state.copyWith(bpm: clampedBpm));
+        }
+      }
     });
     on<MetronomePaused>((event, emit) {
       _metronome.stop();

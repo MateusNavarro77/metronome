@@ -33,3 +33,5 @@ class MetronomeBeatsPerBarChanged extends MetronomeEvent {
 
   MetronomeBeatsPerBarChanged({required this.beatsPerBar});
 }
+
+class MetronomeTapped extends MetronomeEvent {}

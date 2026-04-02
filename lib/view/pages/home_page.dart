@@ -62,10 +62,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.large(
+      floatingActionButton: FloatingActionButton(
         child: Icon(Icons.touch_app, color: colorScheme.onSurface),
         backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
-        onPressed: () {},
+        onPressed: () {
+          context.read<MetronomeBloc>().add(MetronomeTapped());
+        },
       ),
       body: SafeArea(
         child: Padding(
