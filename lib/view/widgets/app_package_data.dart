@@ -31,9 +31,9 @@ class _AppPackageDataState extends State<AppPackageData> {
     if (appVersion == null || buildNumber == null) return SizedBox.shrink();
     return Text(
       'v$appVersion+$buildNumber',
-      style: Theme.of(
-        context,
-      ).textTheme.labelSmall?.copyWith(color: Theme.of(context).hintColor),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     );
   }
 }

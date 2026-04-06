@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metronome/blocs/theme/theme_bloc.dart';
-import 'package:metronome/shared/theme_colors.dart';
+import 'package:metronome/shared/app_theme.dart';
 import 'package:metronome/view/pages/home_page.dart';
 
 class AppWidget extends StatelessWidget {
@@ -14,8 +14,8 @@ class AppWidget extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Metronome',
           themeMode: state is ThemeDark ? ThemeMode.dark : ThemeMode.light,
-          darkTheme: ThemeData.from(colorScheme: ThemeColors.darkColorScheme),
-          theme: ThemeData.from(colorScheme: ThemeColors.lightColorScheme),
+          darkTheme: AppTheme.darkTheme,
+          theme: AppTheme.lightTheme,
           home: const HomePage(),
         );
       },
