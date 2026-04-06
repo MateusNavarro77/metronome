@@ -10,6 +10,7 @@ import 'package:metronome/view/widgets/bpm_slider.dart';
 import 'package:metronome/view/widgets/measure_bar.dart';
 import 'package:metronome/view/widgets/metronome_controls.dart';
 import 'package:metronome/view/widgets/time_signature_selector.dart';
+import 'package:metronome/view/widgets/tap_bpm_fab.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class HomePage extends StatefulWidget {
@@ -59,16 +60,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.touch_app, color: colorScheme.onSurface),
-        backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
-        onPressed: () {
-          context.read<MetronomeBloc>().add(MetronomeTapped());
-        },
-      ),
+      floatingActionButton: const TapBpmFab(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
