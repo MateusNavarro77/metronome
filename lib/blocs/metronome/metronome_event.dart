@@ -1,6 +1,8 @@
 part of 'metronome_bloc.dart';
 
-sealed class MetronomeEvent {}
+sealed class MetronomeEvent {
+  const MetronomeEvent();
+}
 
 class MetronomePaused extends MetronomeEvent {}
 

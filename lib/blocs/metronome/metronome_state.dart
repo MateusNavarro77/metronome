@@ -7,7 +7,7 @@ final class MetronomeState {
   final bool accentOnFirstBeat;
   final int beatsPerBar;
 
-  MetronomeState({
+  const MetronomeState({
     required this.bpm,
     this.tick,
     required this.isRunning,
