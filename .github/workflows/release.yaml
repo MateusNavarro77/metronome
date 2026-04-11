@@ -1,4 +1,4 @@
-name: Flutter Release
+name: Build and upload to Play Store
 
 on:
   release:
