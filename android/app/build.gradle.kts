@@ -15,8 +15,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.mateusnavarro77.metronome"
-    compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    compileSdk = 37
+    ndkVersion = "28.2.13676358"
 
     flavorDimensions += "default"
     productFlavors {
@@ -43,7 +43,7 @@ android {
     defaultConfig {
         applicationId = "com.mateusnavarro77.metronome"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 37
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
@@ -55,12 +55,12 @@ android {
     }
 
     signingConfigs {
-        getByName("debug") {
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String?
-        }
+//        getByName("debug") {
+//            keyAlias = keystoreProperties["keyAlias"] as String?
+//            keyPassword = keystoreProperties["keyPassword"] as String?
+//            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+//            storePassword = keystoreProperties["storePassword"] as String?
+//        }
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String?
             keyPassword = keystoreProperties["keyPassword"] as String?
