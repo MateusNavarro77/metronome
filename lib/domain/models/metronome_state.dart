@@ -9,6 +9,7 @@ class const MetronomeState({
   this.bpm = Bpm.initial,
   this.timeSignature = TimeSignature.fourFour,
   this.subdivision = Subdivision.none,
+  this.isAccentEnabled = true,
   this.isPlaying = false,
   this.currentBeat = 0,
   this.currentSubdivision = 0,
@@ -17,6 +18,7 @@ class const MetronomeState({
   final Bpm bpm;
   final TimeSignature timeSignature;
   final Subdivision subdivision;
+  final bool isAccentEnabled;
   final bool isPlaying;
 
   /// 0-based index of the current beat in the bar (`0 .. timeSignature.numerator - 1`).
@@ -35,6 +37,7 @@ class const MetronomeState({
     Bpm? bpm,
     TimeSignature? timeSignature,
     Subdivision? subdivision,
+    bool? isAccentEnabled,
     bool? isPlaying,
     int? currentBeat,
     int? currentSubdivision,
@@ -45,6 +48,7 @@ class const MetronomeState({
       bpm: bpm ?? this.bpm,
       timeSignature: timeSignature ?? this.timeSignature,
       subdivision: subdivision ?? this.subdivision,
+      isAccentEnabled: isAccentEnabled ?? this.isAccentEnabled,
       isPlaying: isPlaying ?? this.isPlaying,
       currentBeat: currentBeat ?? this.currentBeat,
       currentSubdivision: currentSubdivision ?? this.currentSubdivision,
@@ -61,6 +65,7 @@ class const MetronomeState({
           other.bpm == bpm &&
           other.timeSignature == timeSignature &&
           other.subdivision == subdivision &&
+          other.isAccentEnabled == isAccentEnabled &&
           other.isPlaying == isPlaying &&
           other.currentBeat == currentBeat &&
           other.currentSubdivision == currentSubdivision &&
@@ -71,6 +76,7 @@ class const MetronomeState({
     bpm,
     timeSignature,
     subdivision,
+    isAccentEnabled,
     isPlaying,
     currentBeat,
     currentSubdivision,

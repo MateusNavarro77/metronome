@@ -68,6 +68,13 @@ class MetronomeRepository {
     );
   }
 
+  /// Updates whether the accented beat is enabled.
+  void setAccentEnabled(bool enabled) {
+    if (_state.isAccentEnabled == enabled) return;
+    _engine.updateConfiguration(isAccentEnabled: enabled);
+    _updateState(_state.copyWith(isAccentEnabled: enabled));
+  }
+
   /// Starts playback from Beat 1 (FR-PLY-02).
   Future<void> start() async {
     if (_state.isPlaying) return;
@@ -78,6 +85,7 @@ class MetronomeRepository {
       bpm: _state.bpm,
       timeSignature: _state.timeSignature,
       subdivision: _state.subdivision,
+      isAccentEnabled: _state.isAccentEnabled,
     );
   }
 

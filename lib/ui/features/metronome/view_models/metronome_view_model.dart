@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../../data/repositories/metronome_repository.dart';
+import '../../../../data/repositories/preferences_repository.dart';
 import '../../../../domain/models/bpm.dart';
 import '../../../../domain/models/metronome_state.dart';
 import '../../../../domain/models/subdivision.dart';
@@ -17,18 +18,26 @@ import '../../../../domain/use_cases/tap_tempo_calculator.dart';
 class MetronomeViewModel extends ChangeNotifier {
   MetronomeViewModel({
     required MetronomeRepository repository,
+    PreferencesRepository? preferencesRepository,
     TapTempoCalculator? tapTempoCalculator,
     Duration Function()? clock,
   }) : _repository = repository,
+       _preferencesRepository = preferencesRepository,
        _tapTempoCalculator = tapTempoCalculator ?? TapTempoCalculator(),
        _clock = clock {
     _monotonicWatch.start();
+    final persistedAccent = _preferencesRepository?.getAccentEnabled();
+    if (persistedAccent != null &&
+        persistedAccent != _repository.state.isAccentEnabled) {
+      _repository.setAccentEnabled(persistedAccent);
+    }
     _stateSubscription = _repository.stateChanges.listen((_) {
       notifyListeners();
     });
   }
 
   final MetronomeRepository _repository;
+  final PreferencesRepository? _preferencesRepository;
   final TapTempoCalculator _tapTempoCalculator;
   final Duration Function()? _clock;
   final Stopwatch _monotonicWatch = Stopwatch();
@@ -54,6 +63,9 @@ class MetronomeViewModel extends ChangeNotifier {
 
   /// Whether the metronome is currently playing.
   bool get isPlaying => state.isPlaying;
+
+  /// Whether the accented beat on Beat 1 is enabled.
+  bool get isAccentEnabled => state.isAccentEnabled;
 
   /// Active 0-based beat index within the bar (`0 .. timeSignature.numerator - 1`).
   int get currentBeat => state.currentBeat;
@@ -123,6 +135,18 @@ class MetronomeViewModel extends ChangeNotifier {
   /// Selects a [Subdivision] (FR-SUB-01).
   void selectSubdivision(Subdivision subdivision) {
     _repository.setSubdivision(subdivision);
+  }
+
+  /// Sets whether the accented beat is enabled.
+  void setAccentEnabled(bool enabled) {
+    if (isAccentEnabled == enabled) return;
+    _repository.setAccentEnabled(enabled);
+    _preferencesRepository?.setAccentEnabled(enabled);
+  }
+
+  /// Toggles the accented beat on/off.
+  void toggleAccent() {
+    setAccentEnabled(!isAccentEnabled);
   }
 
   /// Toggles play/stop (FR-PLY-01).

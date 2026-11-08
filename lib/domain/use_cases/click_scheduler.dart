@@ -20,14 +20,19 @@ class ClickScheduler {
   }
 
   /// Resolves the [BeatAccent] for a given [beatIndex] and [subdivisionIndex]
-  /// in [timeSignature].
+  /// in [timeSignature]. When [isAccentEnabled] is false, all main beats receive
+  /// [BeatAccent.weak], while subdivisions retain [BeatAccent.subdivision].
   BeatAccent resolveAccent({
     required TimeSignature timeSignature,
     required int beatIndex,
     required int subdivisionIndex,
+    bool isAccentEnabled = true,
   }) {
     if (subdivisionIndex > 0) {
       return BeatAccent.subdivision;
+    }
+    if (!isAccentEnabled) {
+      return BeatAccent.weak;
     }
     return timeSignature.accentForBeat(beatIndex);
   }
@@ -39,6 +44,7 @@ class ClickScheduler {
     required TimeSignature timeSignature,
     required Subdivision subdivision,
     Duration barStartTimestamp = Duration.zero,
+    bool isAccentEnabled = true,
   }) {
     final events = <BeatEvent>[];
     final step = pulseInterval(bpm: bpm, subdivision: subdivision);
@@ -54,6 +60,7 @@ class ClickScheduler {
               timeSignature: timeSignature,
               beatIndex: beat,
               subdivisionIndex: sub,
+              isAccentEnabled: isAccentEnabled,
             ),
             timestamp: elapsed,
           ),

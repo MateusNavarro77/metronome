@@ -33,6 +33,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
   bool _isInitialized = false;
   bool _audioAvailable = false;
   bool _isPlaying = false;
+  bool _isAccentEnabled = true;
 
   Bpm _bpm = Bpm.initial;
   TimeSignature _timeSignature = TimeSignature.fourFour;
@@ -78,6 +79,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     required Bpm bpm,
     required TimeSignature timeSignature,
     required Subdivision subdivision,
+    bool isAccentEnabled = true,
   }) async {
     if (!_isInitialized) {
       await initialize();
@@ -87,6 +89,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     _bpm = bpm;
     _timeSignature = timeSignature;
     _subdivision = subdivision;
+    _isAccentEnabled = isAccentEnabled;
     _currentBeat = 0;
     _currentSubdivision = 0;
     _isPlaying = true;
@@ -115,6 +118,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     Bpm? bpm,
     TimeSignature? timeSignature,
     Subdivision? subdivision,
+    bool? isAccentEnabled,
   }) {
     if (bpm != null) {
       _bpm = bpm;
@@ -132,6 +136,9 @@ class SoloudMetronomeEngine implements MetronomeEngine {
         _currentSubdivision = 0;
       }
     }
+    if (isAccentEnabled != null) {
+      _isAccentEnabled = isAccentEnabled;
+    }
   }
 
   void _emitCurrentPulseAndScheduleNext() {
@@ -141,6 +148,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
       timeSignature: _timeSignature,
       beatIndex: _currentBeat,
       subdivisionIndex: _currentSubdivision,
+      isAccentEnabled: _isAccentEnabled,
     );
 
     _triggerSound(accent);

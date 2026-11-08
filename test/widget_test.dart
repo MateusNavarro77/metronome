@@ -29,6 +29,16 @@ void main() {
       await tester.pump();
       expect(find.text('121'), findsOneWidget);
 
+      // Verify Accent toggle is present and toggles between ON and OFF
+      expect(find.byKey(const Key('accent_toggle_button')), findsOneWidget);
+      expect(find.text('ACCENT ON'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('accent_toggle_button')));
+      await tester.pump();
+      expect(find.text('ACCENT OFF'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('accent_toggle_button')));
+      await tester.pump();
+      expect(find.text('ACCENT ON'), findsOneWidget);
+
       // Tap '-' button twice to decrement BPM to 119 -> MODERATO (FR-AND-02)
       await tester.tap(find.byKey(const Key('bpm_decrement_button')));
       await tester.tap(find.byKey(const Key('bpm_decrement_button')));
