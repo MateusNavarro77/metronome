@@ -140,9 +140,12 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
           return Scaffold(
             backgroundColor: context.colors.surfaceLowest,
             body: SafeArea(
+              bottom: false,
+              top: false,
               child: Row(
                 children: [
                   NavigationRail(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     key: const Key('adaptive_navigation_rail'),
                     selectedIndex: _currentIndex,
                     onDestinationSelected: _onDestinationSelected,
@@ -173,6 +176,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                         ),
                     destinations: destinations.map((item) {
                       return NavigationRailDestination(
+                        
                         icon: Icon(item.icon, key: item.railKey),
                         selectedIcon: Icon(item.selectedIcon),
                         label: Text(item.label),
