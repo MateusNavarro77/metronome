@@ -45,9 +45,7 @@ class BpmControlSection extends StatelessWidget {
         gradient: RadialGradient(
           radius: 0.85,
           colors: [
-            isDownbeatActive
-                ? const Color(0x2800FF41)
-                : SonicColors.radialGlow,
+            isDownbeatActive ? const Color(0x2800FF41) : SonicColors.radialGlow,
             SonicColors.surfaceLow,
           ],
         ),
@@ -73,7 +71,9 @@ class BpmControlSection extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: isCompact ? SonicDimens.spaceXs : SonicDimens.spaceSm),
+          SizedBox(
+            height: isCompact ? SonicDimens.spaceXs : SonicDimens.spaceSm,
+          ),
           // Hero BPM value flanked by - and + buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,10 +102,7 @@ class BpmControlSection extends StatelessWidget {
                             : SonicTheme.displayLg,
                       ),
                     ),
-                    Text(
-                      'BPM',
-                      style: SonicTheme.labelMd,
-                    ),
+                    Text('BPM', style: SonicTheme.labelMd),
                   ],
                 ),
               ),
@@ -133,7 +130,9 @@ class BpmControlSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: SonicDimens.spaceSm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: SonicDimens.spaceSm,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

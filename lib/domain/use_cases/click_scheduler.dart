@@ -12,10 +12,7 @@ class ClickScheduler {
 
   /// Duration between consecutive pulses (including subdivisions) for [bpm]
   /// and [subdivision].
-  Duration pulseInterval({
-    required Bpm bpm,
-    required Subdivision subdivision,
-  }) {
+  Duration pulseInterval({required Bpm bpm, required Subdivision subdivision}) {
     final microsPerPulse =
         Duration.microsecondsPerMinute /
         (bpm.value * subdivision.pulsesPerBeat);

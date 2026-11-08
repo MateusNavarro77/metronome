@@ -15,9 +15,7 @@ void main() {
     (WidgetTester tester) async {
       final simulatedEngine = SimulatedMetronomeEngine();
 
-      await tester.pumpWidget(
-        MetronomeApp(engineOverride: simulatedEngine),
-      );
+      await tester.pumpWidget(MetronomeApp(engineOverride: simulatedEngine));
 
       // Verify initial state (UI-01, UI-08): 120 BPM, ALLEGRO, 4/4, STOPPED
       expect(find.byKey(const Key('bpm_value_text')), findsOneWidget);

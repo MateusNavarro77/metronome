@@ -183,10 +183,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     if (_audioAvailable) {
       final source = _preloadedSounds[accent];
       if (source != null) {
-        SoLoud.instance.play(
-          source,
-          volume: accent.defaultRelativeVolume,
-        );
+        SoLoud.instance.play(source, volume: accent.defaultRelativeVolume);
         return;
       }
     }

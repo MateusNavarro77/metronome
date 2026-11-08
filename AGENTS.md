@@ -1,6 +1,6 @@
 # AGENTS.md — Metronome Project Rules & Architecture Blueprint
 
-This document defines the strict architectural, coding, design, and testing rules for the **Metronome** application (`specs/prd_metronomo.md` and `DESIGN.md`). All human developers and AI agents must follow these guidelines.
+This document defines the strict architectural, coding, design, and testing rules for the **Metronome** application (`specs/prd_metronomo.md` and `specs/DESIGN.md`). All human developers and AI agents must follow these guidelines.
 
 ---
 
@@ -40,27 +40,10 @@ lib/
 
 ---
 
-## 2. Design System Rules ("The Sonic Architect" — `DESIGN.md`)
+## 2. Design System Rules
 
-All UI components must adhere strictly to `DESIGN.md`:
 
-- **Core Palette**:
-  - Canvas / Base Layer (`surfaceLowest`): `#0E0E0E`
-  - Section Layer (`surfaceLow`): `#131313`
-  - Interaction Layer (`surfaceHigh`): `#2A2A2A`
-  - Inactive Chips / Highest (`surfaceHighest`): `#363636`
-  - Primary Neon Accent (`primaryNeon`): `#00FF41`
-  - Primary Container (`primaryContainer`): `#003907`
-  - On-Surface Primary (`onSurfacePrimary`): `#FFFFFF`
-  - On-Surface Muted (`onSurfaceMuted`): `#888888`
-- **The "No-Line" Rule**:
-  - **1px solid borders and divider lines are strictly prohibited** for sectioning. Define boundaries through tonal background shifts (`#0E0E0E` -> `#131313` -> `#2A2A2A`). Ghost borders (`rgba(255, 255, 255, 0.08)`) are allowed only when surfaces share identical tones and accessibility requires separation.
-- **Typography**:
-  - Use **Comfortaa** (`google_fonts`) across all hierarchy levels (`display-lg` for hero BPM, `headline-md` for time signature, `body-md` for tempo markings, all-caps `label-md` with `0.12em` letter-spacing for labels).
-- **Geometry & Touch Targets**:
-  - Pill and heavily rounded geometry (`BorderRadius.circular(9999)` for primary buttons/chips, `24px–32px` for cards).
-  - Minimum touch targets: `48x48 dp` (`72x72 dp` minimum for the primary Play/Stop pulse button).
-  - Text/control contrast must meet WCAG AA (4.5:1) and include `Semantics` labels for accessibility (UI-02, UI-04, UI-13, UI-14).
+see ./specs/DESIGN.md
 
 ---
 
@@ -94,6 +77,8 @@ All UI components must adhere strictly to `DESIGN.md`:
 ## 4. Tooling, Static Analysis & Testing Rules
 
 - **FVM / Flutter SDK**: The project pins Flutter `3.47.8` (`.fvmrc`) with Dart `^3.13.7`.
+- **Code Formatting**:
+  - Remember to run the formatter with FVM (`fvm dart format .`) or via MCP every time the code changes.
 - **Static Analysis (`dart-run-static-analysis` skill, NFR-MAN-04)**:
   - Zero warnings, zero errors, zero lints before completing any task.
   - Enforce `strict-casts: true`, `strict-inference: true`, and `strict-raw-types: true` in `analysis_options.yaml`.

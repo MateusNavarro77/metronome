@@ -24,7 +24,9 @@ class MeterAndSubdivisionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardPadding = isCompact ? SonicDimens.spaceSm + 2 : SonicDimens.spaceMd;
+    final cardPadding = isCompact
+        ? SonicDimens.spaceSm + 2
+        : SonicDimens.spaceMd;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -62,7 +64,9 @@ class MeterAndSubdivisionSection extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: isCompact ? SonicDimens.spaceXs + 2 : SonicDimens.spaceSm),
+        SizedBox(
+          height: isCompact ? SonicDimens.spaceXs + 2 : SonicDimens.spaceSm,
+        ),
         // Subdivision selector plate
         Container(
           padding: EdgeInsets.all(cardPadding),
@@ -96,7 +100,8 @@ class MeterAndSubdivisionSection extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: _SelectionPill(
                         pillKey: Key('subdivision_${subdivision.name}'),
-                        label: '${subdivision.symbol} ${subdivision.shortLabel}',
+                        label:
+                            '${subdivision.symbol} ${subdivision.shortLabel}',
                         semanticLabel:
                             'Subdivision ${subdivision.label} (${subdivision.pulsesPerBeat} per beat)',
                         isSelected: isSelected,
