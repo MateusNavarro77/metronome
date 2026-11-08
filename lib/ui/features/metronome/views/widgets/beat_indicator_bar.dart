@@ -17,6 +17,7 @@ class BeatIndicatorBar extends StatelessWidget {
     required this.isPlaying,
     required this.currentBeat,
     required this.currentSubdivision,
+    this.isAccentEnabled = true,
     this.isCompact = false,
   });
 
@@ -25,6 +26,7 @@ class BeatIndicatorBar extends StatelessWidget {
   final bool isPlaying;
   final int currentBeat;
   final int currentSubdivision;
+  final bool isAccentEnabled;
   final bool isCompact;
 
   @override
@@ -51,7 +53,9 @@ class BeatIndicatorBar extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(beatCount, (index) {
-                final accent = timeSignature.accentForBeat(index);
+                final accent = isAccentEnabled
+                    ? timeSignature.accentForBeat(index)
+                    : BeatAccent.weak;
                 final isActive = isPlaying && currentBeat == index;
                 final isDownbeat = accent == BeatAccent.strong;
                 final isMedium = accent == BeatAccent.medium;

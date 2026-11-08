@@ -19,6 +19,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
 
   bool _isInitialized = false;
   bool _isPlaying = false;
+  bool _isAccentEnabled = true;
   Bpm _bpm = Bpm.initial;
   TimeSignature _timeSignature = TimeSignature.fourFour;
   Subdivision _subdivision = Subdivision.none;
@@ -33,6 +34,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
   Bpm get bpm => _bpm;
   TimeSignature get timeSignature => _timeSignature;
   Subdivision get subdivision => _subdivision;
+  bool get isAccentEnabled => _isAccentEnabled;
   bool get isInitialized => _isInitialized;
 
   @override
@@ -51,11 +53,13 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     required Bpm bpm,
     required TimeSignature timeSignature,
     required Subdivision subdivision,
+    bool isAccentEnabled = true,
   }) async {
     _isInitialized = true;
     _bpm = bpm;
     _timeSignature = timeSignature;
     _subdivision = subdivision;
+    _isAccentEnabled = isAccentEnabled;
     _currentBeat = 0;
     _currentSubdivision = 0;
     _elapsed = Duration.zero;
@@ -78,6 +82,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     Bpm? bpm,
     TimeSignature? timeSignature,
     Subdivision? subdivision,
+    bool? isAccentEnabled,
   }) {
     if (bpm != null) _bpm = bpm;
     if (timeSignature != null) {
@@ -91,6 +96,9 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
       if (_currentSubdivision >= _subdivision.pulsesPerBeat) {
         _currentSubdivision = 0;
       }
+    }
+    if (isAccentEnabled != null) {
+      _isAccentEnabled = isAccentEnabled;
     }
   }
 
@@ -115,6 +123,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
       timeSignature: _timeSignature,
       beatIndex: _currentBeat,
       subdivisionIndex: _currentSubdivision,
+      isAccentEnabled: _isAccentEnabled,
     );
 
     final event = BeatEvent(

@@ -14,8 +14,10 @@ class PreferencesRepository {
 
   final SharedPreferences? _preferences;
   AppThemeMode _inMemoryThemeMode = AppThemeMode.system;
+  bool _inMemoryAccentEnabled = true;
 
   static const String _keyThemeMode = 'app_theme_mode';
+  static const String _keyAccentEnabled = 'accent_enabled';
 
   /// Loads the persisted [AppThemeMode], defaulting to [AppThemeMode.system].
   AppThemeMode getThemeMode() {
@@ -53,5 +55,20 @@ class PreferencesRepository {
         break;
     }
     await prefs.setString(_keyThemeMode, value);
+  }
+
+  /// Loads whether the accented beat is enabled, defaulting to true.
+  bool getAccentEnabled() {
+    final prefs = _preferences;
+    if (prefs == null) return _inMemoryAccentEnabled;
+    return prefs.getBool(_keyAccentEnabled) ?? true;
+  }
+
+  /// Persists whether the accented beat is enabled.
+  Future<void> setAccentEnabled(bool enabled) async {
+    _inMemoryAccentEnabled = enabled;
+    final prefs = _preferences;
+    if (prefs == null) return;
+    await prefs.setBool(_keyAccentEnabled, enabled);
   }
 }

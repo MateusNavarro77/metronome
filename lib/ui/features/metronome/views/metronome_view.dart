@@ -31,6 +31,7 @@ class MetronomeView extends StatelessWidget {
           builder: (context, _) {
             final isDownbeatActive =
                 viewModel.isPlaying &&
+                viewModel.isAccentEnabled &&
                 viewModel.currentBeat == 0 &&
                 viewModel.currentSubdivision == 0;
 
@@ -83,6 +84,7 @@ class MetronomeView extends StatelessWidget {
                                     timeSignature: viewModel.timeSignature,
                                     subdivision: viewModel.subdivision,
                                     isPlaying: viewModel.isPlaying,
+                                    isAccentEnabled: viewModel.isAccentEnabled,
                                     currentBeat: viewModel.currentBeat,
                                     currentSubdivision:
                                         viewModel.currentSubdivision,
@@ -115,11 +117,13 @@ class MetronomeView extends StatelessWidget {
                                     selectedTimeSignature:
                                         viewModel.timeSignature,
                                     selectedSubdivision: viewModel.subdivision,
+                                    isAccentEnabled: viewModel.isAccentEnabled,
                                     isCompact: isCompactHeight,
                                     onTimeSignatureSelected:
                                         viewModel.selectTimeSignature,
                                     onSubdivisionSelected:
                                         viewModel.selectSubdivision,
+                                    onToggleAccent: viewModel.toggleAccent,
                                   ),
                                   SizedBox(height: gap),
                                   TransportControlsBar(

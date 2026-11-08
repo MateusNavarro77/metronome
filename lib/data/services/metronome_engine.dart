@@ -25,6 +25,7 @@ abstract interface class MetronomeEngine {
     required Bpm bpm,
     required TimeSignature timeSignature,
     required Subdivision subdivision,
+    bool isAccentEnabled = true,
   });
 
   /// Stops playback immediately with no residual sounds and resets to Beat 1 (FR-PLY-04).
@@ -35,6 +36,7 @@ abstract interface class MetronomeEngine {
     Bpm? bpm,
     TimeSignature? timeSignature,
     Subdivision? subdivision,
+    bool? isAccentEnabled,
   });
 
   /// Releases audio and stream resources.

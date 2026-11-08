@@ -41,6 +41,39 @@ void main() {
       check(repo.getThemeMode()).equals(AppThemeMode.system);
       await repo.setThemeMode(AppThemeMode.light);
       check(repo.getThemeMode()).equals(AppThemeMode.light);
+
+      check(repo.getAccentEnabled()).isTrue();
+      await repo.setAccentEnabled(false);
+      check(repo.getAccentEnabled()).isFalse();
     });
+
+    test('defaults to accent enabled and persists accent preference', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = PreferencesRepository(preferences: prefs);
+
+      check(repo.getAccentEnabled()).isTrue();
+      await repo.setAccentEnabled(false);
+      check(repo.getAccentEnabled()).isFalse();
+
+      final repo2 = PreferencesRepository(preferences: prefs);
+      check(repo2.getAccentEnabled()).isFalse();
+    });
+
+    test(
+      'defaults to accent enabled and persists accent preference',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final repo = PreferencesRepository(preferences: prefs);
+
+        check(repo.getAccentEnabled()).isTrue();
+        await repo.setAccentEnabled(false);
+        check(repo.getAccentEnabled()).isFalse();
+
+        final repo2 = PreferencesRepository(preferences: prefs);
+        check(repo2.getAccentEnabled()).isFalse();
+      },
+    );
   });
 }

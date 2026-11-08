@@ -50,17 +50,26 @@ class MetronomeApp extends StatelessWidget {
               previous ?? MetronomeRepository(engine: engine),
           dispose: (_, repo) => repo.dispose(),
         ),
-        ChangeNotifierProxyProvider<MetronomeRepository, MetronomeViewModel>(
-          create: (context) => MetronomeViewModel(
-            repository: context.read<MetronomeRepository>(),
-          ),
-          update: (_, repository, previous) =>
-              previous ?? MetronomeViewModel(repository: repository),
-        ),
         Provider<PreferencesRepository>(
           create: (_) =>
               preferencesRepositoryOverride ??
               PreferencesRepository(preferences: preferences),
+        ),
+        ChangeNotifierProxyProvider2<
+          MetronomeRepository,
+          PreferencesRepository,
+          MetronomeViewModel
+        >(
+          create: (context) => MetronomeViewModel(
+            repository: context.read<MetronomeRepository>(),
+            preferencesRepository: context.read<PreferencesRepository>(),
+          ),
+          update: (_, repository, preferencesRepository, previous) =>
+              previous ??
+              MetronomeViewModel(
+                repository: repository,
+                preferencesRepository: preferencesRepository,
+              ),
         ),
         ChangeNotifierProxyProvider<
           PreferencesRepository,

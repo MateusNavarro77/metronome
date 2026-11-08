@@ -11,16 +11,20 @@ class MeterAndSubdivisionSection extends StatelessWidget {
     super.key,
     required this.selectedTimeSignature,
     required this.selectedSubdivision,
+    this.isAccentEnabled = true,
     this.isCompact = false,
     required this.onTimeSignatureSelected,
     required this.onSubdivisionSelected,
+    this.onToggleAccent,
   });
 
   final TimeSignature selectedTimeSignature;
   final Subdivision selectedSubdivision;
+  final bool isAccentEnabled;
   final bool isCompact;
   final ValueChanged<TimeSignature> onTimeSignatureSelected;
   final ValueChanged<Subdivision> onSubdivisionSelected;
+  final VoidCallback? onToggleAccent;
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +47,21 @@ class MeterAndSubdivisionSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'TIME SIGNATURE',
-                style: context.textTheme.labelMedium?.copyWith(
-                  color: context.colors.onSurfaceMuted,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'TIME SIGNATURE',
+                    style: context.textTheme.labelMedium?.copyWith(
+                      color: context.colors.onSurfaceMuted,
+                    ),
+                  ),
+                  if (onToggleAccent != null)
+                    _AccentTogglePill(
+                      isAccentEnabled: isAccentEnabled,
+                      onToggle: onToggleAccent!,
+                    ),
+                ],
               ),
               SizedBox(height: context.dimens.spaceXs + 2),
               Row(
@@ -189,6 +203,80 @@ class _SelectionPill extends StatelessWidget {
                     ? context.colors.primaryAccent
                     : context.colors.onSurfaceMuted,
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AccentTogglePill extends StatelessWidget {
+  const _AccentTogglePill({
+    required this.isAccentEnabled,
+    required this.onToggle,
+  });
+
+  final bool isAccentEnabled;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      toggled: isAccentEnabled,
+      label: isAccentEnabled
+          ? 'Accent on Beat 1 enabled'
+          : 'Accent on Beat 1 disabled',
+      child: Material(
+        color: isAccentEnabled
+            ? context.colors.primaryContainer
+            : context.colors.surfaceHigh,
+        borderRadius: BorderRadius.circular(context.dimens.radiusFull),
+        child: InkWell(
+          key: const Key('accent_toggle_button'),
+          borderRadius: BorderRadius.circular(context.dimens.radiusFull),
+          onTap: onToggle,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.dimens.spaceSm,
+              vertical: context.dimens.spaceXs,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(context.dimens.radiusFull),
+              border: Border.all(
+                color: isAccentEnabled
+                    ? context.colors.neonGhostBorder
+                    : context.colors.ghostBorder,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isAccentEnabled
+                      ? Icons.volume_up_rounded
+                      : Icons.volume_mute_rounded,
+                  size: 14,
+                  color: isAccentEnabled
+                      ? context.colors.primaryAccent
+                      : context.colors.onSurfaceMuted,
+                ),
+                SizedBox(width: context.dimens.spaceXs),
+                Text(
+                  isAccentEnabled ? 'ACCENT ON' : 'ACCENT OFF',
+                  style: context.textTheme.labelSmall?.copyWith(
+                    fontSize: 11,
+                    letterSpacing: 1.2,
+                    fontWeight: isAccentEnabled
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                    color: isAccentEnabled
+                        ? context.colors.primaryAccent
+                        : context.colors.onSurfaceMuted,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
