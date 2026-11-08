@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/sonic_theme.dart';
+import '../../preferences/views/preferences_view.dart';
 import '../view_models/metronome_view_model.dart';
 import 'widgets/beat_indicator_bar.dart';
 import 'widgets/bpm_control_section.dart';
 import 'widgets/meter_and_subdivision_section.dart';
 import 'widgets/transport_controls_bar.dart';
 
-/// Main Metronome screen implementing the "Sonic Architect" design system (`DESIGN.md`)
-/// and all must-have single-screen requirements (UI-01..UI-04, UI-08, UI-09, UI-13, UI-14).
+/// Main Metronome screen implementing the "Sonic Architect" design system
+/// (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md) and all must-have single-screen
+/// requirements (UI-01..UI-04, UI-08, UI-09, UI-13, UI-14).
 class MetronomeView extends StatelessWidget {
   const MetronomeView({super.key, required this.viewModel});
 
@@ -17,7 +19,7 @@ class MetronomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: SonicColors.surfaceLowest,
+      backgroundColor: context.colors.surfaceLowest,
       body: SafeArea(
         child: ListenableBuilder(
           listenable: viewModel,
@@ -29,15 +31,20 @@ class MetronomeView extends StatelessWidget {
 
             return LayoutBuilder(
               builder: (context, constraints) {
-                final isWide = constraints.maxWidth > 680;
-                final isCompactHeight = constraints.maxHeight < 680;
+                final isWide =
+                    constraints.maxWidth > context.dimens.wideBreakpoint;
+                final isCompactHeight =
+                    constraints.maxHeight <
+                    context.dimens.compactHeightBreakpoint;
                 final gap = isCompactHeight
-                    ? SonicDimens.spaceXs + 2
-                    : SonicDimens.spaceMd;
+                    ? context.dimens.spaceXs + 2
+                    : context.dimens.spaceMd;
 
                 return Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 560),
+                    constraints: BoxConstraints(
+                      maxWidth: context.dimens.maxContentWidth,
+                    ),
                     child: SingleChildScrollView(
                       physics: const ClampingScrollPhysics(),
                       child: ConstrainedBox(
@@ -47,11 +54,11 @@ class MetronomeView extends StatelessWidget {
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: isWide
-                                ? SonicDimens.spaceLg
-                                : SonicDimens.spaceMd,
+                                ? context.dimens.spaceLg
+                                : context.dimens.spaceMd,
                             vertical: isCompactHeight
-                                ? SonicDimens.spaceXs
-                                : SonicDimens.spaceSm,
+                                ? context.dimens.spaceXs
+                                : context.dimens.spaceSm,
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -145,48 +152,67 @@ class _HeaderBar extends StatelessWidget {
       children: [
         Text(
           'METRONOME',
-          style: SonicTheme.labelMd.copyWith(
-            color: SonicColors.onSurfacePrimary,
+          style: context.textTheme.labelMedium?.copyWith(
+            color: context.colors.onSurfacePrimary,
             letterSpacing: 2.2,
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: SonicDimens.spaceSm + 4,
-            vertical: SonicDimens.spaceXs,
-          ),
-          decoration: BoxDecoration(
-            color: isPlaying
-                ? SonicColors.primaryContainer
-                : SonicColors.surfaceHigh,
-            borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isPlaying
-                      ? SonicColors.primaryNeon
-                      : SonicColors.onSurfaceMuted,
-                ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.dimens.spaceSmPlus4,
+                vertical: context.dimens.spaceXs,
               ),
-              const SizedBox(width: 6),
-              Text(
-                isPlaying ? 'PLAYING' : 'STOPPED',
-                key: const Key('playback_state_badge'),
-                style: SonicTheme.labelMd.copyWith(
-                  fontSize: 10,
-                  color: isPlaying
-                      ? SonicColors.primaryNeon
-                      : SonicColors.onSurfaceMuted,
-                ),
+              decoration: BoxDecoration(
+                color: isPlaying
+                    ? context.colors.primaryContainer
+                    : context.colors.surfaceHigh,
+                borderRadius: BorderRadius.circular(context.dimens.radiusFull),
               ),
-            ],
-          ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: context.dimens.badgeDotSize,
+                    height: context.dimens.badgeDotSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isPlaying
+                          ? context.colors.primaryAccent
+                          : context.colors.onSurfaceMuted,
+                    ),
+                  ),
+                  SizedBox(width: context.dimens.badgeSpacing),
+                  Text(
+                    isPlaying ? 'PLAYING' : 'STOPPED',
+                    key: const Key('playback_state_badge'),
+                    style: context.textTheme.labelMedium?.copyWith(
+                      fontSize: 10,
+                      color: isPlaying
+                          ? context.colors.primaryAccent
+                          : context.colors.onSurfaceMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: context.dimens.spaceSm),
+            IconButton(
+              key: const Key('settings_button'),
+              icon: const Icon(Icons.settings_outlined),
+              color: context.colors.onSurfacePrimary,
+              tooltip: 'Settings & Preferences',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const PreferencesView(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );

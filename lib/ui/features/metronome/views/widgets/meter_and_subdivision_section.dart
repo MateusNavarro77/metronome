@@ -25,8 +25,8 @@ class MeterAndSubdivisionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cardPadding = isCompact
-        ? SonicDimens.spaceSm + 2
-        : SonicDimens.spaceMd;
+        ? context.dimens.spaceSmPlus2
+        : context.dimens.spaceMd;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,20 +36,28 @@ class MeterAndSubdivisionSection extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(cardPadding),
           decoration: BoxDecoration(
-            color: SonicColors.surfaceLow,
-            borderRadius: BorderRadius.circular(SonicDimens.radiusMd),
+            color: context.colors.surfaceLow,
+            borderRadius: BorderRadius.circular(context.dimens.radiusMd),
+            border: Border.all(color: context.colors.ghostBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('TIME SIGNATURE', style: SonicTheme.labelMd),
-              const SizedBox(height: SonicDimens.spaceXs + 2),
+              Text(
+                'TIME SIGNATURE',
+                style: context.textTheme.labelMedium?.copyWith(
+                  color: context.colors.onSurfaceMuted,
+                ),
+              ),
+              SizedBox(height: context.dimens.spaceXs + 2),
               Row(
                 children: TimeSignature.presets.map((signature) {
                   final isSelected = signature == selectedTimeSignature;
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.dimens.spaceXs,
+                      ),
                       child: _SelectionPill(
                         pillKey: Key('time_sig_${signature.label}'),
                         label: signature.label,
@@ -65,14 +73,17 @@ class MeterAndSubdivisionSection extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: isCompact ? SonicDimens.spaceXs + 2 : SonicDimens.spaceSm,
+          height: isCompact
+              ? context.dimens.spaceXs + 2
+              : context.dimens.spaceSm,
         ),
         // Subdivision selector plate
         Container(
           padding: EdgeInsets.all(cardPadding),
           decoration: BoxDecoration(
-            color: SonicColors.surfaceLow,
-            borderRadius: BorderRadius.circular(SonicDimens.radiusMd),
+            color: context.colors.surfaceLow,
+            borderRadius: BorderRadius.circular(context.dimens.radiusMd),
+            border: Border.all(color: context.colors.ghostBorder),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,24 +91,31 @@ class MeterAndSubdivisionSection extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('SUBDIVISIONS', style: SonicTheme.labelMd),
+                  Text(
+                    'SUBDIVISIONS',
+                    style: context.textTheme.labelMedium?.copyWith(
+                      color: context.colors.onSurfaceMuted,
+                    ),
+                  ),
                   Text(
                     '${selectedSubdivision.symbol} ${selectedSubdivision.label}',
                     key: const Key('active_subdivision_label'),
-                    style: SonicTheme.bodyMd.copyWith(
-                      color: SonicColors.secondaryGreen,
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: context.colors.secondaryAccent,
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: SonicDimens.spaceXs + 2),
+              SizedBox(height: context.dimens.spaceXs + 2),
               Row(
                 children: Subdivision.values.map((subdivision) {
                   final isSelected = subdivision == selectedSubdivision;
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.dimens.spaceXs,
+                      ),
                       child: _SelectionPill(
                         pillKey: Key('subdivision_${subdivision.name}'),
                         label:
@@ -142,34 +160,34 @@ class _SelectionPill extends StatelessWidget {
       label: semanticLabel,
       child: Material(
         color: isSelected
-            ? SonicColors.primaryContainer
-            : SonicColors.surfaceHigh,
-        borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+            ? context.colors.primaryContainer
+            : context.colors.surfaceHigh,
+        borderRadius: BorderRadius.circular(context.dimens.radiusFull),
         child: InkWell(
           key: pillKey,
-          borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+          borderRadius: BorderRadius.circular(context.dimens.radiusFull),
           onTap: onTap,
           child: Container(
-            constraints: const BoxConstraints(
-              minHeight: SonicDimens.minTouchTarget,
+            constraints: BoxConstraints(
+              minHeight: context.dimens.minTouchTarget,
             ),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+              borderRadius: BorderRadius.circular(context.dimens.radiusFull),
               border: Border.all(
                 color: isSelected
-                    ? SonicColors.neonGhostBorder
-                    : SonicColors.ghostBorder,
+                    ? context.colors.neonGhostBorder
+                    : context.colors.ghostBorder,
               ),
             ),
             child: Text(
               label,
-              style: SonicTheme.titleSm.copyWith(
+              style: context.textTheme.titleSmall?.copyWith(
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected
-                    ? SonicColors.primaryNeon
-                    : SonicColors.onSurfaceMuted,
+                    ? context.colors.primaryAccent
+                    : context.colors.onSurfaceMuted,
               ),
             ),
           ),

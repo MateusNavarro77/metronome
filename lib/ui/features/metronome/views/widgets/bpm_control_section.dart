@@ -32,21 +32,26 @@ class BpmControlSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final verticalPad = isCompact ? SonicDimens.spaceSm : SonicDimens.spaceMd;
+    final verticalPad = isCompact
+        ? context.dimens.spaceSm
+        : context.dimens.spaceMd;
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: SonicDimens.spaceMd,
+        horizontal: context.dimens.spaceMd,
         vertical: verticalPad,
       ),
       decoration: BoxDecoration(
-        color: SonicColors.surfaceLow,
-        borderRadius: BorderRadius.circular(SonicDimens.radiusLg),
+        color: context.colors.surfaceLow,
+        borderRadius: BorderRadius.circular(context.dimens.radiusLg),
+        border: Border.all(color: context.colors.ghostBorder),
         gradient: RadialGradient(
           radius: 0.85,
           colors: [
-            isDownbeatActive ? const Color(0x2800FF41) : SonicColors.radialGlow,
-            SonicColors.surfaceLow,
+            isDownbeatActive
+                ? context.colors.radialGlowDownbeat
+                : context.colors.radialGlow,
+            context.colors.surfaceLow,
           ],
         ),
       ),
@@ -55,24 +60,24 @@ class BpmControlSection extends StatelessWidget {
         children: [
           // Tempo marking pill (FR-AND-01)
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: SonicDimens.spaceMd,
-              vertical: SonicDimens.spaceXs,
+            padding: EdgeInsets.symmetric(
+              horizontal: context.dimens.spaceMd,
+              vertical: context.dimens.spaceXs,
             ),
             decoration: BoxDecoration(
-              color: SonicColors.surfaceHigh,
-              borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+              color: context.colors.surfaceHigh,
+              borderRadius: BorderRadius.circular(context.dimens.radiusFull),
             ),
             child: Text(
               tempoMarking.label.toUpperCase(),
               key: const Key('tempo_marking_text'),
-              style: SonicTheme.labelMd.copyWith(
-                color: SonicColors.secondaryGreen,
+              style: context.textTheme.labelMedium?.copyWith(
+                color: context.colors.secondaryAccent,
               ),
             ),
           ),
           SizedBox(
-            height: isCompact ? SonicDimens.spaceXs : SonicDimens.spaceSm,
+            height: isCompact ? context.dimens.spaceXs : context.dimens.spaceSm,
           ),
           // Hero BPM value flanked by - and + buttons
           Row(
@@ -98,11 +103,21 @@ class BpmControlSection extends StatelessWidget {
                         key: const Key('bpm_value_text'),
                         textAlign: TextAlign.center,
                         style: isCompact
-                            ? SonicTheme.displayLg.copyWith(fontSize: 52)
-                            : SonicTheme.displayLg,
+                            ? context.textTheme.displayLarge?.copyWith(
+                                fontSize: 52,
+                                color: context.colors.onSurfacePrimary,
+                              )
+                            : context.textTheme.displayLarge?.copyWith(
+                                color: context.colors.onSurfacePrimary,
+                              ),
                       ),
                     ),
-                    Text('BPM', style: SonicTheme.labelMd),
+                    Text(
+                      'BPM',
+                      style: context.textTheme.labelMedium?.copyWith(
+                        color: context.colors.onSurfaceMuted,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -130,14 +145,22 @@ class BpmControlSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: SonicDimens.spaceSm,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: context.dimens.spaceSm),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${Bpm.min}', style: SonicTheme.labelMd),
-                Text('${Bpm.max}', style: SonicTheme.labelMd),
+                Text(
+                  '${Bpm.min}',
+                  style: context.textTheme.labelMedium?.copyWith(
+                    color: context.colors.onSurfaceMuted,
+                  ),
+                ),
+                Text(
+                  '${Bpm.max}',
+                  style: context.textTheme.labelMedium?.copyWith(
+                    color: context.colors.onSurfaceMuted,
+                  ),
+                ),
               ],
             ),
           ),
@@ -177,21 +200,21 @@ class _StepperButton extends StatelessWidget {
         onLongPressEnd: enabled ? (_) => onHoldEnd() : null,
         onLongPressCancel: enabled ? onHoldEnd : null,
         child: Material(
-          color: SonicColors.surfaceHigh,
+          color: context.colors.surfaceHigh,
           shape: const CircleBorder(),
           child: InkWell(
             key: buttonKey,
             customBorder: const CircleBorder(),
             onTap: enabled ? onTap : null,
             child: SizedBox(
-              width: 56.0,
-              height: 56.0,
+              width: context.dimens.stepperButtonSize,
+              height: context.dimens.stepperButtonSize,
               child: Icon(
                 icon,
-                size: 28.0,
+                size: context.dimens.stepperIconSize,
                 color: enabled
-                    ? SonicColors.onSurfacePrimary
-                    : SonicColors.onSurfaceMuted,
+                    ? context.colors.onSurfacePrimary
+                    : context.colors.onSurfaceMuted,
               ),
             ),
           ),
