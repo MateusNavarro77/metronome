@@ -71,8 +71,8 @@ void main() {
       await tester.tap(find.text('Light'));
       await tester.pumpAndSettle();
 
-      // Return to Metronome view
-      await tester.tap(find.byKey(const Key('preferences_back_button')));
+      // Return to Metronome view via navigation
+      await tester.tap(find.text('Metronome'));
       await tester.pumpAndSettle();
 
       expect(find.text('METRONOME'), findsOneWidget);

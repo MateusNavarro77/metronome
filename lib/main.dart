@@ -8,7 +8,7 @@ import 'data/services/metronome_engine.dart';
 import 'data/services/soloud_metronome_engine.dart';
 import 'ui/core/theme/sonic_theme.dart';
 import 'ui/features/metronome/view_models/metronome_view_model.dart';
-import 'ui/features/metronome/views/metronome_view.dart';
+import 'ui/features/navigation/views/adaptive_navigation_shell.dart';
 import 'ui/features/preferences/view_models/preferences_view_model.dart';
 
 Future<void> main() async {
@@ -83,7 +83,9 @@ class MetronomeApp extends StatelessWidget {
             themeMode: preferencesViewModel.materialThemeMode,
             home: Consumer<MetronomeViewModel>(
               builder: (context, metronomeViewModel, _) {
-                return MetronomeView(viewModel: metronomeViewModel);
+                return AdaptiveNavigationShell(
+                  metronomeViewModel: metronomeViewModel,
+                );
               },
             ),
           );

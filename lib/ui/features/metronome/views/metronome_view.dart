@@ -12,9 +12,14 @@ import 'widgets/transport_controls_bar.dart';
 /// (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md) and all must-have single-screen
 /// requirements (UI-01..UI-04, UI-08, UI-09, UI-13, UI-14).
 class MetronomeView extends StatelessWidget {
-  const MetronomeView({super.key, required this.viewModel});
+  const MetronomeView({
+    super.key,
+    required this.viewModel,
+    this.onOpenSettings,
+  });
 
   final MetronomeViewModel viewModel;
+  final VoidCallback? onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +74,10 @@ class MetronomeView extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  _HeaderBar(isPlaying: viewModel.isPlaying),
+                                  _HeaderBar(
+                                    isPlaying: viewModel.isPlaying,
+                                    onOpenSettings: onOpenSettings,
+                                  ),
                                   SizedBox(height: gap),
                                   BeatIndicatorBar(
                                     timeSignature: viewModel.timeSignature,
@@ -141,9 +149,10 @@ class MetronomeView extends StatelessWidget {
 }
 
 class _HeaderBar extends StatelessWidget {
-  const _HeaderBar({required this.isPlaying});
+  const _HeaderBar({required this.isPlaying, this.onOpenSettings});
 
   final bool isPlaying;
+  final VoidCallback? onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -205,11 +214,15 @@ class _HeaderBar extends StatelessWidget {
               color: context.colors.onSurfacePrimary,
               tooltip: 'Settings & Preferences',
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const PreferencesView(),
-                  ),
-                );
+                if (onOpenSettings != null) {
+                  onOpenSettings!();
+                } else {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const PreferencesView(),
+                    ),
+                  );
+                }
               },
             ),
           ],

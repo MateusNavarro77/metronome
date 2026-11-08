@@ -8,11 +8,16 @@ import '../view_models/preferences_view_model.dart';
 /// Preferences and settings screen adhering to "The Sonic Architect" design system
 /// (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md, FR-CFG-04, UI-05).
 class PreferencesView extends StatelessWidget {
-  const PreferencesView({super.key});
+  const PreferencesView({super.key, this.showBackButton});
+
+  /// Explicit flag to control back button visibility.
+  /// When omitted, checks [Navigator.canPop].
+  final bool? showBackButton;
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<PreferencesViewModel>();
+    final canPop = showBackButton ?? (ModalRoute.of(context)?.canPop ?? false);
 
     return Scaffold(
       backgroundColor: context.colors.surfaceLowest,
@@ -34,23 +39,34 @@ class PreferencesView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        key: const Key('preferences_back_button'),
-                        icon: const Icon(Icons.arrow_back_rounded),
-                        color: context.colors.onSurfacePrimary,
-                        tooltip: 'Back to metronome',
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      Text(
-                        'PREFERENCES',
-                        style: context.textTheme.labelMedium?.copyWith(
+                      if (canPop) ...[
+                        IconButton(
+                          key: const Key('preferences_back_button'),
+                          icon: const Icon(Icons.arrow_back_rounded),
                           color: context.colors.onSurfacePrimary,
-                          letterSpacing: 2.2,
+                          tooltip: 'Back to metronome',
+                          onPressed: () => Navigator.of(context).pop(),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 48.0,
-                      ), // Visual balancing for back button
+                        Text(
+                          'PREFERENCES',
+                          style: context.textTheme.labelMedium?.copyWith(
+                            color: context.colors.onSurfacePrimary,
+                            letterSpacing: 2.2,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 48.0,
+                        ), // Visual balancing for back button
+                      ] else ...[
+                        Text(
+                          'PREFERENCES',
+                          style: context.textTheme.labelMedium?.copyWith(
+                            color: context.colors.onSurfacePrimary,
+                            letterSpacing: 2.2,
+                          ),
+                        ),
+                        const SizedBox.shrink(),
+                      ],
                     ],
                   ),
                   SizedBox(height: context.dimens.spaceMd),
