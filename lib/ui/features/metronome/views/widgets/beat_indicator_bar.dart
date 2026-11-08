@@ -63,7 +63,7 @@ class BeatIndicatorBar extends StatelessWidget {
                 return Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.dimens.spaceXs,
+                      horizontal: beatCount > 8 ? 2.0 : context.dimens.spaceXs,
                     ),
                     child: _BeatCapsule(
                       beatNumber: index + 1,
@@ -170,16 +170,22 @@ class _BeatCapsule extends StatelessWidget {
                 : null,
           ),
           child: Center(
-            child: Text(
-              '$beatNumber',
-              style: context.textTheme.labelMedium?.copyWith(
-                fontSize: 11,
-                letterSpacing: 0,
-                color: isActive
-                    ? context.colors.onPrimaryAccent
-                    : (isDownbeat
-                          ? context.colors.onSurfacePrimary
-                          : context.colors.onSurfaceMuted),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '$beatNumber',
+                  style: context.textTheme.labelMedium?.copyWith(
+                    fontSize: 11,
+                    letterSpacing: 0,
+                    color: isActive
+                        ? context.colors.onPrimaryAccent
+                        : (isDownbeat
+                              ? context.colors.onSurfacePrimary
+                              : context.colors.onSurfaceMuted),
+                  ),
+                ),
               ),
             ),
           ),

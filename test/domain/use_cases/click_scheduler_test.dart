@@ -151,9 +151,7 @@ void main() {
           );
 
           check(events).length.equals(4);
-          check(
-            events.map((e) => e.accent).toList(),
-          ).deepEquals([
+          check(events.map((e) => e.accent).toList()).deepEquals([
             BeatAccent.weak,
             BeatAccent.weak,
             BeatAccent.weak,
@@ -162,49 +160,41 @@ void main() {
         },
       );
 
-      test(
-        'assigns weak accent to all main beats in 6/8 when isAccentEnabled is false',
-        () {
-          final events = scheduler.generateBarSchedule(
-            bpm: const Bpm(120),
-            timeSignature: TimeSignature.sixEight,
-            subdivision: Subdivision.none,
-            isAccentEnabled: false,
-          );
+      test('assigns weak accent to all main beats in 6/8 when isAccentEnabled is false', () {
+        final events = scheduler.generateBarSchedule(
+          bpm: const Bpm(120),
+          timeSignature: TimeSignature.sixEight,
+          subdivision: Subdivision.none,
+          isAccentEnabled: false,
+        );
 
-          check(events).length.equals(6);
-          check(
-            events.map((e) => e.accent).toList(),
-          ).deepEquals([
-            BeatAccent.weak,
-            BeatAccent.weak,
-            BeatAccent.weak,
-            BeatAccent.weak,
-            BeatAccent.weak,
-            BeatAccent.weak,
-          ]);
-        },
-      );
+        check(events).length.equals(6);
+        check(events.map((e) => e.accent).toList()).deepEquals([
+          BeatAccent.weak,
+          BeatAccent.weak,
+          BeatAccent.weak,
+          BeatAccent.weak,
+          BeatAccent.weak,
+          BeatAccent.weak,
+        ]);
+      });
 
-      test(
-        'keeps distinct subdivision accents while main beats are weak when isAccentEnabled is false',
-        () {
-          final events = scheduler.generateBarSchedule(
-            bpm: const Bpm(120),
-            timeSignature: TimeSignature.fourFour,
-            subdivision: Subdivision.eighth,
-            isAccentEnabled: false,
-          );
+      test('keeps distinct subdivision accents while main beats are weak when isAccentEnabled is false', () {
+        final events = scheduler.generateBarSchedule(
+          bpm: const Bpm(120),
+          timeSignature: TimeSignature.fourFour,
+          subdivision: Subdivision.eighth,
+          isAccentEnabled: false,
+        );
 
-          check(events).length.equals(8);
-          // Beat 0: main is weak, sub is subdivision
-          check(events[0].accent).equals(BeatAccent.weak);
-          check(events[1].accent).equals(BeatAccent.subdivision);
-          // Beat 1: main is weak, sub is subdivision
-          check(events[2].accent).equals(BeatAccent.weak);
-          check(events[3].accent).equals(BeatAccent.subdivision);
-        },
-      );
+        check(events).length.equals(8);
+        // Beat 0: main is weak, sub is subdivision
+        check(events[0].accent).equals(BeatAccent.weak);
+        check(events[1].accent).equals(BeatAccent.subdivision);
+        // Beat 1: main is weak, sub is subdivision
+        check(events[2].accent).equals(BeatAccent.weak);
+        check(events[3].accent).equals(BeatAccent.subdivision);
+      });
     },
   );
 }
