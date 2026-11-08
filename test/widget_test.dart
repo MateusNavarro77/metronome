@@ -46,15 +46,56 @@ void main() {
       expect(find.text('119'), findsOneWidget);
       expect(find.text('MODERATO'), findsOneWidget);
 
-      // Select 6/8 time signature (FR-CMP-01)
+      // Select 6/8 time signature via the Time Signature bottom sheet (FR-CMP-01)
+      expect(find.text('4/4'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('time_signature_selector_button')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('time_signature_bottom_sheet')),
+        findsOneWidget,
+      );
+
       await tester.tap(find.byKey(const Key('time_sig_6/8')));
-      await tester.pump();
-      // Beat indicator now shows 6 beat capsules (numbers 1..6)
+      await tester.pumpAndSettle();
+      // Sheet auto-closes on preset tap and Beat indicator shows 6 beat capsules
+      expect(
+        find.byKey(const Key('time_signature_bottom_sheet')),
+        findsNothing,
+      );
+      expect(find.text('6/8'), findsOneWidget);
       expect(find.text('6'), findsOneWidget);
 
-      // Select Triplets subdivision (FR-SUB-01, FR-SUB-04)
-      await tester.tap(find.byKey(const Key('subdivision_triplet')));
+      // Test custom numerator & denominator inside Time Signature bottom sheet (FR-CMP-03)
+      await tester.tap(find.byKey(const Key('time_signature_selector_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('custom_numerator_increment')));
       await tester.pump();
+      // Sheet stays open while adjusting custom numerator/denominator (7/8)
+      expect(
+        find.byKey(const Key('time_signature_bottom_sheet')),
+        findsOneWidget,
+      );
+      expect(find.text('7/8'), findsWidgets);
+      await tester.tap(find.byKey(const Key('custom_denominator_4')));
+      await tester.pump();
+      expect(find.text('7/4'), findsWidgets);
+
+      // Dismiss bottom sheet by tapping outside (barrier)
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('time_signature_bottom_sheet')),
+        findsNothing,
+      );
+      expect(find.text('7/4'), findsOneWidget);
+
+      // Select Triplets subdivision via Subdivision bottom sheet (FR-SUB-01, FR-SUB-04)
+      await tester.tap(find.byKey(const Key('subdivision_selector_button')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('subdivision_bottom_sheet')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('subdivision_triplet')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('subdivision_bottom_sheet')), findsNothing);
       expect(find.textContaining('Triplets'), findsOneWidget);
 
       // Tap Play/Stop button to start playback (FR-PLY-01..03)

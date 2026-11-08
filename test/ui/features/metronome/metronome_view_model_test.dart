@@ -128,49 +128,49 @@ void main() {
       },
     );
 
+    test('toggles accent on/off and emits weak click on Beat 1 when accent is disabled', () async {
+      check(viewModel.isAccentEnabled).isTrue();
+
+      viewModel.toggleAccent();
+      check(viewModel.isAccentEnabled).isFalse();
+
+      await viewModel.togglePlayStop();
+      check(viewModel.isPlaying).isTrue();
+      check(engine.emittedEvents.first.accent).equals(BeatAccent.weak);
+
+      // Advance to beat 2, still weak
+      engine.advancePulses(1);
+      await Future<void>.delayed(Duration.zero);
+      check(engine.emittedEvents.last.accent).equals(BeatAccent.weak);
+
+      // Turn accent back on during playback
+      viewModel.toggleAccent();
+      check(viewModel.isAccentEnabled).isTrue();
+
+      // Advance 3 more pulses to wrap to Beat 0 of bar 2
+      engine.advancePulses(3);
+      await Future<void>.delayed(Duration.zero);
+      check(viewModel.currentBeat).equals(0);
+      check(engine.emittedEvents.last.accent).equals(BeatAccent.strong);
+    });
+
     test(
-      'toggles accent on/off and emits weak click on Beat 1 when accent is disabled',
-      () async {
-        check(viewModel.isAccentEnabled).isTrue();
+      'initializes with persisted accent preference from PreferencesRepository',
+      () {
+        final prefsRepo = PreferencesRepository(preferences: null);
+        prefsRepo.setAccentEnabled(false);
 
-        viewModel.toggleAccent();
-        check(viewModel.isAccentEnabled).isFalse();
+        final vm = MetronomeViewModel(
+          repository: repository,
+          preferencesRepository: prefsRepo,
+        );
 
-        await viewModel.togglePlayStop();
-        check(viewModel.isPlaying).isTrue();
-        check(engine.emittedEvents.first.accent).equals(BeatAccent.weak);
-
-        // Advance to beat 2, still weak
-        engine.advancePulses(1);
-        await Future<void>.delayed(Duration.zero);
-        check(engine.emittedEvents.last.accent).equals(BeatAccent.weak);
-
-        // Turn accent back on during playback
-        viewModel.toggleAccent();
-        check(viewModel.isAccentEnabled).isTrue();
-
-        // Advance 3 more pulses to wrap to Beat 0 of bar 2
-        engine.advancePulses(3);
-        await Future<void>.delayed(Duration.zero);
-        check(viewModel.currentBeat).equals(0);
-        check(engine.emittedEvents.last.accent).equals(BeatAccent.strong);
+        check(vm.isAccentEnabled).isFalse();
+        vm.toggleAccent();
+        check(vm.isAccentEnabled).isTrue();
+        check(prefsRepo.getAccentEnabled()).isTrue();
+        vm.dispose();
       },
     );
-
-    test('initializes with persisted accent preference from PreferencesRepository', () {
-      final prefsRepo = PreferencesRepository(preferences: null);
-      prefsRepo.setAccentEnabled(false);
-
-      final vm = MetronomeViewModel(
-        repository: repository,
-        preferencesRepository: prefsRepo,
-      );
-
-      check(vm.isAccentEnabled).isFalse();
-      vm.toggleAccent();
-      check(vm.isAccentEnabled).isTrue();
-      check(prefsRepo.getAccentEnabled()).isTrue();
-      vm.dispose();
-    });
   });
 }
