@@ -176,7 +176,6 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                         ),
                     destinations: destinations.map((item) {
                       return NavigationRailDestination(
-                        
                         icon: Icon(item.icon, key: item.railKey),
                         selectedIcon: Icon(item.selectedIcon),
                         label: Text(item.label),
