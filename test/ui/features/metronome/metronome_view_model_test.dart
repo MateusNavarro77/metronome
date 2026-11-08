@@ -29,32 +29,35 @@ void main() {
       await repository.dispose();
     });
 
-    test('starts on Beat 1 (strong) and advances beats and subdivisions', () async {
-      check(viewModel.isPlaying).isFalse();
-      check(viewModel.bpmValue).equals(120);
-      check(viewModel.tempoMarking).equals(TempoMarking.allegro);
+    test(
+      'starts on Beat 1 (strong) and advances beats and subdivisions',
+      () async {
+        check(viewModel.isPlaying).isFalse();
+        check(viewModel.bpmValue).equals(120);
+        check(viewModel.tempoMarking).equals(TempoMarking.allegro);
 
-      await viewModel.togglePlayStop();
-      check(viewModel.isPlaying).isTrue();
-      check(viewModel.currentBeat).equals(0);
-      check(engine.emittedEvents).length.equals(1);
-      check(engine.emittedEvents.first.accent).equals(BeatAccent.strong);
+        await viewModel.togglePlayStop();
+        check(viewModel.isPlaying).isTrue();
+        check(viewModel.currentBeat).equals(0);
+        check(engine.emittedEvents).length.equals(1);
+        check(engine.emittedEvents.first.accent).equals(BeatAccent.strong);
 
-      // Advance 3 pulses in 4/4 (Subdivision.none)
-      engine.advancePulses(3);
-      await Future<void>.delayed(Duration.zero);
-      check(viewModel.currentBeat).equals(3);
+        // Advance 3 pulses in 4/4 (Subdivision.none)
+        engine.advancePulses(3);
+        await Future<void>.delayed(Duration.zero);
+        check(viewModel.currentBeat).equals(3);
 
-      // Next pulse wraps around to Beat 0 (bar 2)
-      engine.advancePulses(1);
-      await Future<void>.delayed(Duration.zero);
-      check(viewModel.currentBeat).equals(0);
+        // Next pulse wraps around to Beat 0 (bar 2)
+        engine.advancePulses(1);
+        await Future<void>.delayed(Duration.zero);
+        check(viewModel.currentBeat).equals(0);
 
-      // Stop resets state to Beat 0
-      await viewModel.togglePlayStop();
-      check(viewModel.isPlaying).isFalse();
-      check(viewModel.currentBeat).equals(0);
-    });
+        // Stop resets state to Beat 0
+        await viewModel.togglePlayStop();
+        check(viewModel.isPlaying).isFalse();
+        check(viewModel.currentBeat).equals(0);
+      },
+    );
 
     test('updates BPM, TimeSignature, and Subdivision dynamically', () {
       viewModel.setBpm(72);

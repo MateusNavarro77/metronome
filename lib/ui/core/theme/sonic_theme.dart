@@ -103,11 +103,8 @@ abstract final class SonicTheme {
   );
 
   /// Title-SM (Menu items / Modal titles: 16px / 1.0rem, weight 500).
-  static TextStyle get titleSm => _comfortaa(
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    height: 1.5,
-  );
+  static TextStyle get titleSm =>
+      _comfortaa(fontSize: 16, fontWeight: FontWeight.w500, height: 1.5);
 
   /// Body-MD (Supporting text / Tempo Marking names: 14px / 0.875rem, weight 400).
   static TextStyle get bodyMd => _comfortaa(

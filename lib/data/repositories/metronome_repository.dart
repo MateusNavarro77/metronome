@@ -55,10 +55,7 @@ class MetronomeRepository {
         ? 0
         : _state.currentBeat;
     _updateState(
-      _state.copyWith(
-        timeSignature: timeSignature,
-        currentBeat: clampedBeat,
-      ),
+      _state.copyWith(timeSignature: timeSignature, currentBeat: clampedBeat),
     );
   }
 
@@ -67,10 +64,7 @@ class MetronomeRepository {
     if (_state.subdivision == subdivision) return;
     _engine.updateConfiguration(subdivision: subdivision);
     _updateState(
-      _state.copyWith(
-        subdivision: subdivision,
-        currentSubdivision: 0,
-      ),
+      _state.copyWith(subdivision: subdivision, currentSubdivision: 0),
     );
   }
 
@@ -78,11 +72,7 @@ class MetronomeRepository {
   Future<void> start() async {
     if (_state.isPlaying) return;
     _updateState(
-      _state.copyWith(
-        isPlaying: true,
-        currentBeat: 0,
-        currentSubdivision: 0,
-      ),
+      _state.copyWith(isPlaying: true, currentBeat: 0, currentSubdivision: 0),
     );
     await _engine.start(
       bpm: _state.bpm,

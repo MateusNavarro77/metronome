@@ -10,9 +10,8 @@ import 'metronome_engine.dart';
 /// Deterministic, synchronous/step-controllable [MetronomeEngine] for unit and
 /// widget tests (NFR-MAN-02, NFR-TST-01).
 class SimulatedMetronomeEngine implements MetronomeEngine {
-  SimulatedMetronomeEngine({
-    ClickScheduler scheduler = const ClickScheduler(),
-  }) : _scheduler = scheduler;
+  SimulatedMetronomeEngine({ClickScheduler scheduler = const ClickScheduler()})
+    : _scheduler = scheduler;
 
   final ClickScheduler _scheduler;
   final StreamController<BeatEvent> _beatController =

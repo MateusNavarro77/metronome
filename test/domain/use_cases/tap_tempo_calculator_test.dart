@@ -11,16 +11,21 @@ void main() {
       calculator = TapTempoCalculator();
     });
 
-    test('returns null on first tap and computes BPM from the second tap onwards', () {
-      final first = calculator.registerTap(Duration.zero);
-      check(first).isNull();
-      check(calculator.tapCount).equals(1);
+    test(
+      'returns null on first tap and computes BPM from the second tap onwards',
+      () {
+        final first = calculator.registerTap(Duration.zero);
+        check(first).isNull();
+        check(calculator.tapCount).equals(1);
 
-      // 500 ms interval = 120 BPM
-      final second = calculator.registerTap(const Duration(milliseconds: 500));
-      check(second).equals(const Bpm(120));
-      check(calculator.tapCount).equals(2);
-    });
+        // 500 ms interval = 120 BPM
+        final second = calculator.registerTap(
+          const Duration(milliseconds: 500),
+        );
+        check(second).equals(const Bpm(120));
+        check(calculator.tapCount).equals(2);
+      },
+    );
 
     test('averages up to the last 8 taps (7 intervals)', () {
       // First tap at 0ms, then 8 taps spaced at 600ms (100 BPM)
@@ -30,7 +35,9 @@ void main() {
       check(calculator.tapCount).equals(8);
 
       // Add a 9th tap 600ms later; window stays capped at 8 taps
-      final result = calculator.registerTap(const Duration(milliseconds: 8 * 600));
+      final result = calculator.registerTap(
+        const Duration(milliseconds: 8 * 600),
+      );
       check(calculator.tapCount).equals(8);
       check(result).equals(const Bpm(100));
     });

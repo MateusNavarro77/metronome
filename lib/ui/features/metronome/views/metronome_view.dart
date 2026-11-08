@@ -10,10 +10,7 @@ import 'widgets/transport_controls_bar.dart';
 /// Main Metronome screen implementing the "Sonic Architect" design system (`DESIGN.md`)
 /// and all must-have single-screen requirements (UI-01..UI-04, UI-08, UI-09, UI-13, UI-14).
 class MetronomeView extends StatelessWidget {
-  const MetronomeView({
-    super.key,
-    required this.viewModel,
-  });
+  const MetronomeView({super.key, required this.viewModel});
 
   final MetronomeViewModel viewModel;
 
@@ -115,10 +112,8 @@ class MetronomeView extends StatelessWidget {
                                     isDownbeatActive: isDownbeatActive,
                                     isCompact: isCompactHeight,
                                     onTogglePlayStop: viewModel.togglePlayStop,
-                                    onTapTempo: (timestamp) =>
-                                        viewModel.registerTapTempo(
-                                          timestamp: timestamp,
-                                        ),
+                                    onTapTempo: (timestamp) => viewModel
+                                        .registerTapTempo(timestamp: timestamp),
                                   ),
                                 ],
                               ),

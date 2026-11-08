@@ -10,7 +10,7 @@ enum const BeatAccent(final String label, final double defaultRelativeVolume) {
   weak('Weak', 0.65),
 
   /// Subdivision pulse inside a beat (quietest).
-  subdivision('Subdivision', 0.35);
+  subdivision('Subdivision', 0.35),
 }
 
 /// Musical time signature such as 2/4, 3/4, 4/4, or 6/8 (FR-CMP-01, FR-CMP-03).

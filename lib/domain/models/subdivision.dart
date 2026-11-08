@@ -8,5 +8,5 @@ enum const Subdivision(
   none(1, 'Quarter', '1x', '♩'),
   eighth(2, 'Eighths', '2x', '♫'),
   triplet(3, 'Triplets', '3x', '♪♪♪'),
-  sixteenth(4, 'Sixteenths', '4x', '♬');
+  sixteenth(4, 'Sixteenths', '4x', '♬'),
 }

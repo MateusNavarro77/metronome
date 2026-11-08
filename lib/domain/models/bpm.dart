@@ -5,7 +5,8 @@ import 'tempo_marking.dart';
 /// Enforces the valid range of [min] (30) to [max] (300) BPM in whole-number
 /// steps and provides safe clamping and step adjustments.
 class const Bpm(final int value) {
-  this : assert(value >= min && value <= max, 'BPM must be between $min and $max');
+  this
+    : assert(value >= min && value <= max, 'BPM must be between $min and $max');
 
   /// Minimum allowed BPM (FR-BPM-01).
   static const int min = 30;
@@ -37,9 +38,8 @@ class const Bpm(final int value) {
   Bpm adjust(int delta) => Bpm.clamped(value + delta);
 
   /// Duration of a single beat at this BPM.
-  Duration get beatDuration => Duration(
-    microseconds: (Duration.microsecondsPerMinute / value).round(),
-  );
+  Duration get beatDuration =>
+      Duration(microseconds: (Duration.microsecondsPerMinute / value).round());
 
   /// The musical tempo marking name for this BPM (FR-AND-01).
   TempoMarking get tempoMarking => TempoMarking.fromBpm(value);

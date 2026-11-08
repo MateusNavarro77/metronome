@@ -82,19 +82,16 @@ class MetronomeViewModel extends ChangeNotifier {
     if (stepSign == 0) return;
 
     _holdTicks = 0;
-    _holdRepeatTimer = Timer.periodic(
-      const Duration(milliseconds: 110),
-      (_) {
-        _holdTicks++;
-        // Accelerate step size the longer the user holds the button
-        final magnitude = switch (_holdTicks) {
-          < 8 => 1,
-          < 18 => 2,
-          _ => 5,
-        };
-        adjustBpm(stepSign * magnitude);
-      },
-    );
+    _holdRepeatTimer = Timer.periodic(const Duration(milliseconds: 110), (_) {
+      _holdTicks++;
+      // Accelerate step size the longer the user holds the button
+      final magnitude = switch (_holdTicks) {
+        < 8 => 1,
+        < 18 => 2,
+        _ => 5,
+      };
+      adjustBpm(stepSign * magnitude);
+    });
   }
 
   /// Stops continuous BPM adjustment when the button is released or cancelled.

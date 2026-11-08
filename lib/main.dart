@@ -16,10 +16,7 @@ void main() {
 /// Root application widget wiring Dependency Injection via `package:provider`
 /// and applying "The Sonic Architect" theme (`DESIGN.md`).
 class MetronomeApp extends StatelessWidget {
-  const MetronomeApp({
-    super.key,
-    this.engineOverride,
-  });
+  const MetronomeApp({super.key, this.engineOverride});
 
   /// Optional [MetronomeEngine] override for widget and integration testing.
   final MetronomeEngine? engineOverride;
