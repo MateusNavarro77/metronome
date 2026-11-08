@@ -37,12 +37,13 @@ class BeatIndicatorBar extends StatelessWidget {
           : 'Pulse indicator stopped, $beatCount beats per bar',
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: SonicDimens.spaceMd,
-          vertical: isCompact ? SonicDimens.spaceSm : SonicDimens.spaceMd,
+          horizontal: context.dimens.spaceMd,
+          vertical: isCompact ? context.dimens.spaceSm : context.dimens.spaceMd,
         ),
         decoration: BoxDecoration(
-          color: SonicColors.surfaceLow,
-          borderRadius: BorderRadius.circular(SonicDimens.radiusMd),
+          color: context.colors.surfaceLow,
+          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
+          border: Border.all(color: context.colors.ghostBorder),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -57,7 +58,9 @@ class BeatIndicatorBar extends StatelessWidget {
 
                 return Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.dimens.spaceXs,
+                    ),
                     child: _BeatCapsule(
                       beatNumber: index + 1,
                       isActive: isActive,
@@ -69,7 +72,7 @@ class BeatIndicatorBar extends StatelessWidget {
               }),
             ),
             if (subdivision != Subdivision.none) ...[
-              const SizedBox(height: SonicDimens.spaceSm),
+              SizedBox(height: context.dimens.spaceSm),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(subdivision.pulsesPerBeat, (subIndex) {
@@ -77,15 +80,19 @@ class BeatIndicatorBar extends StatelessWidget {
                       isPlaying && currentSubdivision == subIndex;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 60),
-                    margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                    width: isSubActive ? 14.0 : 8.0,
-                    height: 6.0,
+                    margin: EdgeInsets.symmetric(
+                      horizontal: context.dimens.spaceXs,
+                    ),
+                    width: isSubActive
+                        ? context.dimens.subdivisionPulseActiveWidth
+                        : context.dimens.subdivisionPulseInactiveWidth,
+                    height: context.dimens.subdivisionPulseHeight,
                     decoration: BoxDecoration(
                       color: isSubActive
-                          ? SonicColors.primaryNeon
-                          : SonicColors.surfaceHigh,
+                          ? context.colors.primaryAccent
+                          : context.colors.surfaceHigh,
                       borderRadius: BorderRadius.circular(
-                        SonicDimens.radiusFull,
+                        context.dimens.radiusFull,
                       ),
                     ),
                   );
@@ -117,23 +124,27 @@ class _BeatCapsule extends StatelessWidget {
     final Color fillColor;
     if (isActive) {
       fillColor = isDownbeat
-          ? SonicColors.primaryNeon
+          ? context.colors.primaryAccent
           : isMedium
-          ? SonicColors.secondaryGreen
-          : SonicColors.onSurfacePrimary;
+          ? context.colors.secondaryAccent
+          : context.colors.onSurfacePrimary;
     } else {
       fillColor = isDownbeat
-          ? SonicColors.surfaceHighest
-          : SonicColors.surfaceHigh;
+          ? context.colors.surfaceHighest
+          : context.colors.surfaceHigh;
     }
 
     // Distinguish Beat 1 by height/shape as well as color (FR-VIS-01, UI-13)
     final double targetHeight = isDownbeat
-        ? (isActive ? 38.0 : 32.0)
-        : (isActive ? 28.0 : 22.0);
+        ? (isActive
+              ? context.dimens.beatCapsuleActiveDownbeat
+              : context.dimens.beatCapsuleInactiveDownbeat)
+        : (isActive
+              ? context.dimens.beatCapsuleActiveRegular
+              : context.dimens.beatCapsuleInactiveRegular);
 
     return SizedBox(
-      height: 40.0,
+      height: context.dimens.beatPillContainerHeight,
       child: Center(
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 70),
@@ -142,12 +153,12 @@ class _BeatCapsule extends StatelessWidget {
           decoration: BoxDecoration(
             color: fillColor,
             borderRadius: BorderRadius.circular(
-              isDownbeat ? SonicDimens.radiusSm : SonicDimens.radiusFull,
+              isDownbeat ? context.dimens.radiusSm : context.dimens.radiusFull,
             ),
             boxShadow: isActive && isDownbeat
-                ? const [
+                ? [
                     BoxShadow(
-                      color: SonicColors.pulseGlow,
+                      color: context.colors.pulseGlow,
                       blurRadius: 18,
                       spreadRadius: 2,
                     ),
@@ -157,14 +168,14 @@ class _BeatCapsule extends StatelessWidget {
           child: Center(
             child: Text(
               '$beatNumber',
-              style: SonicTheme.labelMd.copyWith(
+              style: context.textTheme.labelMedium?.copyWith(
                 fontSize: 11,
                 letterSpacing: 0,
                 color: isActive
-                    ? SonicColors.primaryContainer
+                    ? context.colors.onPrimaryAccent
                     : (isDownbeat
-                          ? SonicColors.onSurfacePrimary
-                          : SonicColors.onSurfaceMuted),
+                          ? context.colors.onSurfacePrimary
+                          : context.colors.onSurfaceMuted),
               ),
             ),
           ),

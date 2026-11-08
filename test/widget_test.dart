@@ -59,6 +59,23 @@ void main() {
       await tester.pump();
       check(simulatedEngine.isPlaying).isFalse();
       expect(find.text('STOPPED'), findsOneWidget);
+
+      // Open Preferences via settings button in header bar
+      await tester.tap(find.byKey(const Key('settings_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('PREFERENCES'), findsOneWidget);
+      expect(find.text('APPEARANCE'), findsOneWidget);
+
+      // Switch to Light theme
+      await tester.tap(find.text('Light'));
+      await tester.pumpAndSettle();
+
+      // Return to Metronome view
+      await tester.tap(find.byKey(const Key('preferences_back_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('METRONOME'), findsOneWidget);
     },
   );
 }

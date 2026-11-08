@@ -1,6 +1,6 @@
 # AGENTS.md — Metronome Project Rules & Architecture Blueprint
 
-This document defines the strict architectural, coding, design, and testing rules for the **Metronome** application (`specs/prd_metronomo.md` and `specs/DESIGN.md`). All human developers and AI agents must follow these guidelines.
+This document defines the strict architectural, coding, design, and testing rules for the **Metronome** application (`specs/prd_metronomo.md`, `specs/DESIGN_DARK.md`, and `specs/DESIGN_LIGHT.md`). All human developers and AI agents must follow these guidelines.
 
 ---
 
@@ -43,7 +43,7 @@ lib/
 ## 2. Design System Rules
 
 
-see ./specs/DESIGN.md
+see ./specs/DESIGN_DARK.md and ./specs/DESIGN_LIGHT.md
 
 ---
 

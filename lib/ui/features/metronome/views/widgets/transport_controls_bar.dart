@@ -60,16 +60,20 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
               onPointerCancel: _handleTapUp,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 80),
-                height: widget.isCompact ? 56.0 : 68.0,
+                height: widget.isCompact
+                    ? context.dimens.tapTempoHeightCompact
+                    : context.dimens.tapTempoHeight,
                 decoration: BoxDecoration(
                   color: _tapPressed
-                      ? SonicColors.primaryContainer
-                      : SonicColors.surfaceHigh,
-                  borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+                      ? context.colors.primaryContainer
+                      : context.colors.surfaceHigh,
+                  borderRadius: BorderRadius.circular(
+                    context.dimens.radiusFull,
+                  ),
                   border: Border.all(
                     color: _tapPressed
-                        ? SonicColors.primaryNeon
-                        : SonicColors.ghostBorder,
+                        ? context.colors.primaryAccent
+                        : context.colors.ghostBorder,
                   ),
                 ),
                 child: Row(
@@ -78,17 +82,17 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                     Icon(
                       Icons.touch_app_rounded,
                       color: _tapPressed
-                          ? SonicColors.primaryNeon
-                          : SonicColors.onSurfacePrimary,
+                          ? context.colors.primaryAccent
+                          : context.colors.onSurfacePrimary,
                       size: 22,
                     ),
-                    const SizedBox(width: SonicDimens.spaceSm),
+                    SizedBox(width: context.dimens.spaceSm),
                     Text(
                       'TAP TEMPO',
-                      style: SonicTheme.labelMd.copyWith(
+                      style: context.textTheme.labelMedium?.copyWith(
                         color: _tapPressed
-                            ? SonicColors.primaryNeon
-                            : SonicColors.onSurfacePrimary,
+                            ? context.colors.primaryAccent
+                            : context.colors.onSurfacePrimary,
                       ),
                     ),
                   ],
@@ -97,8 +101,8 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
             ),
           ),
         ),
-        const SizedBox(width: SonicDimens.spaceLg),
-        // Primary "Pulse" Play/Stop button (DESIGN.md Section 5, FR-PLY-01..03)
+        SizedBox(width: context.dimens.spaceLg),
+        // Primary "Pulse" Play/Stop button (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md)
         Semantics(
           button: true,
           label: widget.isPlaying ? 'Stop metronome' : 'Start metronome',
@@ -106,29 +110,33 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
             scale: widget.isPlaying && widget.isDownbeatActive ? 1.06 : 1.0,
             duration: const Duration(milliseconds: 90),
             child: Container(
-              height: widget.isCompact ? 72.0 : SonicDimens.pulseButtonSize,
+              height: widget.isCompact
+                  ? context.dimens.pulseButtonSizeCompact
+                  : context.dimens.pulseButtonSize,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+                borderRadius: BorderRadius.circular(context.dimens.radiusFull),
                 boxShadow: [
                   BoxShadow(
                     color: widget.isPlaying
-                        ? SonicColors.pulseGlow
-                        : const Color(0x3300FF41),
+                        ? context.colors.pulseGlow
+                        : context.colors.pulseGlowIdle,
                     blurRadius: widget.isPlaying ? 32.0 : 18.0,
                     spreadRadius: widget.isPlaying ? 2.0 : 0.0,
                   ),
                 ],
               ),
               child: Material(
-                color: SonicColors.primaryNeon,
-                borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+                color: context.colors.primaryAccent,
+                borderRadius: BorderRadius.circular(context.dimens.radiusFull),
                 child: InkWell(
                   key: const Key('play_stop_button'),
-                  borderRadius: BorderRadius.circular(SonicDimens.radiusFull),
+                  borderRadius: BorderRadius.circular(
+                    context.dimens.radiusFull,
+                  ),
                   onTap: widget.onTogglePlayStop,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: SonicDimens.spaceLg,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.dimens.spaceLg,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -138,15 +146,15 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                               ? Icons.stop_rounded
                               : Icons.play_arrow_rounded,
                           size: 36,
-                          color: SonicColors.primaryContainer,
+                          color: context.colors.onPrimaryAccent,
                         ),
-                        const SizedBox(width: SonicDimens.spaceXs),
+                        SizedBox(width: context.dimens.spaceXs),
                         Text(
                           widget.isPlaying ? 'STOP' : 'PLAY',
-                          style: SonicTheme.titleSm.copyWith(
+                          style: context.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.2,
-                            color: SonicColors.primaryContainer,
+                            color: context.colors.onPrimaryAccent,
                           ),
                         ),
                       ],
