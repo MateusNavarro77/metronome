@@ -172,7 +172,7 @@ The Android project is configured with product flavors:
 Automated pipelines are configured with GitHub Actions:
 
 * **CI (`.github/workflows/ci.yaml`):** Runs on push and pull requests to `main` and feature branches. Verifies formatting (`dart format`), static analysis (`flutter analyze --fatal-infos`), and executes all unit and widget tests (`flutter test`).
-* **Release (`.github/workflows/release.yaml`):** Triggered on GitHub Release creation or via manual dispatch. Sets up Java 17 and Flutter 3.47.8, decodes keystore credentials, builds an optimized release AAB (`flutter build appbundle --release --flavor prod`), and uploads directly to Google Play Store internal track.
+* **Release (`.github/workflows/release.yaml`):** Triggered by every push to `main`. Sets up Java 17 and Flutter 3.47.8, decodes keystore credentials, builds an optimized release AAB using the version from `pubspec.yaml` and the GitHub Actions workflow run number as the Android build number, then uploads directly to the Google Play Store internal track.
 
 ### Required Secrets for Release
 
