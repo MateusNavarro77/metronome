@@ -15,8 +15,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -41,11 +41,16 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=upload-keystore.jks" >> android/key.properties
 
-      # Build AAB
       - name: Build AAB
-        run: flutter build appbundle --release --flavor prod --build-number "${{ github.run_number }}"
+        run: |
+          VERSION_CODE=$((1000 + ${{ github.run_number }}))
+          echo "Using versionCode=$VERSION_CODE"
 
-      # Upload to Play Store
+          flutter build appbundle \
+            --release \
+            --flavor prod \
+            --build-number $VERSION_CODE
+
       - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
