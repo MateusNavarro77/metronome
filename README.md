@@ -1,26 +1,30 @@
 <a id="readme-top"></a>
 <div align="center">
   
-![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-%230175C2.svg?style=for-the-badge&logo=Dart&logoColor=white)
-![Bloc](https://img.shields.io/badge/Bloc-%234478e8.svg?style=for-the-badge&logo=flutter&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-3.47.8-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-3.13.7-%230175C2.svg?style=for-the-badge&logo=Dart&logoColor=white)
+![Provider](https://img.shields.io/badge/Provider-6.1.5-%234478e8.svg?style=for-the-badge&logo=flutter&logoColor=white)
+![CI](https://github.com/MateusNavarro77/metronome/actions/workflows/ci.yaml/badge.svg)
+
 </div>
 <br />
 <div align="center">
-  <a href="https://github.com/GreatApe77/metronome"> <img src="./readme-assets/app_logo.png" alt="Logo" width="80" height="80">
+  <a href="https://github.com/MateusNavarro77/metronome">
+    <img src="./readme-assets/app_logo.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Metronome</h3>
 
   <p align="center">
-    A simple and effective metronome application built with Flutter.
+    A high-precision, beautifully crafted metronome application built with Flutter, Clean Architecture, and SoLoud low-latency audio synthesis.
     <br />
     <br />
     &middot;
-    <a href="https://github.com/GreatApe77/metronome/issues/new?labels=bug&template=bug-report---.md">Report Bug</a> &middot;
-    <a href="https://github.com/GreatApe77/metronome/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a> </p> </div>
-
-
+    <a href="https://github.com/MateusNavarro77/metronome/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    &middot;
+    <a href="https://github.com/MateusNavarro77/metronome/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
 
 <details>
   <summary>Table of Contents</summary>
@@ -28,6 +32,8 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
+        <li><a href="#key-features">Key Features</a></li>
+        <li><a href="#architecture--design-system">Architecture & Design System</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -36,108 +42,160 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
+        <li><a href="#running-the-app">Running the App</a></li>
         <li><a href="#running-tests">Running Tests</a></li>
+        <li><a href="#build-flavors">Build Flavors</a></li>
       </ul>
     </li>
+    <li><a href="#cicd--deployment">CI/CD & Deployment</a></li>
     <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
   </ol>
 </details>
 
-
-
 ## About The Project
 
-<div align="center">
-    <img src="./readme-assets/app-screenshots/light.png" alt="Product Screenshot Light Theme" width="200"/>
-    <img src="./readme-assets/app-screenshots/dark.png" alt="Product Screenshot Dark Theme" width="200"/>
+This Metronome app is an ultra-precise, low-latency timing tool for musicians. Refactored from the ground up, it combines a pure Dart domain timing engine with **The Sonic Architect** design language—an immersive OLED dark interface with fluid visual beat pulses and neon green accents.
 
-</div>
+### Key Features
 
-
-This Metronome app is a mobile application built using Flutter, designed to provide musicians with a simple and reliable tool for time-keeping. It offers adjustable BPM, visual feedback, and clear audio cues for practice sessions.
-
-Key features include:
-* **Adjustable BPM:** Easily set the tempo from 1 to 250 beats per minute using a slider or increment/decrement buttons.
-* **Play/Pause Control:** Start and stop the metronome at any time.
-* **Visual Beat Indicator:** A measure bar visually displays the current beat in a 4-beat measure.
-* **Accent on First Beat:** Option to enable an accented sound for the first beat of each measure.
-* **Audio Cues:** Utilizes distinct sound files for regular and accented ticks.
-* **Theme Toggle:** Switch between light and dark themes for user preference, with the choice persisted across sessions.
+* **Precision Tempo Control (30–300 BPM):** Seamlessly adjust BPM using interactive controls or rapid increment buttons (+1, +5, -1, -5). Tempo changes take effect on the next pulse without interrupting playback.
+* **Dynamic Italian Tempo Markings:** Instant visual markings across classical ranges: *Largo*, *Larghetto*, *Adagio*, *Andante*, *Moderato*, *Allegro*, *Vivace*, *Presto*, and *Prestissimo*.
+* **Monotonic Tap Tempo:** Accurate tap tempo calculation based on a monotonic pointer-down clock (`Stopwatch`), averaging recent taps with an automatic 2-second timeout reset.
+* **Meter & Time Signatures:** Built-in standard meters (`2/4`, `3/4`, `4/4`, `6/8`) and support for custom time signatures. Accurate accents for Beat 1 (strong), compound meters (e.g., Beat 4 in `6/8` as medium accent), and weak beats.
+* **Beat Subdivisions:** Practice with quarter notes (None), eighth notes, triplets, or sixteenth notes.
+* **Low-Latency PCM Synthesis:** Crystal-clear ticks synthesized via `flutter_soloud` low-latency audio engine.
+* **Sonic Architect Design:** Pure OLED-friendly dark palette (`#0E0E0E` / `#131313` / `#2A2A2A`), neon green pulse accent (`#00FF41`), zero-line border design, Comfortaa typography, and WCAG AA contrast.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+### Architecture & Design System
 
+The project strictly follows layered Clean Architecture principles:
+
+```text
+lib/
+├── data/
+│   ├── models/         # Data transfer objects
+│   ├── repositories/   # MetronomeRepository (Single source of truth)
+│   └── services/       # SoLoud audio synthesis & SimulatedMetronomeEngine
+├── domain/
+│   ├── models/         # 100% Pure Dart immutable models (Bpm, TimeSignature, Subdivision, etc.)
+│   └── use_cases/      # Pure Dart logic (TapTempoCalculator, ClickScheduler)
+└── ui/
+    ├── core/           # Sonic Architect theme, colors, Comfortaa typography
+    └── features/
+        └── metronome/  # ChangeNotifier ViewModels & ListenableBuilder Views
+```
+
+* **Domain Layer (`lib/domain/`):** 100% pure Dart without any Flutter framework dependencies for maximum testability.
+* **Data Layer (`lib/data/`):** Encapsulates platform audio via `MetronomeEngine` interface, interchangeable with test fakes.
+* **UI Layer (`lib/ui/`):** Declarative, performant widgets listening to `MetronomeViewModel` via `ListenableBuilder`.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-This project is built with Flutter and leverages the following major libraries/frameworks:
-
-* [Flutter](https://flutter.dev)
-* [Bloc](https://bloclibrary.dev/)
-* [FlutterSoloud](https://pub.dev/packages/flutter_soloud)
-* [Hydrated Bloc](https://pub.dev/packages/hydrated_bloc)
+* [Flutter](https://flutter.dev) (v3.47.8 pinned via `.fvmrc`)
+* [Dart](https://dart.dev) (^3.13.7)
+* [Provider](https://pub.dev/packages/provider)
+* [FlutterSoLoud](https://pub.dev/packages/flutter_soloud)
+* [Google Fonts](https://pub.dev/packages/google_fonts) (Comfortaa)
+* [Checks](https://pub.dev/packages/checks) (Unit & Widget testing assertions)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 ## Getting Started
 
-To get a local copy up and running, follow these simple steps.
-
 ### Prerequisites
 
-Ensure you have the Flutter SDK installed on your system.
+Ensure you have the Flutter SDK installed. The repository pins Flutter **3.47.8** via `.fvmrc`:
 
-* **Flutter SDK v3.29.0** 
-    For installation instructions, please refer to the [official Flutter documentation](https://flutter.dev/docs/get-started/install).
+```sh
+# Using FVM (recommended)
+fvm install
+fvm use
+```
 
 ### Installation
 
-1.  Clone the repo
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/MateusNavarro77/metronome.git
+   cd metronome
+   ```
 
-    ```sh
-    git clone https://github.com/GreatApe77/metronome.git
-    ```
-2.  Navigate to the project directory
+2. Install dependencies:
+   ```sh
+   flutter pub get
+   ```
 
-    ```sh
-    cd metronome
-    ```
-3.  Install Flutter packages
+### Running the App
 
-    ```sh
-    flutter pub get
-    ```
-4.  Run the app
+Run with the desired flavor:
 
-    ```sh
-    flutter run
-    ```
-5.  For Android Emulator, ensure you have an emulator running or a device connected.
+```sh
+# Development flavor
+flutter run --flavor dev
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+# Production flavor
+flutter run --flavor prod
+```
 
 ### Running Tests
 
-This project includes unit tests to ensure code quality and functionality. Tests are located in the `test` directory.
-
-To run the unit tests, use the following command in your terminal from the project's root directory:
+Run the full suite of unit and widget tests:
 
 ```sh
 flutter test
 ```
 
+Run static analysis:
+
+```sh
+flutter analyze --fatal-infos
+```
+
+### Build Flavors
+
+The Android project is configured with product flavors:
+
+| Flavor | Application ID | App Name |
+| :--- | :--- | :--- |
+| **`dev`** | `com.mateusnavarro77.metronome.dev` | Metronome Dev |
+| **`prod`** | `com.mateusnavarro77.metronome` | Metronome |
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## CI/CD & Deployment
+
+Automated pipelines are configured with GitHub Actions:
+
+* **CI (`.github/workflows/ci.yaml`):** Runs on push and pull requests to `main` and feature branches. Verifies formatting (`dart format`), static analysis (`flutter analyze --fatal-infos`), and executes all unit and widget tests (`flutter test`).
+* **Release (`.github/workflows/release.yaml`):** Triggered on GitHub Release creation or via manual dispatch. Sets up Java 17 and Flutter 3.47.8, decodes keystore credentials, builds an optimized release AAB (`flutter build appbundle --release --flavor prod`), and uploads directly to Google Play Store internal track.
+
+### Required Secrets for Release
+
+* `KEYSTORE_BASE64`: Base64-encoded upload keystore (`upload-keystore.jks`)
+* `KEYSTORE_PASSWORD`: Password for keystore
+* `KEY_PASSWORD`: Password for key alias
+* `KEY_ALIAS`: Alias of the signing key
+* `PLAY_SERVICE_ACCOUNT_JSON`: Google Play Console service account credentials JSON
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
