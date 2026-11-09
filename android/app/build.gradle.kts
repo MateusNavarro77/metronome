@@ -3,7 +3,7 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -15,8 +15,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.mateusnavarro77.metronome"
-    compileSdk = 37
-    ndkVersion = "28.2.13676358"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
 
     flavorDimensions += "default"
     productFlavors {
@@ -32,35 +32,19 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
         applicationId = "com.mateusnavarro77.metronome"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        externalNativeBuild {
-            cmake {
-                arguments("-DANDROID_STL=c++_shared")
-            }
-        }
     }
 
     signingConfigs {
-//        getByName("debug") {
-//            keyAlias = keystoreProperties["keyAlias"] as String?
-//            keyPassword = keystoreProperties["keyPassword"] as String?
-//            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-//            storePassword = keystoreProperties["storePassword"] as String?
-//        }
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String?
             keyPassword = keystoreProperties["keyPassword"] as String?
@@ -80,15 +64,8 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
-        }
-    }
-
     buildFeatures {
-        prefab = true
+        resValues = true
     }
 
     applicationVariants.all {
@@ -108,7 +85,7 @@ android {
     }
 }
 
-// AAB config
+// AAB rename config
 tasks.whenTaskAdded {
     if (name.startsWith("bundle")) {
         doLast {
@@ -127,7 +104,6 @@ tasks.whenTaskAdded {
             val appName = "metronome"
             val versionName = flutter.versionName
 
-            // Find and rename the AAB file
             val flavorBuildType = if (flavorName.isNotEmpty()) {
                 "${flavorName}${buildType.replaceFirstChar { it.uppercase() }}"
             } else {
@@ -149,8 +125,10 @@ tasks.whenTaskAdded {
     }
 }
 
-dependencies {
-    implementation("com.google.oboe:oboe:1.10.0")
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
 }
 
 flutter {
