@@ -1,7 +1,7 @@
 name: metronome
 description: "Metronome app"
-homepage: "https://github.com/GreatApe77/metronome"
-repository: "https://github.com/GreatApe77/metronome"
+homepage: "https://github.com/MateusNavarro77/metronome"
+repository: "https://github.com/MateusNavarro77/metronome"
 screenshots:
   - path: "./readme-assets/app-screenshots/light.png"
     description: "Light theme"
