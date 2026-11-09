@@ -1,9 +1,8 @@
 name: Build and upload to Play Store
 
 on:
-  workflow_dispatch:
-  release:
-    types: [created]
+  push:
+    branches: [main]
 
 jobs:
   build:
@@ -44,7 +43,7 @@ jobs:
 
       # Build AAB
       - name: Build AAB
-        run: flutter build appbundle --release --flavor prod
+        run: flutter build appbundle --release --flavor prod --build-number "${{ github.run_number }}"
 
       # Upload to Play Store
       - name: Upload to Google Play
