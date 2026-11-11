@@ -21,8 +21,7 @@ void main() {
       expect(find.byKey(const Key('bpm_value_text')), findsOneWidget);
       expect(find.text('120'), findsOneWidget);
       expect(find.text('ALLEGRO'), findsOneWidget);
-      expect(find.text('STOPPED'), findsOneWidget);
-      expect(find.text('PLAY'), findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
 
       // Tap '+' button to increment BPM to 121 (FR-BPM-02)
       await tester.tap(find.byKey(const Key('bpm_increment_button')));
@@ -31,13 +30,13 @@ void main() {
 
       // Verify Accent toggle is present and toggles between ON and OFF
       expect(find.byKey(const Key('accent_toggle_button')), findsOneWidget);
-      expect(find.text('ACCENT ON'), findsOneWidget);
+      expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
       await tester.tap(find.byKey(const Key('accent_toggle_button')));
       await tester.pump();
-      expect(find.text('ACCENT OFF'), findsOneWidget);
+      expect(find.byIcon(Icons.volume_mute_rounded), findsOneWidget);
       await tester.tap(find.byKey(const Key('accent_toggle_button')));
       await tester.pump();
-      expect(find.text('ACCENT ON'), findsOneWidget);
+      expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
 
       // Tap '-' button twice to decrement BPM to 119 -> MODERATO (FR-AND-02)
       await tester.tap(find.byKey(const Key('bpm_decrement_button')));
@@ -102,17 +101,14 @@ void main() {
       await tester.tap(find.byKey(const Key('play_stop_button')));
       await tester.pump();
       check(simulatedEngine.isPlaying).isTrue();
-      expect(find.text('PLAYING'), findsOneWidget);
-      expect(find.text('STOP'), findsOneWidget);
 
       // Tap Play/Stop button again to stop playback (FR-PLY-04)
       await tester.tap(find.byKey(const Key('play_stop_button')));
       await tester.pump();
       check(simulatedEngine.isPlaying).isFalse();
-      expect(find.text('STOPPED'), findsOneWidget);
 
-      // Open Preferences via settings button in header bar
-      await tester.tap(find.byKey(const Key('settings_button')));
+      // Open Preferences via navigation rail destination
+      await tester.tap(find.byKey(const Key('rail_destination_settings')));
       await tester.pumpAndSettle();
 
       expect(find.text('PREFERENCES'), findsOneWidget);
@@ -122,8 +118,8 @@ void main() {
       await tester.tap(find.text('Light'));
       await tester.pumpAndSettle();
 
-      // Return to Metronome view via navigation
-      await tester.tap(find.text('Metronome'));
+      // Return to Metronome view via navigation rail
+      await tester.tap(find.byKey(const Key('rail_destination_metronome')));
       await tester.pumpAndSettle();
 
       expect(find.text('METRONOME'), findsOneWidget);

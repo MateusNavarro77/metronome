@@ -248,10 +248,10 @@ class SonicDimens {
 
   // Component Metrics & Touch Targets
   final double minTouchTarget = 48.0;
-  final double pulseButtonSize = 80.0;
-  final double pulseButtonSizeCompact = 72.0;
-  final double tapTempoHeight = 68.0;
-  final double tapTempoHeightCompact = 56.0;
+  final double pulseButtonSize = 96.0;
+  final double pulseButtonSizeCompact = 80.0;
+  final double tapTempoHeight = 96.0;
+  final double tapTempoHeightCompact = 80.0;
   final double stepperButtonSize = 56.0;
   final double stepperIconSize = 28.0;
   final double badgeDotSize = 8.0;
