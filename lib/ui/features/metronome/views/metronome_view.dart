@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/sonic_theme.dart';
-import '../../preferences/views/preferences_view.dart';
 import '../view_models/metronome_view_model.dart';
 import 'widgets/beat_indicator_bar.dart';
 import 'widgets/bpm_control_section.dart';
@@ -211,8 +210,6 @@ class _HeaderBar extends StatelessWidget {
                 ],
               ),
             ),
-          
-            
           ],
         ),
       ],
