@@ -211,24 +211,8 @@ class _HeaderBar extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: context.dimens.spaceSm),
-            IconButton(
-              key: const Key('settings_button'),
-              icon: const Icon(Icons.settings_outlined),
-              color: context.colors.onSurfacePrimary,
-              tooltip: 'Settings & Preferences',
-              onPressed: () {
-                if (onOpenSettings != null) {
-                  onOpenSettings!();
-                } else {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const PreferencesView(),
-                    ),
-                  );
-                }
-              },
-            ),
+          
+            
           ],
         ),
       ],
