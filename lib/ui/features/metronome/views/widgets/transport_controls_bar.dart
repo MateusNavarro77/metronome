@@ -44,10 +44,14 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
 
   @override
   Widget build(BuildContext context) {
+    final controlHeight = widget.isCompact
+        ? context.dimens.pulseButtonSizeCompact
+        : context.dimens.pulseButtonSize;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Large Tap Tempo pill button (FR-TAP-01, FR-TAP-05, FR-TAP-07)
+        // Large Tap Tempo button (FR-TAP-01, FR-TAP-05, FR-TAP-07)
         Expanded(
           child: Semantics(
             button: true,
@@ -60,61 +64,70 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
               onPointerCancel: _handleTapUp,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 80),
-                height: widget.isCompact
-                    ? context.dimens.tapTempoHeightCompact
-                    : context.dimens.tapTempoHeight,
+                height: controlHeight,
                 decoration: BoxDecoration(
                   color: _tapPressed
                       ? context.colors.primaryContainer
                       : context.colors.surfaceHigh,
-                  borderRadius: BorderRadius.circular(
-                    context.dimens.radiusFull,
-                  ),
+                  borderRadius: BorderRadius.circular(context.dimens.radiusMd),
                   border: Border.all(
                     color: _tapPressed
                         ? context.colors.primaryAccent
                         : context.colors.ghostBorder,
+                    width: 1.5,
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.touch_app_rounded,
-                      color: _tapPressed
-                          ? context.colors.primaryAccent
-                          : context.colors.onSurfacePrimary,
-                      size: 22,
-                    ),
-                    SizedBox(width: context.dimens.spaceSm),
-                    Text(
-                      'TAP TEMPO',
-                      style: context.textTheme.labelMedium?.copyWith(
-                        color: _tapPressed
-                            ? context.colors.primaryAccent
-                            : context.colors.onSurfacePrimary,
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.dimens.spaceSmPlus4,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.touch_app_rounded,
+                            color: _tapPressed
+                                ? context.colors.primaryAccent
+                                : context.colors.onSurfacePrimary,
+                            size: widget.isCompact ? 24 : 28,
+                          ),
+                          SizedBox(width: context.dimens.spaceSmPlus2),
+                          Text(
+                            'TAP TEMPO',
+                            style: context.textTheme.labelMedium?.copyWith(
+                              fontSize: widget.isCompact ? 13 : 15,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.8,
+                              color: _tapPressed
+                                  ? context.colors.primaryAccent
+                                  : context.colors.onSurfacePrimary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-        SizedBox(width: context.dimens.spaceLg),
-        // Primary "Pulse" Play/Stop button (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md)
+        SizedBox(width: context.dimens.spaceMd),
+        // Primary Circular "Pulse" Play/Stop button (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md)
         Semantics(
           button: true,
           label: widget.isPlaying ? 'Stop metronome' : 'Start metronome',
           child: AnimatedScale(
-            scale: widget.isPlaying && widget.isDownbeatActive ? 1.06 : 1.0,
+            scale: widget.isPlaying ? 1.1 : 1.0,
             duration: const Duration(milliseconds: 90),
             child: Container(
-              height: widget.isCompact
-                  ? context.dimens.pulseButtonSizeCompact
-                  : context.dimens.pulseButtonSize,
+              width: controlHeight,
+              height: controlHeight,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(context.dimens.radiusFull),
+                shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: widget.isPlaying
@@ -126,38 +139,25 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                 ],
               ),
               child: Material(
+                shape: const CircleBorder(),
                 color: context.colors.primaryAccent,
-                borderRadius: BorderRadius.circular(context.dimens.radiusFull),
+                clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   key: const Key('play_stop_button'),
-                  borderRadius: BorderRadius.circular(
-                    context.dimens.radiusFull,
-                  ),
+                  customBorder: const CircleBorder(),
                   onTap: widget.onTogglePlayStop,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.dimens.spaceLg,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          widget.isPlaying
-                              ? Icons.stop_rounded
-                              : Icons.play_arrow_rounded,
-                          size: 36,
-                          color: context.colors.onPrimaryAccent,
-                        ),
-                        SizedBox(width: context.dimens.spaceXs),
-                        Text(
-                          widget.isPlaying ? 'STOP' : 'PLAY',
-                          style: context.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
-                            color: context.colors.onPrimaryAccent,
-                          ),
-                        ),
-                      ],
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: widget.isPlaying ? 0.0 : 3.0,
+                      ),
+                      child: Icon(
+                        widget.isPlaying
+                            ? Icons.stop_rounded
+                            : Icons.play_arrow_rounded,
+                        size: widget.isCompact ? 42 : 50,
+                        color: context.colors.onPrimaryAccent,
+                      ),
                     ),
                   ),
                 ),
