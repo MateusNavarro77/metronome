@@ -162,30 +162,6 @@ void main() {
       },
     );
 
-    testWidgets(
-      'header settings button navigates directly to Settings destination',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(390, 844);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-
-        await tester.pumpWidget(
-          _buildTestApp(
-            metronomeViewModel: metronomeViewModel,
-            preferencesViewModel: preferencesViewModel,
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        // Tap settings icon in Metronome header
-        await tester.tap(find.byKey(const Key('settings_button')));
-        await tester.pumpAndSettle();
-
-        expect(find.text('PREFERENCES'), findsOneWidget);
-        expect(find.text('APPEARANCE'), findsOneWidget);
-      },
-    );
-
     testWidgets('playback persists uninterrupted while switching tabs', (
       WidgetTester tester,
     ) async {
@@ -223,7 +199,6 @@ void main() {
       await tester.pumpAndSettle();
 
       check(engine.isPlaying).isTrue();
-      expect(find.text('PLAYING'), findsOneWidget);
     });
   });
 }

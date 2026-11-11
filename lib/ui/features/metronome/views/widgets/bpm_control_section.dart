@@ -4,15 +4,15 @@ import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/tempo_marking.dart';
 import '../../../../core/theme/sonic_theme.dart';
 
-/// Hero BPM display with radial neon glow, tempo marking pill, and tactile
-/// `-`/`+` step buttons with hold-to-accelerate support (FR-BPM-01..03, FR-AND-01..02).
+/// Hero BPM display with tactile `-`/`+` step buttons and quick-adjust slider
+/// (FR-BPM-01..03, FR-AND-01..02).
 class BpmControlSection extends StatelessWidget {
   const BpmControlSection({
     super.key,
     required this.bpm,
     required this.tempoMarking,
     required this.isPlaying,
-    required this.isDownbeatActive,
+    this.isDownbeatActive = false,
     this.isCompact = false,
     required this.onAdjustBpm,
     required this.onStartHoldAdjust,
@@ -36,24 +36,10 @@ class BpmControlSection extends StatelessWidget {
         ? context.dimens.spaceSm
         : context.dimens.spaceMd;
 
-    return Container(
+    return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: context.dimens.spaceMd,
         vertical: verticalPad,
-      ),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceLow,
-        borderRadius: BorderRadius.circular(context.dimens.radiusLg),
-        border: Border.all(color: context.colors.ghostBorder),
-        gradient: RadialGradient(
-          radius: 0.85,
-          colors: [
-            isDownbeatActive
-                ? context.colors.radialGlowDownbeat
-                : context.colors.radialGlow,
-            context.colors.surfaceLow,
-          ],
-        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

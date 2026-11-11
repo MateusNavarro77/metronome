@@ -65,7 +65,6 @@ class MeterAndSubdivisionSection extends StatelessWidget {
         children: [
           // 1. Time Signature trigger card
           Expanded(
-            flex: 4,
             child: _SummaryTriggerCard(
               cardKey: const Key('time_signature_selector_button'),
               caption: 'TIME SIG',
@@ -89,7 +88,6 @@ class MeterAndSubdivisionSection extends StatelessWidget {
           SizedBox(width: context.dimens.spaceSm),
           // 2. Subdivision trigger card
           Expanded(
-            flex: 5,
             child: _SummaryTriggerCard(
               cardKey: const Key('subdivision_selector_button'),
               caption: 'SUBDIVISION',
@@ -113,13 +111,10 @@ class MeterAndSubdivisionSection extends StatelessWidget {
           if (onToggleAccent != null) ...[
             SizedBox(width: context.dimens.spaceSm),
             // 3. Dedicated Accent toggle button
-            Expanded(
-              flex: 4,
-              child: _AccentToggleCard(
-                isAccentEnabled: isAccentEnabled,
-                verticalPadding: verticalPadding,
-                onToggle: onToggleAccent!,
-              ),
+            _AccentToggleCard(
+              isAccentEnabled: isAccentEnabled,
+              verticalPadding: verticalPadding,
+              onToggle: onToggleAccent!,
             ),
           ],
         ],
@@ -210,7 +205,7 @@ class _SummaryTriggerCard extends StatelessWidget {
 class _AccentToggleCard extends StatelessWidget {
   const _AccentToggleCard({
     required this.isAccentEnabled,
-    required this.verticalPadding,
+    this.verticalPadding = 0,
     required this.onToggle,
   });
 
@@ -226,84 +221,41 @@ class _AccentToggleCard extends StatelessWidget {
       label: isAccentEnabled
           ? 'Accent on Beat 1 enabled'
           : 'Accent on Beat 1 disabled',
-      child: Material(
-        color: isAccentEnabled
-            ? context.colors.primaryContainer
-            : context.colors.surfaceLow,
-        borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        child: InkWell(
+      child: Center(
+        child: IconButton(
+          // Set the desired size
+          constraints: BoxConstraints(
+            maxWidth: context.dimens.stepperButtonSize,
+            minWidth: context.dimens.stepperButtonSize,
+            maxHeight: context.dimens.stepperButtonSize,
+            minHeight: context.dimens.stepperButtonSize,
+          ),
+          iconSize: context.dimens.stepperButtonSize,
           key: const Key('accent_toggle_button'),
-          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-          onTap: onToggle,
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: context.dimens.minTouchTarget,
+          tooltip: isAccentEnabled
+              ? 'Downbeat accent ON'
+              : 'Downbeat accent OFF',
+          isSelected: isAccentEnabled,
+          onPressed: onToggle,
+          style: IconButton.styleFrom(
+            backgroundColor: isAccentEnabled
+                ? context.colors.primaryContainer
+                : context.colors.surfaceLow,
+            foregroundColor: isAccentEnabled
+                ? context.colors.primaryAccent
+                : context.colors.onSurfaceMuted,
+            side: BorderSide(
+              color: isAccentEnabled
+                  ? context.colors.neonGhostBorder
+                  : context.colors.ghostBorder,
             ),
-            padding: EdgeInsets.symmetric(
-              horizontal: context.dimens.spaceSmPlus2,
-              vertical: verticalPadding,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-              border: Border.all(
-                color: isAccentEnabled
-                    ? context.colors.neonGhostBorder
-                    : context.colors.ghostBorder,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'DOWNBEAT',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.labelMedium?.copyWith(
-                          fontSize: 10,
-                          letterSpacing: 1.1,
-                          color: isAccentEnabled
-                              ? context.colors.primaryAccent
-                              : context.colors.onSurfaceMuted,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      isAccentEnabled
-                          ? Icons.volume_up_rounded
-                          : Icons.volume_mute_rounded,
-                      size: 14,
-                      color: isAccentEnabled
-                          ? context.colors.primaryAccent
-                          : context.colors.onSurfaceMuted,
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.dimens.spaceXs),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    isAccentEnabled ? 'ACCENT ON' : 'ACCENT OFF',
-                    maxLines: 1,
-                    style: context.textTheme.titleSmall?.copyWith(
-                      fontSize: 12,
-                      fontWeight: isAccentEnabled
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                      color: isAccentEnabled
-                          ? context.colors.primaryAccent
-                          : context.colors.onSurfaceMuted,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            shape: const CircleBorder(),
+          ),
+          icon: Icon(
+            size: context.dimens.stepperIconSize,
+            isAccentEnabled
+                ? Icons.volume_up_rounded
+                : Icons.volume_mute_rounded,
           ),
         ),
       ),

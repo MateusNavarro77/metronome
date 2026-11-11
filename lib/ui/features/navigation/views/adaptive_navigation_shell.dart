@@ -149,7 +149,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                     key: const Key('adaptive_navigation_rail'),
                     selectedIndex: _currentIndex,
                     onDestinationSelected: _onDestinationSelected,
-                    labelType: NavigationRailLabelType.all,
+                    labelType: NavigationRailLabelType.selected,
                     backgroundColor: context.colors.surfaceLow,
                     indicatorColor: context.colors.primaryContainer,
                     selectedIconTheme: IconThemeData(
