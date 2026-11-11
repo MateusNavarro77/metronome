@@ -199,7 +199,6 @@ void main() {
       await tester.pumpAndSettle();
 
       check(engine.isPlaying).isTrue();
-      expect(find.text('PLAYING'), findsOneWidget);
     });
   });
 }

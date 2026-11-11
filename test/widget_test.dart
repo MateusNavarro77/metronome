@@ -21,8 +21,7 @@ void main() {
       expect(find.byKey(const Key('bpm_value_text')), findsOneWidget);
       expect(find.text('120'), findsOneWidget);
       expect(find.text('ALLEGRO'), findsOneWidget);
-      expect(find.text('STOPPED'), findsOneWidget);
-      expect(find.text('PLAY'), findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
 
       // Tap '+' button to increment BPM to 121 (FR-BPM-02)
       await tester.tap(find.byKey(const Key('bpm_increment_button')));
@@ -102,14 +101,11 @@ void main() {
       await tester.tap(find.byKey(const Key('play_stop_button')));
       await tester.pump();
       check(simulatedEngine.isPlaying).isTrue();
-      expect(find.text('PLAYING'), findsOneWidget);
-      expect(find.text('STOP'), findsOneWidget);
 
       // Tap Play/Stop button again to stop playback (FR-PLY-04)
       await tester.tap(find.byKey(const Key('play_stop_button')));
       await tester.pump();
       check(simulatedEngine.isPlaying).isFalse();
-      expect(find.text('STOPPED'), findsOneWidget);
 
       // Open Preferences via navigation rail destination
       await tester.tap(find.byKey(const Key('rail_destination_settings')));

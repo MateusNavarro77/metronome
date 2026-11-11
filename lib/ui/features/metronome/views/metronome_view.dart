@@ -107,34 +107,31 @@ class MetronomeView extends StatelessWidget {
                                 onSliderChanged: viewModel.setBpm,
                               ),
                               SizedBox(height: gap),
-                              // Lower Section: Time Signature, Subdivisions & Thumb-Zone Transport (UI-09)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  MeterAndSubdivisionSection(
-                                    selectedTimeSignature:
-                                        viewModel.timeSignature,
-                                    selectedSubdivision: viewModel.subdivision,
-                                    isAccentEnabled: viewModel.isAccentEnabled,
-                                    isCompact: isCompactHeight,
-                                    onTimeSignatureSelected:
-                                        viewModel.selectTimeSignature,
-                                    onSubdivisionSelected:
-                                        viewModel.selectSubdivision,
-                                    onToggleAccent: viewModel.toggleAccent,
-                                  ),
-                                  SizedBox(height: gap),
-                                  TransportControlsBar(
-                                    isPlaying: viewModel.isPlaying,
-                                    isDownbeatActive: isDownbeatActive,
-                                    isCompact: isCompactHeight,
-                                    onTogglePlayStop: viewModel.togglePlayStop,
-                                    onTapTempo: (timestamp) => viewModel
-                                        .registerTapTempo(timestamp: timestamp),
-                                  ),
-                                ],
+                              // Transport Controls (Tap tempo + Circular Play/Stop Pulse CTA)
+                              TransportControlsBar(
+                                isPlaying: viewModel.isPlaying,
+                                isDownbeatActive: isDownbeatActive,
+                                isCompact: isCompactHeight,
+                                onTogglePlayStop: viewModel.togglePlayStop,
+                                onTapTempo: (timestamp) => viewModel
+                                    .registerTapTempo(timestamp: timestamp),
                               ),
+                              SizedBox(height: gap),
+                              // Lower Section: Time Signature, Subdivisions & Accent (UI-09)
+                              MeterAndSubdivisionSection(
+                                selectedTimeSignature: viewModel.timeSignature,
+                                selectedSubdivision: viewModel.subdivision,
+                                isAccentEnabled: viewModel.isAccentEnabled,
+                                isCompact: isCompactHeight,
+                                onTimeSignatureSelected:
+                                    viewModel.selectTimeSignature,
+                                onSubdivisionSelected:
+                                    viewModel.selectSubdivision,
+                                onToggleAccent: viewModel.toggleAccent,
+                              ),
+                              SizedBox(height: gap),
+
+                              // Lower Section: Time Signature, Subdivisions & Accent (UI-09)
                             ],
                           ),
                         ),
@@ -168,49 +165,6 @@ class _HeaderBar extends StatelessWidget {
             color: context.colors.onSurfacePrimary,
             letterSpacing: 2.2,
           ),
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.dimens.spaceSmPlus4,
-                vertical: context.dimens.spaceXs,
-              ),
-              decoration: BoxDecoration(
-                color: isPlaying
-                    ? context.colors.primaryContainer
-                    : context.colors.surfaceHigh,
-                borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: context.dimens.badgeDotSize,
-                    height: context.dimens.badgeDotSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isPlaying
-                          ? context.colors.primaryAccent
-                          : context.colors.onSurfaceMuted,
-                    ),
-                  ),
-                  SizedBox(width: context.dimens.badgeSpacing),
-                  Text(
-                    isPlaying ? 'PLAYING' : 'STOPPED',
-                    key: const Key('playback_state_badge'),
-                    style: context.textTheme.labelMedium?.copyWith(
-                      fontSize: 10,
-                      color: isPlaying
-                          ? context.colors.primaryAccent
-                          : context.colors.onSurfaceMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ],
     );
