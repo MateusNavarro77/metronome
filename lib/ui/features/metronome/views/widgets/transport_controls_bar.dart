@@ -122,6 +122,14 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
         // Primary Play/Stop CTA button with M3E round -> square shape morphing
         M3EButton.filled(
           key: const Key('play_stop_button'),
+          decoration: M3EButtonDecoration(
+            backgroundColor: WidgetStatePropertyAll<Color?>(
+              context.colorScheme.primary,
+            ),
+            foregroundColor: WidgetStatePropertyAll<Color?>(
+              context.colorScheme.onPrimary,
+            ),
+          ),
           size: M3EButtonSize.custom(
             width: controlHeight,
             height: controlHeight,

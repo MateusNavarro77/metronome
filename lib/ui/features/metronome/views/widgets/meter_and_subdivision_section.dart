@@ -208,7 +208,7 @@ class _AccentToggleCard extends StatelessWidget {
         variant: isAccentEnabled
             ? M3EIconButtonVariant.tonal
             : M3EIconButtonVariant.outlined,
-        size: M3EIconButtonSize.lg,
+        size: M3EIconButtonSize.md,
         shape: M3EIconButtonShapeVariant.round,
         isSelected: isAccentEnabled,
         tooltip: isAccentEnabled ? 'Downbeat accent ON' : 'Downbeat accent OFF',
