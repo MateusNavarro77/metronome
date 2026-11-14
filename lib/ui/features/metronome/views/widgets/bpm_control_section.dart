@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/tempo_marking.dart';
@@ -127,11 +129,13 @@ class BpmControlSection extends StatelessWidget {
           Semantics(
             label: 'BPM quick adjust slider',
             value: '$bpm BPM',
-            child: Slider(
+            child: M3ESlider(
               key: const Key('bpm_slider'),
               value: bpm.toDouble(),
               min: Bpm.min.toDouble(),
               max: Bpm.max.toDouble(),
+              size: isCompact ? M3ESliderSize.xs : M3ESliderSize.s,
+              label: '$bpm',
               onChanged: (value) => onSliderChanged(value.round()),
             ),
           ),
@@ -182,34 +186,19 @@ class _StepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: semanticLabel,
-      child: GestureDetector(
-        onLongPressStart: enabled ? (_) => onHoldStart() : null,
-        onLongPressEnd: enabled ? (_) => onHoldEnd() : null,
-        onLongPressCancel: enabled ? onHoldEnd : null,
-        child: Material(
-          color: context.colorScheme.surfaceContainerHigh,
-          shape: const CircleBorder(),
-          child: InkWell(
-            key: buttonKey,
-            customBorder: const CircleBorder(),
-            onTap: enabled ? onTap : null,
-            child: SizedBox(
-              width: context.dimens.stepperButtonSize,
-              height: context.dimens.stepperButtonSize,
-              child: Icon(
-                icon,
-                size: context.dimens.stepperIconSize,
-                color: enabled
-                    ? context.colorScheme.onSurface
-                    : context.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ),
+    return GestureDetector(
+      onLongPressStart: enabled ? (_) => onHoldStart() : null,
+      onLongPressEnd: enabled ? (_) => onHoldEnd() : null,
+      onLongPressCancel: enabled ? onHoldEnd : null,
+      child: M3EIconButton(
+        key: buttonKey,
+        variant: M3EIconButtonVariant.tonal,
+        size: M3EIconButtonSize.lg,
+        shape: M3EIconButtonShapeVariant.round,
+        icon: Icon(icon),
+        tooltip: semanticLabel,
+        semanticLabel: semanticLabel,
+        onPressed: enabled ? onTap : null,
       ),
     );
   }

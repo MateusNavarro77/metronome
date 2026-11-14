@@ -35,6 +35,10 @@ Prefer tokens from `M3ETheme.of(context)` (`colorScheme`, `typography.baseline`,
 - **Zero-latency pointer input** (e.g., audio tap tempo using `Listener.onPointerDown` with a monotonic clock): keep `Listener` rather than replacing it with an ink/tap button whose tap recognizer introduces arena delay.
 - **Custom real-time painters / visualizers** (e.g., beat indicator bars, waveforms): keep custom painting and feed it `ColorScheme` / `M3EShapes` / `M3EMotion` tokens.
 
+### 5. Layout & Modal Sizing Gotchas
+- **Avoid `IntrinsicHeight` / `IntrinsicWidth` around `M3E*` controls:** Widgets like `M3EIconButton` and `M3ECard` use internal `LayoutBuilder`s for responsive state/shape calculations, which throws `LayoutBuilder does not support returning intrinsic dimensions` inside intrinsic-sizing parents. Use `Row(crossAxisAlignment: CrossAxisAlignment.center)` or explicit heights instead.
+- **Set `initialValue: M3EBottomSheetValue.expanded` for tall/form sheets:** `M3EBottomSheet.show` defaults to `M3EBottomSheetValue.collapsed` (50% viewport height). Pass `initialValue: M3EBottomSheetValue.expanded` (with `isDismissible: true`) for form or multi-section sheets so bottom action buttons stay visible on compact screens and in 800×600 tests.
+
 ## Component Catalog & Reference Guide
 
 Load only the reference file needed for the area you are working on:

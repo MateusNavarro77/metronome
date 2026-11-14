@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../core/theme/app_theme.dart';
 import '../../presets/views/widgets/preset_editor_sheet.dart';
@@ -42,11 +44,10 @@ class MetronomeView extends StatelessWidget {
     );
     if (saved == null || !context.mounted) return;
 
-    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-      SnackBar(
-        content: Text('Saved preset "${saved.name}"'),
-        duration: const Duration(seconds: 2),
-      ),
+    M3ESnackbar.show(
+      context,
+      message: 'Saved preset "${saved.name}"',
+      duration: const Duration(seconds: 2),
     );
   }
 
@@ -224,46 +225,12 @@ class _HeaderBar extends StatelessWidget {
           ),
         ),
         if (canSavePresets)
-          Material(
-            color: context.colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-            child: InkWell(
-              key: const Key('save_preset_header_button'),
-              borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-              onTap: onSavePreset,
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: context.dimens.minTouchTarget,
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.dimens.spaceMd,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    context.dimens.radiusFull,
-                  ),
-                  border: Border.all(color: context.colorScheme.outlineVariant),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.bookmark_add_outlined,
-                      size: 18,
-                      color: context.colorScheme.primary,
-                    ),
-                    SizedBox(width: context.dimens.spaceXs),
-                    Text(
-                      'Save Preset',
-                      style: context.textTheme.labelMedium?.copyWith(
-                        letterSpacing: 0.4,
-                        color: context.colorScheme.onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          M3EButton.tonal(
+            key: const Key('save_preset_header_button'),
+            size: M3EButtonSize.xs,
+            icon: const Icon(Icons.bookmark_add_outlined),
+            label: const Text('Save Preset'),
+            onPressed: onSavePreset,
           ),
       ],
     );

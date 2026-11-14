@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/app_theme_mode.dart';
@@ -40,10 +42,10 @@ class PreferencesView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (canPop) ...[
-                        IconButton(
+                        M3EIconButton(
                           key: const Key('preferences_back_button'),
+                          variant: M3EIconButtonVariant.standard,
                           icon: const Icon(Icons.arrow_back_rounded),
-                          color: context.colorScheme.onSurface,
                           tooltip: 'Back to metronome',
                           onPressed: () => Navigator.of(context).pop(),
                         ),
@@ -72,17 +74,9 @@ class PreferencesView extends StatelessWidget {
                   SizedBox(height: context.dimens.spaceMd),
 
                   // Appearance Section Plate
-                  Container(
+                  M3ECard(
+                    variant: M3ECardVariant.outlined,
                     padding: EdgeInsets.all(context.dimens.spaceMd),
-                    decoration: BoxDecoration(
-                      color: context.colorScheme.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(
-                        context.dimens.radiusMd,
-                      ),
-                      border: Border.all(
-                        color: context.colorScheme.outlineVariant,
-                      ),
-                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -113,25 +107,25 @@ class PreferencesView extends StatelessWidget {
                         ),
                         SizedBox(height: context.dimens.spaceMd),
 
-                        // Architectural SegmentedButton for Theme Selection
+                        // Expressive SegmentedButton for Theme Selection
                         SizedBox(
                           width: double.infinity,
-                          child: SegmentedButton<AppThemeMode>(
+                          child: M3ESegmentedButton<AppThemeMode>(
                             key: const Key('theme_mode_segmented_button'),
                             segments: const [
-                              ButtonSegment<AppThemeMode>(
+                              M3ESegment<AppThemeMode>(
                                 value: AppThemeMode.system,
-                                label: Text('System'),
+                                label: 'System',
                                 icon: Icon(Icons.brightness_auto_rounded),
                               ),
-                              ButtonSegment<AppThemeMode>(
+                              M3ESegment<AppThemeMode>(
                                 value: AppThemeMode.light,
-                                label: Text('Light'),
+                                label: 'Light',
                                 icon: Icon(Icons.light_mode_rounded),
                               ),
-                              ButtonSegment<AppThemeMode>(
+                              M3ESegment<AppThemeMode>(
                                 value: AppThemeMode.dark,
-                                label: Text('Dark'),
+                                label: 'Dark',
                                 icon: Icon(Icons.dark_mode_rounded),
                               ),
                             ],
@@ -141,33 +135,6 @@ class PreferencesView extends StatelessWidget {
                                 viewModel.setThemeMode(selected.first);
                               }
                             },
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.resolveWith((
-                                states,
-                              ) {
-                                if (states.contains(WidgetState.selected)) {
-                                  return context.colorScheme.primaryContainer;
-                                }
-                                return context.colorScheme.surfaceContainerHigh;
-                              }),
-                              foregroundColor: WidgetStateProperty.resolveWith((
-                                states,
-                              ) {
-                                if (states.contains(WidgetState.selected)) {
-                                  return context.colorScheme.onPrimaryContainer;
-                                }
-                                return context.colorScheme.onSurfaceVariant;
-                              }),
-                              side: WidgetStateProperty.resolveWith((states) {
-                                return BorderSide(
-                                  color: states.contains(WidgetState.selected)
-                                      ? context.colorScheme.primary.withValues(
-                                          alpha: 0.45,
-                                        )
-                                      : context.colorScheme.outlineVariant,
-                                );
-                              }),
-                            ),
                           ),
                         ),
                       ],
