@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../core/theme/sonic_theme.dart';
 import '../view_models/metronome_view_model.dart';
