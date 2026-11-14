@@ -39,6 +39,11 @@ class SoloudMetronomeEngine implements MetronomeEngine {
   TimeSignature _timeSignature = TimeSignature.fourFour;
   Subdivision _subdivision = Subdivision.none;
 
+  Bpm? _pendingBpm;
+  TimeSignature? _pendingTimeSignature;
+  Subdivision? _pendingSubdivision;
+  bool? _pendingAccentEnabled;
+
   int _currentBeat = 0;
   int _currentSubdivision = 0;
   Duration _nextTargetTimestamp = Duration.zero;
@@ -85,6 +90,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
       await initialize();
     }
     _nextPulseTimer?.cancel();
+    _clearPendingConfiguration();
 
     _bpm = bpm;
     _timeSignature = timeSignature;
@@ -107,6 +113,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
   Future<void> stop() async {
     _nextPulseTimer?.cancel();
     _nextPulseTimer = null;
+    _clearPendingConfiguration();
     _isPlaying = false;
     _stopwatch.stop();
     _currentBeat = 0;
@@ -122,27 +129,76 @@ class SoloudMetronomeEngine implements MetronomeEngine {
   }) {
     if (bpm != null) {
       _bpm = bpm;
+      _pendingBpm = null;
     }
     if (timeSignature != null) {
       _timeSignature = timeSignature;
+      _pendingTimeSignature = null;
       if (_currentBeat >= _timeSignature.numerator) {
         _currentBeat = 0;
       }
     }
-    if (subdivision != null && subdivision != _subdivision) {
-      _subdivision = subdivision;
-      // Apply subdivision change cleanly from the next beat (FR-SUB-03)
-      if (_currentSubdivision >= _subdivision.pulsesPerBeat) {
-        _currentSubdivision = 0;
+    if (subdivision != null) {
+      _pendingSubdivision = null;
+      if (subdivision != _subdivision) {
+        _subdivision = subdivision;
+        // Apply subdivision change cleanly from the next beat (FR-SUB-03)
+        if (_currentSubdivision >= _subdivision.pulsesPerBeat) {
+          _currentSubdivision = 0;
+        }
       }
     }
     if (isAccentEnabled != null) {
       _isAccentEnabled = isAccentEnabled;
+      _pendingAccentEnabled = null;
     }
+  }
+
+  @override
+  void scheduleNextBarConfiguration({
+    Bpm? bpm,
+    TimeSignature? timeSignature,
+    Subdivision? subdivision,
+    bool? isAccentEnabled,
+  }) {
+    if (!_isPlaying) {
+      _clearPendingConfiguration();
+      updateConfiguration(
+        bpm: bpm,
+        timeSignature: timeSignature,
+        subdivision: subdivision,
+        isAccentEnabled: isAccentEnabled,
+      );
+      return;
+    }
+    if (bpm != null) _pendingBpm = bpm;
+    if (timeSignature != null) _pendingTimeSignature = timeSignature;
+    if (subdivision != null) _pendingSubdivision = subdivision;
+    if (isAccentEnabled != null) _pendingAccentEnabled = isAccentEnabled;
+  }
+
+  void _applyPendingBarConfigurationIfDownbeat() {
+    if (_currentBeat != 0 || _currentSubdivision != 0) return;
+    if (_pendingBpm != null) _bpm = _pendingBpm!;
+    if (_pendingTimeSignature != null) _timeSignature = _pendingTimeSignature!;
+    if (_pendingSubdivision != null) _subdivision = _pendingSubdivision!;
+    if (_pendingAccentEnabled != null) {
+      _isAccentEnabled = _pendingAccentEnabled!;
+    }
+    _clearPendingConfiguration();
+  }
+
+  void _clearPendingConfiguration() {
+    _pendingBpm = null;
+    _pendingTimeSignature = null;
+    _pendingSubdivision = null;
+    _pendingAccentEnabled = null;
   }
 
   void _emitCurrentPulseAndScheduleNext() {
     if (!_isPlaying) return;
+
+    _applyPendingBarConfigurationIfDownbeat();
 
     final accent = _scheduler.resolveAccent(
       timeSignature: _timeSignature,

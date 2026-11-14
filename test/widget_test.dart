@@ -124,6 +124,24 @@ void main() {
 
       expect(find.text('METRONOME'), findsOneWidget);
 
+      // Save current configuration (119 BPM, 7/4, Triplets) as a preset (UC-06)
+      await tester.tap(find.byKey(const Key('save_preset_header_button')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('preset_name_input')),
+        'Odd Meter Triplets',
+      );
+      await tester.ensureVisible(
+        find.byKey(const Key('preset_editor_save_button')),
+      );
+      await tester.tap(find.byKey(const Key('preset_editor_save_button')));
+      await tester.pumpAndSettle();
+
+      // Verify saved preset appears in the Presets tab
+      await tester.tap(find.byKey(const Key('rail_destination_presets')));
+      await tester.pumpAndSettle();
+      expect(find.text('Odd Meter Triplets'), findsOneWidget);
+
       await tester.runAsync(() => GoogleFonts.pendingFonts());
       await tester.pump();
     },

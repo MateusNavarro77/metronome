@@ -4,8 +4,8 @@ import '../../../core/theme/sonic_theme.dart';
 import '../../metronome/view_models/metronome_view_model.dart';
 import '../../metronome/views/metronome_view.dart';
 import '../../preferences/views/preferences_view.dart';
-import '../../presets/views/presets_placeholder_view.dart';
-import '../../setlists/views/setlists_placeholder_view.dart';
+import '../../presets/views/presets_view.dart';
+import '../../setlists/views/setlists_view.dart';
 
 /// Top-level adaptive navigation shell providing responsive layout switching
 /// between [NavigationBar] (portrait) and [NavigationRail] (landscape / wide screen),
@@ -128,8 +128,8 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                   viewModel: widget.metronomeViewModel,
                   onOpenSettings: () => _onDestinationSelected(3),
                 ),
-                const PresetsPlaceholderView(),
-                const SetlistsPlaceholderView(),
+                const PresetsView(),
+                const SetlistsView(),
                 const PreferencesView(showBackButton: false),
               ],
             ),
