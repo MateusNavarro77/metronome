@@ -52,6 +52,7 @@ void main() {
 
         expect(handleFinder, findsOneWidget);
         expect(sheetFinder, findsOneWidget);
+        expect(find.byType(BackdropFilter), findsNothing);
         // Ensure the drag handle is inside the styled sheet container.
         expect(
           find.descendant(of: sheetFinder, matching: handleFinder),

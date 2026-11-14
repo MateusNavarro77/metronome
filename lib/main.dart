@@ -139,10 +139,10 @@ class MetronomeApp extends StatelessWidget {
             theme: SonicTheme.lightTheme,
             darkTheme: SonicTheme.darkTheme,
             themeMode: preferencesViewModel.materialThemeMode,
-            home: Consumer<MetronomeViewModel>(
-              builder: (context, metronomeViewModel, _) {
+            home: Builder(
+              builder: (context) {
                 return AdaptiveNavigationShell(
-                  metronomeViewModel: metronomeViewModel,
+                  metronomeViewModel: context.read<MetronomeViewModel>(),
                 );
               },
             ),

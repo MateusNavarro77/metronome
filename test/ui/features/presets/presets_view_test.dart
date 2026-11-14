@@ -232,5 +232,42 @@ void main() {
         check(libraryRepo.setlists.first.presetIds).deepEquals([beta.id]);
       },
     );
+
+    test('PresetsViewModel ignores beat tick updates and notifies on active preset changes', () async {
+      final presetOne = await libraryRepo.createPreset(
+        name: 'Stage Opener',
+        bpm: const Bpm(128),
+        timeSignature: TimeSignature.fourFour,
+        subdivision: Subdivision.none,
+        isAccentEnabled: true,
+      );
+      final presetTwo = await libraryRepo.createPreset(
+        name: 'Encore',
+        bpm: const Bpm(140),
+        timeSignature: TimeSignature.fourFour,
+        subdivision: Subdivision.none,
+        isAccentEnabled: true,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      var notifications = 0;
+      presetsVm.addListener(() => notifications++);
+
+      metronomeVm.togglePlayStop();
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(0);
+
+      engine.advancePulses(3);
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(0);
+
+      presetsVm.loadPreset(presetOne);
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(1);
+
+      presetsVm.loadPreset(presetTwo);
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(2);
+    });
   });
 }

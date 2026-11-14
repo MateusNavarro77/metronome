@@ -107,10 +107,12 @@ void main() {
             find.byKey(Key('setlist_detail_sheet_$setlistId')),
             findsOneWidget,
           );
+          expect(find.byType(BackdropFilter), findsNothing);
 
           // Add Song A and Song B
           await tester.tap(find.byKey(const Key('setlist_add_preset_button')));
           await tester.pumpAndSettle();
+          expect(find.byType(BackdropFilter), findsNothing);
           await tester.tap(find.byKey(Key('add_preset_picker_item_${p1.id}')));
           await tester.pumpAndSettle();
 
@@ -335,6 +337,54 @@ void main() {
           await tester.pump();
         },
       );
+
+      test('SetlistsViewModel ignores beat tick updates and notifies on active setlist changes', () async {
+        final (
+          :engine,
+          :libraryRepo,
+          :metronomeVm,
+          :setlistsVm,
+          metronomeRepo: _,
+        ) = createHarness();
+        final p1 = await libraryRepo.createPreset(
+          name: 'Song 1',
+          bpm: const Bpm(120),
+          timeSignature: TimeSignature.fourFour,
+          subdivision: Subdivision.none,
+          isAccentEnabled: true,
+        );
+        final p2 = await libraryRepo.createPreset(
+          name: 'Song 2',
+          bpm: const Bpm(132),
+          timeSignature: TimeSignature.fourFour,
+          subdivision: Subdivision.none,
+          isAccentEnabled: true,
+        );
+        final setlist = await libraryRepo.createSetlist(
+          name: 'Gig Set',
+          presetIds: [p1.id, p2.id],
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        var notifications = 0;
+        setlistsVm.addListener(() => notifications++);
+
+        metronomeVm.togglePlayStop();
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(0);
+
+        engine.advancePulses(3);
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(0);
+
+        setlistsVm.activateSetlist(setlist, initialIndex: 0);
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(1);
+
+        metronomeVm.nextSetlistItem();
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(2);
+      });
     },
   );
 }
