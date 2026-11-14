@@ -74,7 +74,7 @@ extension MetronomeContextTheme on BuildContext {
 /// Material 3 Expressive theme builder for the Metronome app.
 abstract final class AppTheme {
   /// Baseline seed color (`#6750A4`).
-  static const Color seedColor = Color(0xFF6750A4);
+  static const Color seedColor = Color(0xFF00FF41);
 
   static M3ETypography _buildComfortaaTypography() {
     final baseline = M3ETypeScale.fromTextTheme(
