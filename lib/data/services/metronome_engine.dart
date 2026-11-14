@@ -39,6 +39,17 @@ abstract interface class MetronomeEngine {
     bool? isAccentEnabled,
   });
 
+  /// Schedules a configuration update to take effect at the start of the next bar
+  /// (`beatIndex == 0 && subdivisionIndex == 0`) without interrupting playback (FR-PRE-09).
+  ///
+  /// If the engine is currently stopped, the configuration applies immediately.
+  void scheduleNextBarConfiguration({
+    Bpm? bpm,
+    TimeSignature? timeSignature,
+    Subdivision? subdivision,
+    bool? isAccentEnabled,
+  });
+
   /// Releases audio and stream resources.
   Future<void> dispose();
 }
