@@ -107,6 +107,9 @@ void main() {
         await tester.tap(find.byKey(const Key('nav_destination_metronome')));
         await tester.pumpAndSettle();
         expect(find.text('METRONOME'), findsOneWidget);
+
+        await tester.runAsync(() => GoogleFonts.pendingFonts());
+        await tester.pump();
       },
     );
 

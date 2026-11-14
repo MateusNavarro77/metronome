@@ -123,6 +123,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('METRONOME'), findsOneWidget);
+
+      await tester.runAsync(() => GoogleFonts.pendingFonts());
+      await tester.pump();
     },
   );
 }
