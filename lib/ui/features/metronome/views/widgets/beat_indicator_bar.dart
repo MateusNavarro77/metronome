@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
@@ -37,15 +39,11 @@ class BeatIndicatorBar extends StatelessWidget {
       label: isPlaying
           ? 'Beat ${currentBeat + 1} of $beatCount'
           : 'Pulse indicator stopped, $beatCount beats per bar',
-      child: Container(
+      child: M3ECard(
+        variant: M3ECardVariant.outlined,
         padding: EdgeInsets.symmetric(
           horizontal: context.dimens.spaceMd,
           vertical: isCompact ? context.dimens.spaceSm : context.dimens.spaceMd,
-        ),
-        decoration: BoxDecoration(
-          color: context.colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-          border: Border.all(color: context.colorScheme.outlineVariant),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -83,7 +81,8 @@ class BeatIndicatorBar extends StatelessWidget {
                   final isSubActive =
                       isPlaying && currentSubdivision == subIndex;
                   return AnimatedContainer(
-                    duration: const Duration(milliseconds: 60),
+                    duration: M3EMotion.short1,
+                    curve: M3EMotion.emphasized,
                     margin: EdgeInsets.symmetric(
                       horizontal: context.dimens.spaceXs,
                     ),
@@ -158,14 +157,14 @@ class _BeatCapsule extends StatelessWidget {
       height: context.dimens.beatPillContainerHeight,
       child: Center(
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 70),
-          curve: Curves.easeOut,
+          duration: M3EMotion.short2,
+          curve: M3EMotion.emphasized,
           height: targetHeight,
           decoration: BoxDecoration(
             color: fillColor,
-            borderRadius: BorderRadius.circular(
-              isDownbeat ? context.dimens.radiusSm : context.dimens.radiusFull,
-            ),
+            borderRadius: isDownbeat
+                ? M3EShapes.radiusSmall
+                : M3EShapes.radiusExtraExtraLarge,
             boxShadow: isActive && isDownbeat
                 ? [
                     BoxShadow(

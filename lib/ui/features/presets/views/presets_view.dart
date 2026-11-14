@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/preset.dart';
@@ -113,9 +115,10 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
       preset.id,
     );
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => _DeletePresetConfirmDialog(
+    final confirmed = await M3EDialog.show<bool>(
+      context,
+      dialog: _buildDeletePresetDialog(
+        context,
         preset: preset,
         containingSetlists: containingSetlists,
       ),
@@ -162,20 +165,12 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                           letterSpacing: 2.2,
                         ),
                       ),
-                      FilledButton.icon(
+                      M3EButton.filled(
                         key: const Key('create_preset_button'),
-                        onPressed: _openCreatePresetSheet,
-                        style: FilledButton.styleFrom(
-                          minimumSize: Size(0, context.dimens.minTouchTarget),
-                          backgroundColor: context.colorScheme.primary,
-                          foregroundColor: context.colorScheme.onPrimary,
-                          shape: const StadiumBorder(),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.dimens.spaceMd,
-                          ),
-                        ),
+                        size: M3EButtonSize.sm,
                         icon: const Icon(Icons.add_rounded, size: 20),
-                        label: const Text('New Preset'),
+                        onPressed: _openCreatePresetSheet,
+                        child: const Text('New Preset'),
                       ),
                     ],
                   ),
@@ -186,62 +181,27 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                   padding: EdgeInsets.symmetric(
                     horizontal: context.dimens.spaceMd,
                   ),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.dimens.spaceMd,
-                      vertical: context.dimens.spaceXs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.colorScheme.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(
-                        context.dimens.radiusFull,
-                      ),
-                      border: Border.all(
-                        color: context.colorScheme.outlineVariant,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.search_rounded,
-                          size: 20,
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                        SizedBox(width: context.dimens.spaceSm),
-                        Expanded(
-                          child: TextField(
-                            key: const Key('presets_search_field'),
-                            controller: _searchController,
-                            onChanged: vm.setSearchQuery,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: context.colorScheme.onSurface,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Search presets by name...',
-                              hintStyle: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colorScheme.onSurfaceVariant,
-                              ),
-                              isDense: true,
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        if (vm.searchQuery.isNotEmpty)
-                          IconButton(
+                  child: M3ETextField(
+                    key: const Key('presets_search_field'),
+                    controller: _searchController,
+                    variant: M3ETextFieldVariant.outlined,
+                    placeholder: 'Search presets by name...',
+                    density: -1,
+                    leading: const Icon(Icons.search_rounded, size: 20),
+                    trailing: vm.searchQuery.isNotEmpty
+                        ? M3EIconButton(
                             key: const Key('presets_search_clear_button'),
+                            variant: M3EIconButtonVariant.standard,
+                            size: M3EIconButtonSize.sm,
                             tooltip: 'Clear search',
                             onPressed: () {
                               _searchController.clear();
                               vm.setSearchQuery('');
                             },
-                            icon: Icon(
-                              Icons.close_rounded,
-                              size: 18,
-                              color: context.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                      ],
-                    ),
+                            icon: const Icon(Icons.close_rounded, size: 18),
+                          )
+                        : null,
+                    onChanged: vm.setSearchQuery,
                   ),
                 ),
                 SizedBox(height: context.dimens.spaceSmPlus4),
@@ -321,172 +281,147 @@ class _PresetCard extends StatelessWidget {
       selected: isActive,
       label:
           '${preset.name}, ${preset.bpm.value} BPM, ${preset.timeSignature.label}',
-      child: Material(
-        color: isActive
-            ? context.colorScheme.primaryContainer
-            : context.colorScheme.surfaceContainerLow,
+      child: M3ECard(
+        key: Key('preset_card_${preset.id}'),
+        variant: isActive ? M3ECardVariant.filled : M3ECardVariant.outlined,
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        child: InkWell(
-          key: Key('preset_card_${preset.id}'),
-          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.all(context.dimens.spaceMd),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-              border: Border.all(
-                color: isActive
-                    ? context.colorScheme.primary.withValues(alpha: 0.45)
-                    : context.colorScheme.outlineVariant,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+        padding: EdgeInsets.all(context.dimens.spaceMd),
+        onPressed: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  preset.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: context.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: isActive
-                                        ? context.colorScheme.onPrimaryContainer
-                                        : context.colorScheme.onSurface,
-                                  ),
+                          Flexible(
+                            child: Text(
+                              preset.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: context.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          if (isActive) ...[
+                            SizedBox(width: context.dimens.spaceSm),
+                            Container(
+                              key: Key('preset_active_badge_${preset.id}'),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.dimens.spaceSm,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: context.colorScheme.primary,
+                                borderRadius: BorderRadius.circular(
+                                  context.dimens.radiusFull,
                                 ),
                               ),
-                              if (isActive) ...[
-                                SizedBox(width: context.dimens.spaceSm),
-                                Container(
-                                  key: Key('preset_active_badge_${preset.id}'),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: context.dimens.spaceSm,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: context.colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(
-                                      context.dimens.radiusFull,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'ACTIVE',
-                                    style: context.textTheme.labelMedium
-                                        ?.copyWith(
-                                          fontSize: 9,
-                                          letterSpacing: 0.8,
-                                          color: context.colorScheme.onPrimary,
-                                        ),
-                                  ),
+                              child: Text(
+                                'ACTIVE',
+                                style: context.textTheme.labelMedium?.copyWith(
+                                  fontSize: 9,
+                                  letterSpacing: 0.8,
+                                  color: context.colorScheme.onPrimary,
                                 ),
-                              ],
-                            ],
-                          ),
-                          if (preset.note.isNotEmpty) ...[
-                            SizedBox(height: context.dimens.spaceXs),
-                            Text(
-                              preset.note,
-                              key: Key('preset_note_${preset.id}'),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                fontSize: 12,
-                                color: isActive
-                                    ? context.colorScheme.onPrimaryContainer
-                                          .withValues(alpha: 0.8)
-                                    : context.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
                         ],
                       ),
-                    ),
-                    IconButton(
-                      key: Key('preset_favorite_button_${preset.id}'),
-                      tooltip: preset.isFavorite
-                          ? 'Unfavorite ${preset.name}'
-                          : 'Favorite ${preset.name}',
-                      constraints: BoxConstraints(
-                        minWidth: context.dimens.minTouchTarget,
-                        minHeight: context.dimens.minTouchTarget,
-                      ),
-                      onPressed: onToggleFavorite,
-                      icon: Icon(
-                        preset.isFavorite
-                            ? Icons.star_rounded
-                            : Icons.star_outline_rounded,
-                        color: preset.isFavorite
-                            ? context.colorScheme.primary
-                            : context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                      if (preset.note.isNotEmpty) ...[
+                        SizedBox(height: context.dimens.spaceXs),
+                        Text(
+                          preset.note,
+                          key: Key('preset_note_${preset.id}'),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 12,
+                            color: context.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-                SizedBox(height: context.dimens.spaceSm),
-                Wrap(
-                  spacing: context.dimens.spaceSm,
-                  runSpacing: context.dimens.spaceXs,
-                  children: [
-                    _ParameterBadge(
-                      label:
-                          '${preset.bpm.value} BPM · ${preset.bpm.tempoMarking.label}',
-                      isActive: isActive,
-                    ),
-                    _ParameterBadge(
-                      label: preset.timeSignature.label,
-                      isActive: isActive,
-                    ),
-                    _ParameterBadge(
-                      label:
-                          '${preset.subdivision.symbol} ${preset.subdivision.label}',
-                      isActive: isActive,
-                    ),
-                    _ParameterBadge(
-                      label: preset.isAccentEnabled
-                          ? 'Accent ON'
-                          : 'Accent OFF',
-                      isActive: isActive,
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.dimens.spaceSm),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _ActionIconButton(
-                      buttonKey: Key('preset_edit_button_${preset.id}'),
-                      icon: Icons.edit_outlined,
-                      tooltip: 'Edit ${preset.name}',
-                      onPressed: onEdit,
-                    ),
-                    _ActionIconButton(
-                      buttonKey: Key('preset_duplicate_button_${preset.id}'),
-                      icon: Icons.copy_rounded,
-                      tooltip: 'Duplicate ${preset.name}',
-                      onPressed: onDuplicate,
-                    ),
-                    _ActionIconButton(
-                      buttonKey: Key('preset_delete_button_${preset.id}'),
-                      icon: Icons.delete_outline_rounded,
-                      tooltip: 'Delete ${preset.name}',
-                      isDestructive: true,
-                      onPressed: onDelete,
-                    ),
-                  ],
+                M3EIconButton(
+                  key: Key('preset_favorite_button_${preset.id}'),
+                  variant: M3EIconButtonVariant.standard,
+                  isSelected: preset.isFavorite,
+                  tooltip: preset.isFavorite
+                      ? 'Unfavorite ${preset.name}'
+                      : 'Favorite ${preset.name}',
+                  onPressed: onToggleFavorite,
+                  icon: Icon(
+                    Icons.star_outline_rounded,
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                  selectedIcon: Icon(
+                    Icons.star_rounded,
+                    color: context.colorScheme.primary,
+                  ),
                 ),
               ],
             ),
-          ),
+            SizedBox(height: context.dimens.spaceSm),
+            Wrap(
+              spacing: context.dimens.spaceSm,
+              runSpacing: context.dimens.spaceXs,
+              children: [
+                _ParameterBadge(
+                  label:
+                      '${preset.bpm.value} BPM · ${preset.bpm.tempoMarking.label}',
+                  isActive: isActive,
+                ),
+                _ParameterBadge(
+                  label: preset.timeSignature.label,
+                  isActive: isActive,
+                ),
+                _ParameterBadge(
+                  label:
+                      '${preset.subdivision.symbol} ${preset.subdivision.label}',
+                  isActive: isActive,
+                ),
+                _ParameterBadge(
+                  label: preset.isAccentEnabled ? 'Accent ON' : 'Accent OFF',
+                  isActive: isActive,
+                ),
+              ],
+            ),
+            SizedBox(height: context.dimens.spaceSm),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                _ActionIconButton(
+                  buttonKey: Key('preset_edit_button_${preset.id}'),
+                  icon: Icons.edit_outlined,
+                  tooltip: 'Edit ${preset.name}',
+                  onPressed: onEdit,
+                ),
+                _ActionIconButton(
+                  buttonKey: Key('preset_duplicate_button_${preset.id}'),
+                  icon: Icons.copy_rounded,
+                  tooltip: 'Duplicate ${preset.name}',
+                  onPressed: onDuplicate,
+                ),
+                _ActionIconButton(
+                  buttonKey: Key('preset_delete_button_${preset.id}'),
+                  icon: Icons.delete_outline_rounded,
+                  tooltip: 'Delete ${preset.name}',
+                  isDestructive: true,
+                  onPressed: onDelete,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -541,13 +476,10 @@ class _ActionIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return M3EIconButton(
       key: buttonKey,
+      variant: M3EIconButtonVariant.standard,
       tooltip: tooltip,
-      constraints: BoxConstraints(
-        minWidth: context.dimens.minTouchTarget,
-        minHeight: context.dimens.minTouchTarget,
-      ),
       onPressed: onPressed,
       icon: Icon(
         icon,
@@ -575,13 +507,10 @@ class _EmptyPresetsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return M3ECard(
+      variant: M3ECardVariant.outlined,
+      borderRadius: BorderRadius.circular(context.dimens.radiusLg),
       padding: EdgeInsets.all(context.dimens.spaceLg),
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(context.dimens.radiusLg),
-        border: Border.all(color: context.colorScheme.outlineVariant),
-      ),
       child: Column(
         children: [
           Container(
@@ -617,18 +546,13 @@ class _EmptyPresetsCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: context.dimens.spaceMd),
-          FilledButton(
+          M3EButton.filled(
             key: Key(
               hasAnyPresets
                   ? 'empty_clear_search_button'
                   : 'empty_create_preset_button',
             ),
-            style: FilledButton.styleFrom(
-              minimumSize: Size(0, context.dimens.minTouchTarget),
-              backgroundColor: context.colorScheme.primary,
-              foregroundColor: context.colorScheme.onPrimary,
-              shape: const StadiumBorder(),
-            ),
+            size: M3EButtonSize.md,
             onPressed: hasAnyPresets ? onClearSearch : onCreatePreset,
             child: Text(hasAnyPresets ? 'Clear Search' : 'Create Preset'),
           ),
@@ -638,83 +562,59 @@ class _EmptyPresetsCard extends StatelessWidget {
   }
 }
 
-class _DeletePresetConfirmDialog extends StatelessWidget {
-  const _DeletePresetConfirmDialog({
-    required this.preset,
-    required this.containingSetlists,
-  });
+M3EDialog _buildDeletePresetDialog(
+  BuildContext context, {
+  required Preset preset,
+  required List<Setlist> containingSetlists,
+}) {
+  final setlistNames = containingSetlists.map((s) => s.name).join(', ');
 
-  final Preset preset;
-  final List<Setlist> containingSetlists;
-
-  @override
-  Widget build(BuildContext context) {
-    final setlistNames = containingSetlists.map((s) => s.name).join(', ');
-
-    return AlertDialog(
-      key: const Key('delete_preset_confirm_dialog'),
-      backgroundColor: context.colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-      ),
-      title: Text(
-        'Delete Preset?',
-        style: context.textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: context.colorScheme.onSurface,
+  return M3EDialog(
+    key: const Key('delete_preset_confirm_dialog'),
+    title: 'Delete Preset?',
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Are you sure you want to delete "${preset.name}"? This action cannot be undone.',
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
+          ),
         ),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Are you sure you want to delete "${preset.name}"? This action cannot be undone.',
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurfaceVariant,
+        if (containingSetlists.isNotEmpty) ...[
+          SizedBox(height: context.dimens.spaceMd),
+          Container(
+            key: const Key('delete_preset_setlist_warning'),
+            padding: EdgeInsets.all(context.dimens.spaceSmPlus4),
+            decoration: BoxDecoration(
+              color: context.colorScheme.error.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(context.dimens.radiusSm),
+            ),
+            child: Text(
+              'Warning: Used in ${containingSetlists.length} '
+              '${containingSetlists.length == 1 ? 'setlist' : 'setlists'}: '
+              '$setlistNames. Deleting this preset will remove it from those setlists.',
+              style: context.textTheme.bodyMedium?.copyWith(
+                fontSize: 13,
+                color: context.colorScheme.error,
+              ),
             ),
           ),
-          if (containingSetlists.isNotEmpty) ...[
-            SizedBox(height: context.dimens.spaceMd),
-            Container(
-              key: const Key('delete_preset_setlist_warning'),
-              padding: EdgeInsets.all(context.dimens.spaceSmPlus4),
-              decoration: BoxDecoration(
-                color: context.colorScheme.error.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(context.dimens.radiusSm),
-              ),
-              child: Text(
-                'Warning: Used in ${containingSetlists.length} '
-                '${containingSetlists.length == 1 ? 'setlist' : 'setlists'}: '
-                '$setlistNames. Deleting this preset will remove it from those setlists.',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  fontSize: 13,
-                  color: context.colorScheme.error,
-                ),
-              ),
-            ),
-          ],
         ],
-      ),
-      actions: [
-        TextButton(
-          key: const Key('cancel_delete_preset_button'),
-          onPressed: () => Navigator.of(context).pop(false),
-          child: Text(
-            'Cancel',
-            style: TextStyle(color: context.colorScheme.onSurface),
-          ),
-        ),
-        FilledButton(
-          key: const Key('confirm_delete_preset_button'),
-          style: FilledButton.styleFrom(
-            backgroundColor: context.colorScheme.error,
-            foregroundColor: context.colorScheme.onError,
-          ),
-          onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Delete'),
-        ),
       ],
-    );
-  }
+    ),
+    actions: [
+      M3EButton.text(
+        key: const Key('cancel_delete_preset_button'),
+        onPressed: () => Navigator.of(context).pop(false),
+        child: const Text('Cancel'),
+      ),
+      M3EButton.filled(
+        key: const Key('confirm_delete_preset_button'),
+        onPressed: () => Navigator.of(context).pop(true),
+        child: const Text('Delete'),
+      ),
+    ],
+  );
 }

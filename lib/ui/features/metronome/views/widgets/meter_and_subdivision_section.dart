@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
@@ -28,10 +30,11 @@ class MeterAndSubdivisionSection extends StatelessWidget {
   final VoidCallback? onToggleAccent;
 
   void _openTimeSignatureSheet(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
+    M3EBottomSheet.show<void>(
+      context,
+      showDragHandle: true,
+      isDismissible: true,
+      initialValue: M3EBottomSheetValue.expanded,
       builder: (_) => TimeSignatureBottomSheet(
         initialTimeSignature: selectedTimeSignature,
         onTimeSignatureSelected: onTimeSignatureSelected,
@@ -40,10 +43,11 @@ class MeterAndSubdivisionSection extends StatelessWidget {
   }
 
   void _openSubdivisionSheet(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
+    M3EBottomSheet.show<void>(
+      context,
+      showDragHandle: true,
+      isDismissible: true,
+      initialValue: M3EBottomSheetValue.expanded,
       builder: (_) => SubdivisionBottomSheet(
         selectedSubdivision: selectedSubdivision,
         onSubdivisionSelected: onSubdivisionSelected,
@@ -57,66 +61,64 @@ class MeterAndSubdivisionSection extends StatelessWidget {
         ? context.dimens.spaceSm
         : context.dimens.spaceSmPlus4;
 
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // 1. Time Signature trigger card
-          Expanded(
-            child: _SummaryTriggerCard(
-              cardKey: const Key('time_signature_selector_button'),
-              caption: 'TIME SIG',
-              semanticLabel:
-                  'Time signature ${selectedTimeSignature.label}. Tap to change.',
-              verticalPadding: verticalPadding,
-              onTap: () => _openTimeSignatureSheet(context),
-              valueWidget: Text(
-                selectedTimeSignature.label,
-                key: const Key('active_time_signature_label'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.titleSmall?.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: context.colorScheme.onSurface,
-                ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // 1. Time Signature trigger card
+        Expanded(
+          child: _SummaryTriggerCard(
+            cardKey: const Key('time_signature_selector_button'),
+            caption: 'TIME SIG',
+            semanticLabel:
+                'Time signature ${selectedTimeSignature.label}. Tap to change.',
+            verticalPadding: verticalPadding,
+            onTap: () => _openTimeSignatureSheet(context),
+            valueWidget: Text(
+              selectedTimeSignature.label,
+              key: const Key('active_time_signature_label'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.titleSmall?.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: context.colorScheme.onSurface,
               ),
             ),
           ),
+        ),
+        SizedBox(width: context.dimens.spaceSm),
+        // 2. Subdivision trigger card
+        Expanded(
+          child: _SummaryTriggerCard(
+            cardKey: const Key('subdivision_selector_button'),
+            caption: 'SUBDIVISION',
+            semanticLabel:
+                'Subdivision ${selectedSubdivision.label}. Tap to change.',
+            verticalPadding: verticalPadding,
+            onTap: () => _openSubdivisionSheet(context),
+            valueWidget: Text(
+              '${selectedSubdivision.symbol} ${selectedSubdivision.label}',
+              key: const Key('active_subdivision_label'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.titleSmall?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: context.colorScheme.secondary,
+              ),
+            ),
+          ),
+        ),
+        if (onToggleAccent != null) ...[
           SizedBox(width: context.dimens.spaceSm),
-          // 2. Subdivision trigger card
-          Expanded(
-            child: _SummaryTriggerCard(
-              cardKey: const Key('subdivision_selector_button'),
-              caption: 'SUBDIVISION',
-              semanticLabel:
-                  'Subdivision ${selectedSubdivision.label}. Tap to change.',
-              verticalPadding: verticalPadding,
-              onTap: () => _openSubdivisionSheet(context),
-              valueWidget: Text(
-                '${selectedSubdivision.symbol} ${selectedSubdivision.label}',
-                key: const Key('active_subdivision_label'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.titleSmall?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: context.colorScheme.secondary,
-                ),
-              ),
-            ),
+          // 3. Dedicated Accent toggle button
+          _AccentToggleCard(
+            isAccentEnabled: isAccentEnabled,
+            verticalPadding: verticalPadding,
+            onToggle: onToggleAccent!,
           ),
-          if (onToggleAccent != null) ...[
-            SizedBox(width: context.dimens.spaceSm),
-            // 3. Dedicated Accent toggle button
-            _AccentToggleCard(
-              isAccentEnabled: isAccentEnabled,
-              verticalPadding: verticalPadding,
-              onToggle: onToggleAccent!,
-            ),
-          ],
         ],
-      ),
+      ],
     );
   }
 }
@@ -143,57 +145,44 @@ class _SummaryTriggerCard extends StatelessWidget {
     return Semantics(
       button: true,
       label: semanticLabel,
-      child: Material(
-        color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        child: InkWell(
-          key: cardKey,
-          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-          onTap: onTap,
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: context.dimens.minTouchTarget,
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: context.dimens.spaceSmPlus4,
-              vertical: verticalPadding,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-              border: Border.all(color: context.colorScheme.outlineVariant),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
+      child: M3ECard(
+        key: cardKey,
+        variant: M3ECardVariant.outlined,
+        onPressed: onTap,
+        padding: EdgeInsets.symmetric(
+          horizontal: context.dimens.spaceSmPlus4,
+          vertical: verticalPadding,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        caption,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.labelMedium?.copyWith(
-                          fontSize: 10,
-                          letterSpacing: 1.1,
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      size: 16,
+                Flexible(
+                  child: Text(
+                    caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.labelMedium?.copyWith(
+                      fontSize: 10,
+                      letterSpacing: 1.1,
                       color: context.colorScheme.onSurfaceVariant,
                     ),
-                  ],
+                  ),
                 ),
-                SizedBox(height: context.dimens.spaceXs),
-                valueWidget,
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 16,
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
               ],
             ),
-          ),
+            SizedBox(height: context.dimens.spaceXs),
+            valueWidget,
+          ],
         ),
       ),
     );
@@ -213,49 +202,22 @@ class _AccentToggleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      toggled: isAccentEnabled,
-      label: isAccentEnabled
-          ? 'Accent on Beat 1 enabled'
-          : 'Accent on Beat 1 disabled',
-      child: Center(
-        child: IconButton(
-          // Set the desired size
-          constraints: BoxConstraints(
-            maxWidth: context.dimens.stepperButtonSize,
-            minWidth: context.dimens.stepperButtonSize,
-            maxHeight: context.dimens.stepperButtonSize,
-            minHeight: context.dimens.stepperButtonSize,
-          ),
-          iconSize: context.dimens.stepperButtonSize,
-          key: const Key('accent_toggle_button'),
-          tooltip: isAccentEnabled
-              ? 'Downbeat accent ON'
-              : 'Downbeat accent OFF',
-          isSelected: isAccentEnabled,
-          onPressed: onToggle,
-          style: IconButton.styleFrom(
-            backgroundColor: isAccentEnabled
-                ? context.colorScheme.primaryContainer
-                : context.colorScheme.surfaceContainerLow,
-            foregroundColor: isAccentEnabled
-                ? context.colorScheme.onPrimaryContainer
-                : context.colorScheme.onSurfaceVariant,
-            side: BorderSide(
-              color: isAccentEnabled
-                  ? context.colorScheme.primary.withValues(alpha: 0.45)
-                  : context.colorScheme.outlineVariant,
-            ),
-            shape: const CircleBorder(),
-          ),
-          icon: Icon(
-            size: context.dimens.stepperIconSize,
-            isAccentEnabled
-                ? Icons.volume_up_rounded
-                : Icons.volume_mute_rounded,
-          ),
-        ),
+    return Center(
+      child: M3EIconButton(
+        key: const Key('accent_toggle_button'),
+        variant: isAccentEnabled
+            ? M3EIconButtonVariant.tonal
+            : M3EIconButtonVariant.outlined,
+        size: M3EIconButtonSize.lg,
+        shape: M3EIconButtonShapeVariant.round,
+        isSelected: isAccentEnabled,
+        tooltip: isAccentEnabled ? 'Downbeat accent ON' : 'Downbeat accent OFF',
+        semanticLabel: isAccentEnabled
+            ? 'Accent on Beat 1 enabled'
+            : 'Accent on Beat 1 disabled',
+        icon: const Icon(Icons.volume_mute_rounded),
+        selectedIcon: const Icon(Icons.volume_up_rounded),
+        onPressed: onToggle,
       ),
     );
   }
@@ -373,15 +335,11 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           ),
           SizedBox(height: context.dimens.spaceSm),
           // Beats per bar (Numerator 1..16) stepper
-          Container(
+          M3ECard(
+            variant: M3ECardVariant.outlined,
             padding: EdgeInsets.symmetric(
               horizontal: context.dimens.spaceMd,
               vertical: context.dimens.spaceSmPlus2,
-            ),
-            decoration: BoxDecoration(
-              color: context.colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
-              border: Border.all(color: context.colorScheme.outlineVariant),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -445,13 +403,9 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           ),
           SizedBox(height: context.dimens.spaceSmPlus4),
           // Note value (Denominator 2, 4, 8, 16) pill selector
-          Container(
+          M3ECard(
+            variant: M3ECardVariant.outlined,
             padding: EdgeInsets.all(context.dimens.spaceMd),
-            decoration: BoxDecoration(
-              color: context.colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
-              border: Border.all(color: context.colorScheme.outlineVariant),
-            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -519,124 +473,100 @@ class SubdivisionBottomSheet extends StatelessWidget {
               selected: isSelected,
               label:
                   'Subdivision ${subdivision.label} (${subdivision.pulsesPerBeat} per beat)',
-              child: Material(
-                color: isSelected
-                    ? context.colorScheme.primaryContainer
-                    : context.colorScheme.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(
-                  context.dimens.radiusDefault,
+              child: M3ECard(
+                key: Key('subdivision_${subdivision.name}'),
+                variant: isSelected
+                    ? M3ECardVariant.filled
+                    : M3ECardVariant.outlined,
+                color: isSelected ? context.colorScheme.primaryContainer : null,
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.dimens.spaceMd,
+                  vertical: context.dimens.spaceSmPlus4,
                 ),
-                child: InkWell(
-                  key: Key('subdivision_${subdivision.name}'),
-                  borderRadius: BorderRadius.circular(
-                    context.dimens.radiusDefault,
-                  ),
-                  onTap: () {
-                    onSubdivisionSelected(subdivision);
-                    Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: context.dimens.minTouchTarget + 8,
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.dimens.spaceMd,
-                      vertical: context.dimens.spaceSmPlus4,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                        context.dimens.radiusDefault,
-                      ),
-                      border: Border.all(
+                onPressed: () {
+                  onSubdivisionSelected(subdivision);
+                  Navigator.of(context).pop();
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
                         color: isSelected
-                            ? context.colorScheme.primary.withValues(
-                                alpha: 0.45,
-                              )
-                            : context.colorScheme.outlineVariant,
+                            ? context.colorScheme.surfaceContainerLow
+                                  .withValues(alpha: 0.45)
+                            : context.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(
+                          context.dimens.radiusSm,
+                        ),
+                      ),
+                      child: Text(
+                        subdivision.symbol,
+                        style: context.textTheme.titleSmall?.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: isSelected
+                              ? context.colorScheme.onPrimaryContainer
+                              : context.colorScheme.onSurface,
+                        ),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 40,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? context.colorScheme.surfaceContainerLow
-                                      .withValues(alpha: 0.45)
-                                : context.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(
-                              context.dimens.radiusSm,
-                            ),
-                          ),
-                          child: Text(
-                            subdivision.symbol,
+                    SizedBox(width: context.dimens.spaceMd),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            subdivision.label,
                             style: context.textTheme.titleSmall?.copyWith(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
                               color: isSelected
                                   ? context.colorScheme.onPrimaryContainer
                                   : context.colorScheme.onSurface,
                             ),
                           ),
-                        ),
-                        SizedBox(width: context.dimens.spaceMd),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                subdivision.label,
-                                style: context.textTheme.titleSmall?.copyWith(
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w600,
-                                  color: isSelected
-                                      ? context.colorScheme.onPrimaryContainer
-                                      : context.colorScheme.onSurface,
-                                ),
-                              ),
-                              Text(
-                                '${subdivision.pulsesPerBeat} '
-                                '${subdivision.pulsesPerBeat == 1 ? 'pulse' : 'pulses'} per beat',
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                  color: isSelected
-                                      ? context.colorScheme.onPrimaryContainer
-                                            .withValues(alpha: 0.8)
-                                      : context.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.dimens.spaceSmPlus2,
-                            vertical: context.dimens.spaceXs,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? context.colorScheme.primary
-                                : context.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(
-                              context.dimens.radiusFull,
-                            ),
-                          ),
-                          child: Text(
-                            subdivision.shortLabel,
-                            style: context.textTheme.labelMedium?.copyWith(
-                              letterSpacing: 0.5,
+                          Text(
+                            '${subdivision.pulsesPerBeat} '
+                            '${subdivision.pulsesPerBeat == 1 ? 'pulse' : 'pulses'} per beat',
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              fontSize: 12,
                               color: isSelected
-                                  ? context.colorScheme.onPrimary
+                                  ? context.colorScheme.onPrimaryContainer
+                                        .withValues(alpha: 0.8)
                                   : context.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.dimens.spaceSmPlus2,
+                        vertical: context.dimens.spaceXs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? context.colorScheme.primary
+                            : context.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(
+                          context.dimens.radiusFull,
+                        ),
+                      ),
+                      child: Text(
+                        subdivision.shortLabel,
+                        style: context.textTheme.labelMedium?.copyWith(
+                          letterSpacing: 0.5,
+                          color: isSelected
+                              ? context.colorScheme.onPrimary
+                              : context.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -661,66 +591,36 @@ class _SonicModalSheetContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(context.dimens.radiusLg),
-      ),
-      child: Container(
-        constraints: BoxConstraints(maxWidth: context.dimens.maxContentWidth),
-        decoration: BoxDecoration(
-          color: context.colorScheme.surfaceContainerLow,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(context.dimens.radiusLg),
-          ),
-          border: Border(
-            top: BorderSide(color: context.colorScheme.outlineVariant),
-          ),
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          context.dimens.spaceLg,
+          context.dimens.spaceXs,
+          context.dimens.spaceLg,
+          context.dimens.spaceLg,
         ),
-        child: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              context.dimens.spaceLg,
-              context.dimens.spaceSmPlus4,
-              context.dimens.spaceLg,
-              context.dimens.spaceLg,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: context.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(
-                        context.dimens.radiusFull,
-                      ),
-                    ),
+                Text(
+                  title,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    letterSpacing: 1.6,
+                    fontWeight: FontWeight.w700,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
-                SizedBox(height: context.dimens.spaceMd),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: context.textTheme.titleSmall?.copyWith(
-                        letterSpacing: 1.6,
-                        fontWeight: FontWeight.w700,
-                        color: context.colorScheme.onSurface,
-                      ),
-                    ),
-                    ?trailing,
-                  ],
-                ),
-                SizedBox(height: context.dimens.spaceMd),
-                child,
+                ?trailing,
               ],
             ),
-          ),
+            SizedBox(height: context.dimens.spaceMd),
+            child,
+          ],
         ),
       ),
     );
@@ -744,32 +644,15 @@ class _ModalStepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: semanticLabel,
-      child: Material(
-        color: enabled
-            ? context.colorScheme.surfaceContainerHigh
-            : context.colorScheme.surfaceContainerLow,
-        shape: const CircleBorder(),
-        child: InkWell(
-          key: buttonKey,
-          customBorder: const CircleBorder(),
-          onTap: enabled ? onTap : null,
-          child: SizedBox(
-            width: context.dimens.minTouchTarget,
-            height: context.dimens.minTouchTarget,
-            child: Icon(
-              icon,
-              size: 22,
-              color: enabled
-                  ? context.colorScheme.onSurface
-                  : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-            ),
-          ),
-        ),
-      ),
+    return M3EIconButton(
+      key: buttonKey,
+      variant: M3EIconButtonVariant.tonal,
+      size: M3EIconButtonSize.md,
+      shape: M3EIconButtonShapeVariant.round,
+      icon: Icon(icon),
+      tooltip: semanticLabel,
+      semanticLabel: semanticLabel,
+      onPressed: enabled ? onTap : null,
     );
   }
 }
@@ -791,45 +674,15 @@ class _SelectionPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      label: semanticLabel,
-      child: Material(
-        color: isSelected
-            ? context.colorScheme.primaryContainer
-            : context.colorScheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-        child: InkWell(
-          key: pillKey,
-          borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-          onTap: onTap,
-          child: Container(
-            constraints: BoxConstraints(
-              minHeight: context.dimens.minTouchTarget,
-            ),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-              border: Border.all(
-                color: isSelected
-                    ? context.colorScheme.primary.withValues(alpha: 0.45)
-                    : context.colorScheme.outlineVariant,
-              ),
-            ),
-            child: Text(
-              label,
-              style: context.textTheme.titleSmall?.copyWith(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? context.colorScheme.onPrimaryContainer
-                    : context.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ),
-      ),
+    return M3EButton(
+      key: pillKey,
+      style: isSelected ? M3EButtonStyle.filled : M3EButtonStyle.tonal,
+      size: M3EButtonSize.sm,
+      shape: isSelected ? M3EButtonShape.square : M3EButtonShape.round,
+      isSelected: isSelected,
+      semanticLabel: semanticLabel,
+      onPressed: onTap,
+      child: Text(label),
     );
   }
 }

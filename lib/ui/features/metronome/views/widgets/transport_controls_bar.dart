@@ -1,5 +1,7 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../core/theme/app_theme.dart';
 
@@ -63,13 +65,14 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
               onPointerUp: _handleTapUp,
               onPointerCancel: _handleTapUp,
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 80),
+                duration: M3EMotion.short2,
+                curve: M3EMotion.emphasized,
                 height: controlHeight,
                 decoration: BoxDecoration(
                   color: _tapPressed
                       ? context.colorScheme.primaryContainer
                       : context.colorScheme.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(context.dimens.radiusMd),
+                  borderRadius: M3EShapes.radiusMedium,
                   border: Border.all(
                     color: _tapPressed
                         ? context.colorScheme.primary
@@ -116,54 +119,23 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
           ),
         ),
         SizedBox(width: context.dimens.spaceMd),
-        // Primary Circular Play/Stop CTA button
-        Semantics(
-          button: true,
-          label: widget.isPlaying ? 'Stop metronome' : 'Start metronome',
-          child: AnimatedScale(
-            scale: widget.isPlaying ? 1.1 : 1.0,
-            duration: const Duration(milliseconds: 90),
-            child: Container(
-              width: controlHeight,
-              height: controlHeight,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: context.colorScheme.shadow.withValues(
-                      alpha: widget.isPlaying ? 0.24 : 0.14,
-                    ),
-                    blurRadius: widget.isPlaying ? 20.0 : 10.0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Material(
-                shape: const CircleBorder(),
-                color: context.colorScheme.primary,
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  key: const Key('play_stop_button'),
-                  customBorder: const CircleBorder(),
-                  onTap: widget.onTogglePlayStop,
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: widget.isPlaying ? 0.0 : 3.0,
-                      ),
-                      child: Icon(
-                        widget.isPlaying
-                            ? Icons.stop_rounded
-                            : Icons.play_arrow_rounded,
-                        size: widget.isCompact ? 42 : 50,
-                        color: context.colorScheme.onPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        // Primary Play/Stop CTA button with M3E round -> square shape morphing
+        M3EButton.filled(
+          key: const Key('play_stop_button'),
+          size: M3EButtonSize.custom(
+            width: controlHeight,
+            height: controlHeight,
+            hPadding: 0,
+            iconSize: widget.isCompact ? 42 : 50,
           ),
+          shape: M3EButtonShape.round,
+          isSelected: widget.isPlaying,
+          icon: const Icon(Icons.play_arrow_rounded),
+          selectedIcon: const Icon(Icons.stop_rounded),
+          semanticLabel: widget.isPlaying
+              ? 'Stop metronome'
+              : 'Start metronome',
+          onPressed: widget.onTogglePlayStop,
         ),
       ],
     );

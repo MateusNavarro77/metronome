@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/preset.dart';
@@ -66,21 +68,11 @@ class _SetlistsViewBody extends StatelessWidget {
     BuildContext context,
     Setlist setlist,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
+    final confirmed = await M3EDialog.show<bool>(
+      context,
+      dialog: M3EDialog(
         key: const Key('delete_setlist_confirm_dialog'),
-        backgroundColor: context.colorScheme.surfaceContainerLow,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        ),
-        title: Text(
-          'Delete Setlist?',
-          style: context.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: context.colorScheme.onSurface,
-          ),
-        ),
+        title: 'Delete Setlist?',
         content: Text(
           'Are you sure you want to delete "${setlist.name}"? Your saved presets will remain in your library.',
           style: context.textTheme.bodyMedium?.copyWith(
@@ -88,21 +80,14 @@ class _SetlistsViewBody extends StatelessWidget {
           ),
         ),
         actions: [
-          TextButton(
+          M3EButton.text(
             key: const Key('cancel_delete_setlist_button'),
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: context.colorScheme.onSurface),
-            ),
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
           ),
-          FilledButton(
+          M3EButton.filled(
             key: const Key('confirm_delete_setlist_button'),
-            style: FilledButton.styleFrom(
-              backgroundColor: context.colorScheme.error,
-              foregroundColor: context.colorScheme.onError,
-            ),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
+            onPressed: () => Navigator.of(context).pop(true),
             child: const Text('Delete'),
           ),
         ],
@@ -147,20 +132,12 @@ class _SetlistsViewBody extends StatelessWidget {
                           letterSpacing: 2.2,
                         ),
                       ),
-                      FilledButton.icon(
+                      M3EButton.filled(
                         key: const Key('create_setlist_button'),
-                        onPressed: () => _createSetlist(context),
-                        style: FilledButton.styleFrom(
-                          minimumSize: Size(0, context.dimens.minTouchTarget),
-                          backgroundColor: context.colorScheme.primary,
-                          foregroundColor: context.colorScheme.onPrimary,
-                          shape: const StadiumBorder(),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.dimens.spaceMd,
-                          ),
-                        ),
+                        size: M3EButtonSize.sm,
                         icon: const Icon(Icons.add_rounded, size: 20),
-                        label: const Text('New Setlist'),
+                        onPressed: () => _createSetlist(context),
+                        child: const Text('New Setlist'),
                       ),
                     ],
                   ),
@@ -250,154 +227,111 @@ class _SetlistCard extends StatelessWidget {
       button: true,
       selected: isActive,
       label: '${setlist.name}, ${presets.length} songs',
-      child: Material(
-        color: isActive
-            ? context.colorScheme.primaryContainer
-            : context.colorScheme.surfaceContainerLow,
+      child: M3ECard(
+        key: Key('setlist_card_${setlist.id}'),
+        variant: isActive ? M3ECardVariant.filled : M3ECardVariant.outlined,
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        child: InkWell(
-          key: Key('setlist_card_${setlist.id}'),
-          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.all(context.dimens.spaceMd),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-              border: Border.all(
-                color: isActive
-                    ? context.colorScheme.primary.withValues(alpha: 0.45)
-                    : context.colorScheme.outlineVariant,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+        padding: EdgeInsets.all(context.dimens.spaceMd),
+        onPressed: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  setlist.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: context.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: isActive
-                                        ? context.colorScheme.onPrimaryContainer
-                                        : context.colorScheme.onSurface,
-                                  ),
-                                ),
+                          Flexible(
+                            child: Text(
+                              setlist.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: context.colorScheme.onSurface,
                               ),
-                              if (isActive) ...[
-                                SizedBox(width: context.dimens.spaceSm),
-                                Container(
-                                  key: Key(
-                                    'setlist_active_badge_${setlist.id}',
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: context.dimens.spaceSm,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: context.colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(
-                                      context.dimens.radiusFull,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'ACTIVE',
-                                    style: context.textTheme.labelMedium
-                                        ?.copyWith(
-                                          fontSize: 9,
-                                          letterSpacing: 0.8,
-                                          color: context.colorScheme.onPrimary,
-                                        ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                          SizedBox(height: context.dimens.spaceXs),
-                          Text(
-                            '${presets.length} ${presets.length == 1 ? 'song' : 'songs'} · $previewText',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontSize: 13,
-                              color: isActive
-                                  ? context.colorScheme.onPrimaryContainer
-                                        .withValues(alpha: 0.82)
-                                  : context.colorScheme.onSurfaceVariant,
                             ),
                           ),
+                          if (isActive) ...[
+                            SizedBox(width: context.dimens.spaceSm),
+                            Container(
+                              key: Key('setlist_active_badge_${setlist.id}'),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.dimens.spaceSm,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: context.colorScheme.primary,
+                                borderRadius: BorderRadius.circular(
+                                  context.dimens.radiusFull,
+                                ),
+                              ),
+                              child: Text(
+                                'ACTIVE',
+                                style: context.textTheme.labelMedium?.copyWith(
+                                  fontSize: 9,
+                                  letterSpacing: 0.8,
+                                  color: context.colorScheme.onPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.dimens.spaceSmPlus2),
-                Row(
-                  children: [
-                    FilledButton.icon(
-                      key: Key('setlist_activate_button_${setlist.id}'),
-                      onPressed: presets.isEmpty ? null : onActivate,
-                      style: FilledButton.styleFrom(
-                        minimumSize: Size(0, context.dimens.minTouchTarget),
-                        backgroundColor: context.colorScheme.primary,
-                        foregroundColor: context.colorScheme.onPrimary,
-                        disabledBackgroundColor:
-                            context.colorScheme.surfaceContainerHigh,
-                        disabledForegroundColor:
-                            context.colorScheme.onSurfaceVariant,
-                        shape: const StadiumBorder(),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.dimens.spaceMd,
+                      SizedBox(height: context.dimens.spaceXs),
+                      Text(
+                        '${presets.length} ${presets.length == 1 ? 'song' : 'songs'} · $previewText',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          fontSize: 13,
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      icon: const Icon(Icons.playlist_play_rounded, size: 20),
-                      label: const Text('Activate'),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      key: Key('setlist_rename_button_${setlist.id}'),
-                      tooltip: 'Rename ${setlist.name}',
-                      constraints: BoxConstraints(
-                        minWidth: context.dimens.minTouchTarget,
-                        minHeight: context.dimens.minTouchTarget,
-                      ),
-                      onPressed: onRename,
-                      icon: Icon(
-                        Icons.edit_outlined,
-                        size: 20,
-                        color: isActive
-                            ? context.colorScheme.onPrimaryContainer
-                            : context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    IconButton(
-                      key: Key('setlist_delete_button_${setlist.id}'),
-                      tooltip: 'Delete ${setlist.name}',
-                      constraints: BoxConstraints(
-                        minWidth: context.dimens.minTouchTarget,
-                        minHeight: context.dimens.minTouchTarget,
-                      ),
-                      onPressed: onDelete,
-                      icon: Icon(
-                        Icons.delete_outline_rounded,
-                        size: 20,
-                        color: context.colorScheme.error,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
+            SizedBox(height: context.dimens.spaceSmPlus2),
+            Row(
+              children: [
+                M3EButton.filled(
+                  key: Key('setlist_activate_button_${setlist.id}'),
+                  size: M3EButtonSize.sm,
+                  icon: const Icon(Icons.playlist_play_rounded, size: 20),
+                  onPressed: presets.isEmpty ? null : onActivate,
+                  child: const Text('Activate'),
+                ),
+                const Spacer(),
+                M3EIconButton(
+                  key: Key('setlist_rename_button_${setlist.id}'),
+                  variant: M3EIconButtonVariant.standard,
+                  tooltip: 'Rename ${setlist.name}',
+                  onPressed: onRename,
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                M3EIconButton(
+                  key: Key('setlist_delete_button_${setlist.id}'),
+                  variant: M3EIconButtonVariant.standard,
+                  tooltip: 'Delete ${setlist.name}',
+                  onPressed: onDelete,
+                  icon: Icon(
+                    Icons.delete_outline_rounded,
+                    size: 20,
+                    color: context.colorScheme.error,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -411,13 +345,10 @@ class _EmptySetlistsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return M3ECard(
+      variant: M3ECardVariant.outlined,
+      borderRadius: BorderRadius.circular(context.dimens.radiusLg),
       padding: EdgeInsets.all(context.dimens.spaceLg),
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(context.dimens.radiusLg),
-        border: Border.all(color: context.colorScheme.outlineVariant),
-      ),
       child: Column(
         children: [
           Container(
@@ -451,14 +382,9 @@ class _EmptySetlistsCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: context.dimens.spaceMd),
-          FilledButton(
+          M3EButton.filled(
             key: const Key('empty_create_setlist_button'),
-            style: FilledButton.styleFrom(
-              minimumSize: Size(0, context.dimens.minTouchTarget),
-              backgroundColor: context.colorScheme.primary,
-              foregroundColor: context.colorScheme.onPrimary,
-              shape: const StadiumBorder(),
-            ),
+            size: M3EButtonSize.md,
             onPressed: onCreateSetlist,
             child: const Text('Create Setlist'),
           ),

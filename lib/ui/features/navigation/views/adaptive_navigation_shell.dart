@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../core/theme/app_theme.dart';
 import '../../metronome/view_models/metronome_view_model.dart';
@@ -8,7 +10,7 @@ import '../../presets/views/presets_view.dart';
 import '../../setlists/views/setlists_view.dart';
 
 /// Top-level adaptive navigation shell providing responsive layout switching
-/// between [NavigationBar] (portrait) and [NavigationRail] (landscape / wide screen),
+/// between [M3ENavigationBar] (portrait) and [M3ENavigationRail] (landscape / wide screen),
 /// retaining page state via [IndexedStack] with smooth animated transitions.
 class AdaptiveNavigationShell extends StatefulWidget {
   const AdaptiveNavigationShell({
@@ -144,48 +146,25 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
               top: false,
               child: Row(
                 children: [
-                  NavigationRail(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  M3ENavigationRail(
                     key: const Key('adaptive_navigation_rail'),
+                    type: M3ENavigationRailType.alwaysCollapse,
+                    alignment: M3ENavigationRailAlignment.center,
+                    labelBehavior: M3ENavigationRailLabelBehavior.onlySelected,
+                    showDivider: true,
                     selectedIndex: _currentIndex,
                     onDestinationSelected: _onDestinationSelected,
-                    labelType: NavigationRailLabelType.selected,
-                    backgroundColor: context.colorScheme.surfaceContainerLow,
-                    indicatorColor: context.colorScheme.primaryContainer,
-                    selectedIconTheme: IconThemeData(
-                      color: context.colorScheme.onPrimaryContainer,
-                      size: 24,
-                    ),
-                    unselectedIconTheme: IconThemeData(
-                      color: context.colorScheme.onSurfaceVariant,
-                      size: 24,
-                    ),
-                    selectedLabelTextStyle: context.textTheme.labelMedium
-                        ?.copyWith(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                          color: context.colorScheme.primary,
-                        ),
-                    unselectedLabelTextStyle: context.textTheme.labelMedium
-                        ?.copyWith(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                    destinations: destinations.map((item) {
-                      return NavigationRailDestination(
-                        icon: Icon(item.icon, key: item.railKey),
-                        selectedIcon: Icon(item.selectedIcon),
-                        label: Text(item.label),
-                      );
-                    }).toList(),
-                  ),
-                  VerticalDivider(
-                    width: 1,
-                    thickness: 1,
-                    color: context.colorScheme.outlineVariant,
+                    sections: [
+                      M3ENavigationRailSection(
+                        destinations: destinations.map((item) {
+                          return M3ENavigationRailDestination(
+                            icon: Icon(item.icon, key: item.railKey),
+                            selectedIcon: Icon(item.selectedIcon),
+                            label: item.label,
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                   Expanded(child: content),
                 ],
@@ -197,54 +176,19 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
         return Scaffold(
           backgroundColor: context.colorScheme.surface,
           body: content,
-          bottomNavigationBar: Theme(
-            data: Theme.of(context).copyWith(
-              navigationBarTheme: NavigationBarThemeData(
-                backgroundColor: context.colorScheme.surfaceContainerLow,
-                indicatorColor: context.colorScheme.primaryContainer,
-                iconTheme: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return IconThemeData(
-                      color: context.colorScheme.onPrimaryContainer,
-                      size: 24,
-                    );
-                  }
-                  return IconThemeData(
-                    color: context.colorScheme.onSurfaceVariant,
-                    size: 24,
-                  );
-                }),
-                labelTextStyle: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return context.textTheme.labelMedium?.copyWith(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                      color: context.colorScheme.primary,
-                    );
-                  }
-                  return context.textTheme.labelMedium?.copyWith(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.5,
-                    color: context.colorScheme.onSurfaceVariant,
-                  );
-                }),
-              ),
-            ),
-            child: NavigationBar(
-              key: const Key('adaptive_navigation_bar'),
-              selectedIndex: _currentIndex,
-              onDestinationSelected: _onDestinationSelected,
-              destinations: destinations.map((item) {
-                return NavigationDestination(
-                  key: item.navKey,
-                  icon: Icon(item.icon),
-                  selectedIcon: Icon(item.selectedIcon),
-                  label: item.label,
-                );
-              }).toList(),
-            ),
+          bottomNavigationBar: M3ENavigationBar(
+            key: const Key('adaptive_navigation_bar'),
+            selectedIndex: _currentIndex,
+            onDestinationSelected: _onDestinationSelected,
+            labelBehavior: M3ENavBarLabelBehavior.alwaysShow,
+            indicatorStyle: M3ENavBarIndicatorStyle.pill,
+            destinations: destinations.map((item) {
+              return M3ENavigationBarDestination(
+                icon: Icon(item.icon, key: item.navKey),
+                selectedIcon: Icon(item.selectedIcon),
+                label: item.label,
+              );
+            }).toList(),
           ),
         );
       },
