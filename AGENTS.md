@@ -1,6 +1,6 @@
 # AGENTS.md — Metronome Project Rules & Architecture Blueprint
 
-This document defines the strict architectural, coding, design, and testing rules for the **Metronome** application (`specs/prd_metronomo.md`, `specs/DESIGN_DARK.md`, and `specs/DESIGN_LIGHT.md`). All human developers and AI agents must follow these guidelines.
+This document defines the strict architectural, coding, design, and testing rules for the **Metronome** application (`specs/prd_metronomo.md` and Material 3 Expressive via `package:material_3_expressive`). All human developers and AI agents must follow these guidelines.
 
 ---
 
@@ -42,8 +42,13 @@ lib/
 
 ## 2. Design System Rules
 
+The app uses **Material 3 Expressive** via `package:material_3_expressive` (`M3EMaterialApp`, `M3EThemeData`, and `M3E*` components) configured in `lib/ui/core/theme/app_theme.dart`:
 
-see ./specs/DESIGN_DARK.md and ./specs/DESIGN_LIGHT.md
+- **Seed Color & Theme Mode**: `M3EThemeData.light` and `M3EThemeData.dark` seeded from `AppTheme.seedColor` (`Color(0xFF6750A4)`), with `dynamicColoring: false`, wired to `PreferencesViewModel` (`system`, `light`, `dark`) via `M3EThemeController`.
+- **Typography**: Bundled **Comfortaa** font (`google_fonts` + `assets/google_fonts/`) applied onto `M3ETypeScale` / `TextTheme`.
+- **Tokens & Dimensions**: Access Material 3 `ColorScheme` / `TextTheme` and `M3ETheme` tokens via `context.colorScheme`, `context.textTheme`, `context.m3e`, and metronome-specific layout metrics via `context.dimens` (`MetronomeDimens`).
+- **Co-importing `material_ui`**: If a file imports both `package:material_3_expressive/material_3_expressive.dart` and `package:material_ui/material_ui.dart`, hide the colliding shape symbols on `material_ui` (`hide CornerRounding, RoundedPolygon`).
+- **Migration Roadmap**: See [migration_plan.md](file:///Users/mateus77/Desktop/projects/metronome/specs/migration_to_material3_expressive/migration_plan.md).
 
 ---
 

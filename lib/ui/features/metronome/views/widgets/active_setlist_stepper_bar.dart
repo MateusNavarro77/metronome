@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../../domain/models/preset.dart';
 import '../../../../../domain/models/setlist.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Stage-friendly stepper bar shown on the main Metronome screen when a
 /// [Setlist] is active (FR-PRE-08, FR-PRE-09, UI-02).
@@ -45,9 +45,11 @@ class ActiveSetlistStepperBar extends StatelessWidget {
         vertical: verticalPad,
       ),
       decoration: BoxDecoration(
-        color: context.colors.surfaceLow,
+        color: context.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        border: Border.all(color: context.colors.neonGhostBorder),
+        border: Border.all(
+          color: context.colorScheme.primary.withValues(alpha: 0.45),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -58,7 +60,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
               Icon(
                 Icons.queue_music_rounded,
                 size: 16,
-                color: context.colors.primaryAccent,
+                color: context.colorScheme.primary,
               ),
               SizedBox(width: context.dimens.spaceXs),
               Expanded(
@@ -69,7 +71,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   style: context.textTheme.labelMedium?.copyWith(
                     fontSize: 10,
                     letterSpacing: 1.2,
-                    color: context.colors.primaryAccent,
+                    color: context.colorScheme.primary,
                   ),
                 ),
               ),
@@ -81,7 +83,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.primaryContainer,
+                    color: context.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(
                       context.dimens.radiusFull,
                     ),
@@ -91,7 +93,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                     style: context.textTheme.labelMedium?.copyWith(
                       fontSize: 9,
                       letterSpacing: 0.8,
-                      color: context.colors.primaryAccent,
+                      color: context.colorScheme.onPrimaryContainer,
                     ),
                   ),
                 ),
@@ -103,7 +105,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: context.colors.surfaceHigh,
+                  color: context.colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(
                     context.dimens.radiusFull,
                   ),
@@ -114,7 +116,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   style: context.textTheme.labelMedium?.copyWith(
                     fontSize: 11,
                     letterSpacing: 0.4,
-                    color: context.colors.onSurfacePrimary,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -131,7 +133,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                 icon: Icon(
                   Icons.close_rounded,
                   size: 18,
-                  color: context.colors.onSurfaceMuted,
+                  color: context.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -159,7 +161,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: context.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: context.colors.onSurfacePrimary,
+                        color: context.colorScheme.onSurface,
                       ),
                     ),
                     if (currentPreset.note.isNotEmpty) ...[
@@ -172,7 +174,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: context.textTheme.bodyMedium?.copyWith(
                           fontSize: 12,
-                          color: context.colors.onSurfaceMuted,
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -218,8 +220,8 @@ class _StepButton extends StatelessWidget {
       label: semanticLabel,
       child: Material(
         color: enabled
-            ? context.colors.primaryContainer
-            : context.colors.surfaceHigh,
+            ? context.colorScheme.primaryContainer
+            : context.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(context.dimens.radiusFull),
         child: InkWell(
           key: buttonKey,
@@ -237,16 +239,16 @@ class _StepButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(context.dimens.radiusFull),
               border: Border.all(
                 color: enabled
-                    ? context.colors.neonGhostBorder
-                    : context.colors.ghostBorder,
+                    ? context.colorScheme.primary.withValues(alpha: 0.45)
+                    : context.colorScheme.outlineVariant,
               ),
             ),
             child: Icon(
               icon,
               size: 26,
               color: enabled
-                  ? context.colors.primaryAccent
-                  : context.colors.onSurfaceMuted.withValues(alpha: 0.4),
+                  ? context.colorScheme.onPrimaryContainer
+                  : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
           ),
         ),

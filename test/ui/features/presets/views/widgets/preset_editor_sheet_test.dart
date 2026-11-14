@@ -5,7 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:metronome/domain/models/bpm.dart';
 import 'package:metronome/domain/models/subdivision.dart';
 import 'package:metronome/domain/models/time_signature.dart';
-import 'package:metronome/ui/core/theme/sonic_theme.dart';
+import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/presets/views/widgets/preset_editor_sheet.dart';
 
 void main() {
@@ -23,7 +23,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            theme: SonicTheme.darkTheme,
+            theme: AppTheme.darkTheme,
             home: Scaffold(
               body: Builder(
                 builder: (context) => Center(

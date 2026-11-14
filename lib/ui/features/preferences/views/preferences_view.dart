@@ -2,11 +2,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../domain/models/app_theme_mode.dart';
-import '../../../core/theme/sonic_theme.dart';
+import '../../../core/theme/app_theme.dart';
 import '../view_models/preferences_view_model.dart';
 
-/// Preferences and settings screen adhering to "The Sonic Architect" design system
-/// (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md, FR-CFG-04, UI-05).
+/// Preferences and settings screen using Material 3 Expressive theming
+/// (FR-CFG-04, UI-05).
 class PreferencesView extends StatelessWidget {
   const PreferencesView({super.key, this.showBackButton});
 
@@ -20,7 +20,7 @@ class PreferencesView extends StatelessWidget {
     final canPop = showBackButton ?? (ModalRoute.of(context)?.canPop ?? false);
 
     return Scaffold(
-      backgroundColor: context.colors.surfaceLowest,
+      backgroundColor: context.colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -43,14 +43,14 @@ class PreferencesView extends StatelessWidget {
                         IconButton(
                           key: const Key('preferences_back_button'),
                           icon: const Icon(Icons.arrow_back_rounded),
-                          color: context.colors.onSurfacePrimary,
+                          color: context.colorScheme.onSurface,
                           tooltip: 'Back to metronome',
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         Text(
                           'PREFERENCES',
                           style: context.textTheme.labelMedium?.copyWith(
-                            color: context.colors.onSurfacePrimary,
+                            color: context.colorScheme.onSurface,
                             letterSpacing: 2.2,
                           ),
                         ),
@@ -61,7 +61,7 @@ class PreferencesView extends StatelessWidget {
                         Text(
                           'PREFERENCES',
                           style: context.textTheme.labelMedium?.copyWith(
-                            color: context.colors.onSurfacePrimary,
+                            color: context.colorScheme.onSurface,
                             letterSpacing: 2.2,
                           ),
                         ),
@@ -75,11 +75,13 @@ class PreferencesView extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(context.dimens.spaceMd),
                     decoration: BoxDecoration(
-                      color: context.colors.surfaceLow,
+                      color: context.colorScheme.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(
                         context.dimens.radiusMd,
                       ),
-                      border: Border.all(color: context.colors.ghostBorder),
+                      border: Border.all(
+                        color: context.colorScheme.outlineVariant,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,13 +91,13 @@ class PreferencesView extends StatelessWidget {
                             Icon(
                               Icons.palette_outlined,
                               size: 20,
-                              color: context.colors.primaryAccent,
+                              color: context.colorScheme.primary,
                             ),
                             SizedBox(width: context.dimens.spaceSm),
                             Text(
                               'APPEARANCE',
                               style: context.textTheme.labelMedium?.copyWith(
-                                color: context.colors.onSurfacePrimary,
+                                color: context.colorScheme.onSurface,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -103,9 +105,9 @@ class PreferencesView extends StatelessWidget {
                         ),
                         SizedBox(height: context.dimens.spaceXs),
                         Text(
-                          'Choose between studio dark mode, architectural daylight mode, or match your device system appearance.',
+                          'Choose between dark mode, light mode, or match your device system appearance.',
                           style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.onSurfaceMuted,
+                            color: context.colorScheme.onSurfaceVariant,
                             fontSize: 13,
                           ),
                         ),
@@ -144,23 +146,25 @@ class PreferencesView extends StatelessWidget {
                                 states,
                               ) {
                                 if (states.contains(WidgetState.selected)) {
-                                  return context.colors.primaryContainer;
+                                  return context.colorScheme.primaryContainer;
                                 }
-                                return context.colors.surfaceHigh;
+                                return context.colorScheme.surfaceContainerHigh;
                               }),
                               foregroundColor: WidgetStateProperty.resolveWith((
                                 states,
                               ) {
                                 if (states.contains(WidgetState.selected)) {
-                                  return context.colors.primaryAccent;
+                                  return context.colorScheme.onPrimaryContainer;
                                 }
-                                return context.colors.onSurfaceMuted;
+                                return context.colorScheme.onSurfaceVariant;
                               }),
                               side: WidgetStateProperty.resolveWith((states) {
                                 return BorderSide(
                                   color: states.contains(WidgetState.selected)
-                                      ? context.colors.neonGhostBorder
-                                      : context.colors.ghostBorder,
+                                      ? context.colorScheme.primary.withValues(
+                                          alpha: 0.45,
+                                        )
+                                      : context.colorScheme.outlineVariant,
                                 );
                               }),
                             ),

@@ -8,7 +8,7 @@ import 'package:metronome/data/services/simulated_metronome_engine.dart';
 import 'package:metronome/domain/models/bpm.dart';
 import 'package:metronome/domain/models/subdivision.dart';
 import 'package:metronome/domain/models/time_signature.dart';
-import 'package:metronome/ui/core/theme/sonic_theme.dart';
+import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/presets/view_models/presets_view_model.dart';
 import 'package:metronome/ui/features/presets/views/presets_view.dart';
@@ -48,7 +48,7 @@ void main() {
 
     Widget buildTestApp() {
       return MaterialApp(
-        theme: SonicTheme.darkTheme,
+        theme: AppTheme.darkTheme,
         home: PresetsView(viewModel: presetsVm),
       );
     }

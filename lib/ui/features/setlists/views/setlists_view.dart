@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 
 import '../../../../domain/models/preset.dart';
 import '../../../../domain/models/setlist.dart';
-import '../../../core/theme/sonic_theme.dart';
+import '../../../core/theme/app_theme.dart';
 import '../view_models/setlists_view_model.dart';
 import 'widgets/setlist_detail_sheet.dart';
 import 'widgets/setlist_name_dialog.dart';
 
-/// Setlists management screen adhering to "The Sonic Architect" design system
+/// Setlists management screen using Material 3 Expressive theming
 /// and PRD section 3.7 (FR-PRE-06..09, UI-05..06).
 class SetlistsView extends StatelessWidget {
   const SetlistsView({super.key, this.viewModel});
@@ -70,7 +70,7 @@ class _SetlistsViewBody extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         key: const Key('delete_setlist_confirm_dialog'),
-        backgroundColor: context.colors.surfaceLow,
+        backgroundColor: context.colorScheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(context.dimens.radiusMd),
         ),
@@ -78,13 +78,13 @@ class _SetlistsViewBody extends StatelessWidget {
           'Delete Setlist?',
           style: context.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
-            color: context.colors.onSurfacePrimary,
+            color: context.colorScheme.onSurface,
           ),
         ),
         content: Text(
           'Are you sure you want to delete "${setlist.name}"? Your saved presets will remain in your library.',
           style: context.textTheme.bodyMedium?.copyWith(
-            color: context.colors.onSurfaceMuted,
+            color: context.colorScheme.onSurfaceVariant,
           ),
         ),
         actions: [
@@ -93,14 +93,14 @@ class _SetlistsViewBody extends StatelessWidget {
             onPressed: () => Navigator.of(dialogContext).pop(false),
             child: Text(
               'Cancel',
-              style: TextStyle(color: context.colors.onSurfacePrimary),
+              style: TextStyle(color: context.colorScheme.onSurface),
             ),
           ),
           FilledButton(
             key: const Key('confirm_delete_setlist_button'),
             style: FilledButton.styleFrom(
-              backgroundColor: context.colors.error,
-              foregroundColor: context.colors.surfaceLowest,
+              backgroundColor: context.colorScheme.error,
+              foregroundColor: context.colorScheme.onError,
             ),
             onPressed: () => Navigator.of(dialogContext).pop(true),
             child: const Text('Delete'),
@@ -120,7 +120,7 @@ class _SetlistsViewBody extends StatelessWidget {
     final activeSetlistId = viewModel.activeSetlistId;
 
     return Scaffold(
-      backgroundColor: context.colors.surfaceLowest,
+      backgroundColor: context.colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -143,7 +143,7 @@ class _SetlistsViewBody extends StatelessWidget {
                       Text(
                         'SETLISTS',
                         style: context.textTheme.labelMedium?.copyWith(
-                          color: context.colors.onSurfacePrimary,
+                          color: context.colorScheme.onSurface,
                           letterSpacing: 2.2,
                         ),
                       ),
@@ -152,8 +152,8 @@ class _SetlistsViewBody extends StatelessWidget {
                         onPressed: () => _createSetlist(context),
                         style: FilledButton.styleFrom(
                           minimumSize: Size(0, context.dimens.minTouchTarget),
-                          backgroundColor: context.colors.primaryAccent,
-                          foregroundColor: context.colors.onPrimaryAccent,
+                          backgroundColor: context.colorScheme.primary,
+                          foregroundColor: context.colorScheme.onPrimary,
                           shape: const StadiumBorder(),
                           padding: EdgeInsets.symmetric(
                             horizontal: context.dimens.spaceMd,
@@ -252,8 +252,8 @@ class _SetlistCard extends StatelessWidget {
       label: '${setlist.name}, ${presets.length} songs',
       child: Material(
         color: isActive
-            ? context.colors.primaryContainer
-            : context.colors.surfaceLow,
+            ? context.colorScheme.primaryContainer
+            : context.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
         child: InkWell(
           key: Key('setlist_card_${setlist.id}'),
@@ -265,8 +265,8 @@ class _SetlistCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(context.dimens.radiusMd),
               border: Border.all(
                 color: isActive
-                    ? context.colors.neonGhostBorder
-                    : context.colors.ghostBorder,
+                    ? context.colorScheme.primary.withValues(alpha: 0.45)
+                    : context.colorScheme.outlineVariant,
               ),
             ),
             child: Column(
@@ -288,8 +288,8 @@ class _SetlistCard extends StatelessWidget {
                                   style: context.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: isActive
-                                        ? context.colors.onPrimaryContainer
-                                        : context.colors.onSurfacePrimary,
+                                        ? context.colorScheme.onPrimaryContainer
+                                        : context.colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -304,7 +304,7 @@ class _SetlistCard extends StatelessWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: context.colors.primaryAccent,
+                                    color: context.colorScheme.primary,
                                     borderRadius: BorderRadius.circular(
                                       context.dimens.radiusFull,
                                     ),
@@ -315,7 +315,7 @@ class _SetlistCard extends StatelessWidget {
                                         ?.copyWith(
                                           fontSize: 9,
                                           letterSpacing: 0.8,
-                                          color: context.colors.onPrimaryAccent,
+                                          color: context.colorScheme.onPrimary,
                                         ),
                                   ),
                                 ),
@@ -330,9 +330,9 @@ class _SetlistCard extends StatelessWidget {
                             style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: 13,
                               color: isActive
-                                  ? context.colors.onPrimaryContainer
+                                  ? context.colorScheme.onPrimaryContainer
                                         .withValues(alpha: 0.82)
-                                  : context.colors.onSurfaceMuted,
+                                  : context.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -348,10 +348,12 @@ class _SetlistCard extends StatelessWidget {
                       onPressed: presets.isEmpty ? null : onActivate,
                       style: FilledButton.styleFrom(
                         minimumSize: Size(0, context.dimens.minTouchTarget),
-                        backgroundColor: context.colors.primaryAccent,
-                        foregroundColor: context.colors.onPrimaryAccent,
-                        disabledBackgroundColor: context.colors.surfaceHigh,
-                        disabledForegroundColor: context.colors.onSurfaceMuted,
+                        backgroundColor: context.colorScheme.primary,
+                        foregroundColor: context.colorScheme.onPrimary,
+                        disabledBackgroundColor:
+                            context.colorScheme.surfaceContainerHigh,
+                        disabledForegroundColor:
+                            context.colorScheme.onSurfaceVariant,
                         shape: const StadiumBorder(),
                         padding: EdgeInsets.symmetric(
                           horizontal: context.dimens.spaceMd,
@@ -373,8 +375,8 @@ class _SetlistCard extends StatelessWidget {
                         Icons.edit_outlined,
                         size: 20,
                         color: isActive
-                            ? context.colors.onPrimaryContainer
-                            : context.colors.onSurfaceMuted,
+                            ? context.colorScheme.onPrimaryContainer
+                            : context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     IconButton(
@@ -388,7 +390,7 @@ class _SetlistCard extends StatelessWidget {
                       icon: Icon(
                         Icons.delete_outline_rounded,
                         size: 20,
-                        color: context.colors.error,
+                        color: context.colorScheme.error,
                       ),
                     ),
                   ],
@@ -412,9 +414,9 @@ class _EmptySetlistsCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.dimens.spaceLg),
       decoration: BoxDecoration(
-        color: context.colors.surfaceLow,
+        color: context.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(context.dimens.radiusLg),
-        border: Border.all(color: context.colors.ghostBorder),
+        border: Border.all(color: context.colorScheme.outlineVariant),
       ),
       child: Column(
         children: [
@@ -422,13 +424,13 @@ class _EmptySetlistsCard extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: context.colors.surfaceHigh,
+              color: context.colorScheme.surfaceContainerHigh,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.queue_music_rounded,
               size: 28,
-              color: context.colors.primaryAccent,
+              color: context.colorScheme.primary,
             ),
           ),
           SizedBox(height: context.dimens.spaceMd),
@@ -437,7 +439,7 @@ class _EmptySetlistsCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: context.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
-              color: context.colors.onSurfacePrimary,
+              color: context.colorScheme.onSurface,
             ),
           ),
           SizedBox(height: context.dimens.spaceXs),
@@ -445,7 +447,7 @@ class _EmptySetlistsCard extends StatelessWidget {
             'Group your saved presets into ordered gig or rehearsal setlists with seamless bar-synced transitions.',
             textAlign: TextAlign.center,
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.onSurfaceMuted,
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: context.dimens.spaceMd),
@@ -453,8 +455,8 @@ class _EmptySetlistsCard extends StatelessWidget {
             key: const Key('empty_create_setlist_button'),
             style: FilledButton.styleFrom(
               minimumSize: Size(0, context.dimens.minTouchTarget),
-              backgroundColor: context.colors.primaryAccent,
-              foregroundColor: context.colors.onPrimaryAccent,
+              backgroundColor: context.colorScheme.primary,
+              foregroundColor: context.colorScheme.onPrimary,
               shape: const StadiumBorder(),
             ),
             onPressed: onCreateSetlist,

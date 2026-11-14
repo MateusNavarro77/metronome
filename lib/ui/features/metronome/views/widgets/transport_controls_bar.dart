@@ -1,10 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Bottom thumb-zone controls housing the large Tap Tempo button and the
-/// glowing Neon Green Play/Stop "Pulse" CTA button (FR-TAP-01, FR-TAP-05, FR-PLY-01..03).
+/// primary Play/Stop CTA button (FR-TAP-01, FR-TAP-05, FR-PLY-01..03).
 class TransportControlsBar extends StatefulWidget {
   const TransportControlsBar({
     super.key,
@@ -67,13 +67,13 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                 height: controlHeight,
                 decoration: BoxDecoration(
                   color: _tapPressed
-                      ? context.colors.primaryContainer
-                      : context.colors.surfaceHigh,
+                      ? context.colorScheme.primaryContainer
+                      : context.colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(context.dimens.radiusMd),
                   border: Border.all(
                     color: _tapPressed
-                        ? context.colors.primaryAccent
-                        : context.colors.ghostBorder,
+                        ? context.colorScheme.primary
+                        : context.colorScheme.outlineVariant,
                     width: 1.5,
                   ),
                 ),
@@ -90,8 +90,8 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                           Icon(
                             Icons.touch_app_rounded,
                             color: _tapPressed
-                                ? context.colors.primaryAccent
-                                : context.colors.onSurfacePrimary,
+                                ? context.colorScheme.onPrimaryContainer
+                                : context.colorScheme.onSurface,
                             size: widget.isCompact ? 24 : 28,
                           ),
                           SizedBox(width: context.dimens.spaceSmPlus2),
@@ -102,8 +102,8 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.8,
                               color: _tapPressed
-                                  ? context.colors.primaryAccent
-                                  : context.colors.onSurfacePrimary,
+                                  ? context.colorScheme.onPrimaryContainer
+                                  : context.colorScheme.onSurface,
                             ),
                           ),
                         ],
@@ -116,7 +116,7 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
           ),
         ),
         SizedBox(width: context.dimens.spaceMd),
-        // Primary Circular "Pulse" Play/Stop button (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md)
+        // Primary Circular Play/Stop CTA button
         Semantics(
           button: true,
           label: widget.isPlaying ? 'Stop metronome' : 'Start metronome',
@@ -130,17 +130,17 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: widget.isPlaying
-                        ? context.colors.pulseGlow
-                        : context.colors.pulseGlowIdle,
-                    blurRadius: widget.isPlaying ? 32.0 : 18.0,
-                    spreadRadius: widget.isPlaying ? 2.0 : 0.0,
+                    color: context.colorScheme.shadow.withValues(
+                      alpha: widget.isPlaying ? 0.24 : 0.14,
+                    ),
+                    blurRadius: widget.isPlaying ? 20.0 : 10.0,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Material(
                 shape: const CircleBorder(),
-                color: context.colors.primaryAccent,
+                color: context.colorScheme.primary,
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   key: const Key('play_stop_button'),
@@ -156,7 +156,7 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                             ? Icons.stop_rounded
                             : Icons.play_arrow_rounded,
                         size: widget.isCompact ? 42 : 50,
-                        color: context.colors.onPrimaryAccent,
+                        color: context.colorScheme.onPrimary,
                       ),
                     ),
                   ),

@@ -8,7 +8,7 @@ import 'package:metronome/data/services/simulated_metronome_engine.dart';
 import 'package:metronome/domain/models/bpm.dart';
 import 'package:metronome/domain/models/subdivision.dart';
 import 'package:metronome/domain/models/time_signature.dart';
-import 'package:metronome/ui/core/theme/sonic_theme.dart';
+import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/metronome/views/metronome_view.dart';
 import 'package:metronome/ui/features/setlists/view_models/setlists_view_model.dart';
@@ -83,7 +83,7 @@ void main() {
 
           await tester.pumpWidget(
             MaterialApp(
-              theme: SonicTheme.darkTheme,
+              theme: AppTheme.darkTheme,
               home: SetlistsView(viewModel: setlistsVm),
             ),
           );
@@ -234,7 +234,7 @@ void main() {
 
           await tester.pumpWidget(
             MaterialApp(
-              theme: SonicTheme.darkTheme,
+              theme: AppTheme.darkTheme,
               home: MetronomeView(viewModel: metronomeVm),
             ),
           );

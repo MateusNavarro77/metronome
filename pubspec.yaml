@@ -47,6 +47,7 @@ dependencies:
   flutter_soloud: ^5.2.3
   shared_preferences: ^2.3.2
   material_ui: ^1.11.0
+  material_3_expressive: ^1.2.1
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../../../core/theme/sonic_theme.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../metronome/view_models/metronome_view_model.dart';
 import '../../metronome/views/metronome_view.dart';
 import '../../preferences/views/preferences_view.dart';
@@ -138,7 +138,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
 
         if (useRail) {
           return Scaffold(
-            backgroundColor: context.colors.surfaceLowest,
+            backgroundColor: context.colorScheme.surface,
             body: SafeArea(
               bottom: false,
               top: false,
@@ -150,14 +150,14 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                     selectedIndex: _currentIndex,
                     onDestinationSelected: _onDestinationSelected,
                     labelType: NavigationRailLabelType.selected,
-                    backgroundColor: context.colors.surfaceLow,
-                    indicatorColor: context.colors.primaryContainer,
+                    backgroundColor: context.colorScheme.surfaceContainerLow,
+                    indicatorColor: context.colorScheme.primaryContainer,
                     selectedIconTheme: IconThemeData(
-                      color: context.colors.onPrimaryContainer,
+                      color: context.colorScheme.onPrimaryContainer,
                       size: 24,
                     ),
                     unselectedIconTheme: IconThemeData(
-                      color: context.colors.onSurfaceMuted,
+                      color: context.colorScheme.onSurfaceVariant,
                       size: 24,
                     ),
                     selectedLabelTextStyle: context.textTheme.labelMedium
@@ -165,14 +165,14 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
-                          color: context.colors.primaryAccent,
+                          color: context.colorScheme.primary,
                         ),
                     unselectedLabelTextStyle: context.textTheme.labelMedium
                         ?.copyWith(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.5,
-                          color: context.colors.onSurfaceMuted,
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                     destinations: destinations.map((item) {
                       return NavigationRailDestination(
@@ -185,7 +185,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                   VerticalDivider(
                     width: 1,
                     thickness: 1,
-                    color: context.colors.ghostBorder,
+                    color: context.colorScheme.outlineVariant,
                   ),
                   Expanded(child: content),
                 ],
@@ -195,22 +195,22 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
         }
 
         return Scaffold(
-          backgroundColor: context.colors.surfaceLowest,
+          backgroundColor: context.colorScheme.surface,
           body: content,
           bottomNavigationBar: Theme(
             data: Theme.of(context).copyWith(
               navigationBarTheme: NavigationBarThemeData(
-                backgroundColor: context.colors.surfaceLow,
-                indicatorColor: context.colors.primaryContainer,
+                backgroundColor: context.colorScheme.surfaceContainerLow,
+                indicatorColor: context.colorScheme.primaryContainer,
                 iconTheme: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.selected)) {
                     return IconThemeData(
-                      color: context.colors.onPrimaryContainer,
+                      color: context.colorScheme.onPrimaryContainer,
                       size: 24,
                     );
                   }
                   return IconThemeData(
-                    color: context.colors.onSurfaceMuted,
+                    color: context.colorScheme.onSurfaceVariant,
                     size: 24,
                   );
                 }),
@@ -220,14 +220,14 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
-                      color: context.colors.primaryAccent,
+                      color: context.colorScheme.primary,
                     );
                   }
                   return context.textTheme.labelMedium?.copyWith(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.5,
-                    color: context.colors.onSurfaceMuted,
+                    color: context.colorScheme.onSurfaceVariant,
                   );
                 }),
               ),
