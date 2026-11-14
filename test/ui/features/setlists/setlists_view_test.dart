@@ -8,7 +8,7 @@ import 'package:metronome/data/services/simulated_metronome_engine.dart';
 import 'package:metronome/domain/models/bpm.dart';
 import 'package:metronome/domain/models/subdivision.dart';
 import 'package:metronome/domain/models/time_signature.dart';
-import 'package:metronome/ui/core/theme/sonic_theme.dart';
+import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/metronome/views/metronome_view.dart';
 import 'package:metronome/ui/features/setlists/view_models/setlists_view_model.dart';
@@ -83,7 +83,7 @@ void main() {
 
           await tester.pumpWidget(
             MaterialApp(
-              theme: SonicTheme.darkTheme,
+              theme: AppTheme.darkTheme,
               home: SetlistsView(viewModel: setlistsVm),
             ),
           );
@@ -107,10 +107,12 @@ void main() {
             find.byKey(Key('setlist_detail_sheet_$setlistId')),
             findsOneWidget,
           );
+          expect(find.byType(BackdropFilter), findsNothing);
 
           // Add Song A and Song B
           await tester.tap(find.byKey(const Key('setlist_add_preset_button')));
           await tester.pumpAndSettle();
+          expect(find.byType(BackdropFilter), findsNothing);
           await tester.tap(find.byKey(Key('add_preset_picker_item_${p1.id}')));
           await tester.pumpAndSettle();
 
@@ -232,7 +234,7 @@ void main() {
 
           await tester.pumpWidget(
             MaterialApp(
-              theme: SonicTheme.darkTheme,
+              theme: AppTheme.darkTheme,
               home: MetronomeView(viewModel: metronomeVm),
             ),
           );
@@ -335,6 +337,54 @@ void main() {
           await tester.pump();
         },
       );
+
+      test('SetlistsViewModel ignores beat tick updates and notifies on active setlist changes', () async {
+        final (
+          :engine,
+          :libraryRepo,
+          :metronomeVm,
+          :setlistsVm,
+          metronomeRepo: _,
+        ) = createHarness();
+        final p1 = await libraryRepo.createPreset(
+          name: 'Song 1',
+          bpm: const Bpm(120),
+          timeSignature: TimeSignature.fourFour,
+          subdivision: Subdivision.none,
+          isAccentEnabled: true,
+        );
+        final p2 = await libraryRepo.createPreset(
+          name: 'Song 2',
+          bpm: const Bpm(132),
+          timeSignature: TimeSignature.fourFour,
+          subdivision: Subdivision.none,
+          isAccentEnabled: true,
+        );
+        final setlist = await libraryRepo.createSetlist(
+          name: 'Gig Set',
+          presetIds: [p1.id, p2.id],
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        var notifications = 0;
+        setlistsVm.addListener(() => notifications++);
+
+        metronomeVm.togglePlayStop();
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(0);
+
+        engine.advancePulses(3);
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(0);
+
+        setlistsVm.activateSetlist(setlist, initialIndex: 0);
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(1);
+
+        metronomeVm.nextSetlistItem();
+        await Future<void>.delayed(Duration.zero);
+        check(notifications).equals(2);
+      });
     },
   );
 }

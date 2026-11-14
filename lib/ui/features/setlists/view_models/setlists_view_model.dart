@@ -14,6 +14,8 @@ class SetlistsViewModel extends ChangeNotifier {
     required MetronomeViewModel metronomeViewModel,
   }) : _repository = repository,
        _metronomeViewModel = metronomeViewModel {
+    _lastActiveSetlistId = _metronomeViewModel.state.activeSetlistId;
+    _lastActiveSetlistIndex = _metronomeViewModel.activeSetlistIndex;
     _librarySubscription = _repository.changes.listen((_) {
       notifyListeners();
     });
@@ -24,6 +26,8 @@ class SetlistsViewModel extends ChangeNotifier {
   final MetronomeViewModel _metronomeViewModel;
 
   StreamSubscription<void>? _librarySubscription;
+  String? _lastActiveSetlistId;
+  int _lastActiveSetlistIndex = 0;
 
   /// All saved setlists.
   List<Setlist> get setlists => _repository.setlists;
@@ -96,6 +100,14 @@ class SetlistsViewModel extends ChangeNotifier {
   }
 
   void _onMetronomeChanged() {
+    final currentSetlistId = activeSetlistId;
+    final currentSetlistIndex = activeSetlistIndex;
+    if (currentSetlistId == _lastActiveSetlistId &&
+        currentSetlistIndex == _lastActiveSetlistIndex) {
+      return;
+    }
+    _lastActiveSetlistId = currentSetlistId;
+    _lastActiveSetlistIndex = currentSetlistIndex;
     notifyListeners();
   }
 

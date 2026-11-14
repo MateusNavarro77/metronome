@@ -1,8 +1,10 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/preset.dart';
 import '../../../../../domain/models/setlist.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Stage-friendly stepper bar shown on the main Metronome screen when a
 /// [Setlist] is active (FR-PRE-08, FR-PRE-09, UI-02).
@@ -38,16 +40,12 @@ class ActiveSetlistStepperBar extends StatelessWidget {
         ? context.dimens.spaceSm
         : context.dimens.spaceSmPlus4;
 
-    return Container(
+    return M3ECard(
       key: const Key('active_setlist_stepper_bar'),
+      variant: M3ECardVariant.outlined,
       padding: EdgeInsets.symmetric(
         horizontal: context.dimens.spaceSmPlus4,
         vertical: verticalPad,
-      ),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceLow,
-        borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        border: Border.all(color: context.colors.neonGhostBorder),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -58,7 +56,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
               Icon(
                 Icons.queue_music_rounded,
                 size: 16,
-                color: context.colors.primaryAccent,
+                color: context.colorScheme.primary,
               ),
               SizedBox(width: context.dimens.spaceXs),
               Expanded(
@@ -69,7 +67,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   style: context.textTheme.labelMedium?.copyWith(
                     fontSize: 10,
                     letterSpacing: 1.2,
-                    color: context.colors.primaryAccent,
+                    color: context.colorScheme.primary,
                   ),
                 ),
               ),
@@ -81,7 +79,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.primaryContainer,
+                    color: context.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(
                       context.dimens.radiusFull,
                     ),
@@ -91,7 +89,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                     style: context.textTheme.labelMedium?.copyWith(
                       fontSize: 9,
                       letterSpacing: 0.8,
-                      color: context.colors.primaryAccent,
+                      color: context.colorScheme.onPrimaryContainer,
                     ),
                   ),
                 ),
@@ -103,7 +101,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: context.colors.surfaceHigh,
+                  color: context.colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(
                     context.dimens.radiusFull,
                   ),
@@ -114,25 +112,18 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   style: context.textTheme.labelMedium?.copyWith(
                     fontSize: 11,
                     letterSpacing: 0.4,
-                    color: context.colors.onSurfacePrimary,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
               ),
               SizedBox(width: context.dimens.spaceXs),
-              IconButton(
+              M3EIconButton(
                 key: const Key('setlist_deactivate_button'),
+                variant: M3EIconButtonVariant.standard,
+                size: M3EIconButtonSize.sm,
                 tooltip: 'Exit setlist',
-                constraints: BoxConstraints(
-                  minWidth: context.dimens.minTouchTarget,
-                  minHeight: context.dimens.minTouchTarget,
-                ),
-                padding: EdgeInsets.zero,
                 onPressed: onDeactivate,
-                icon: Icon(
-                  Icons.close_rounded,
-                  size: 18,
-                  color: context.colors.onSurfaceMuted,
-                ),
+                icon: const Icon(Icons.close_rounded),
               ),
             ],
           ),
@@ -159,7 +150,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: context.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: context.colors.onSurfacePrimary,
+                        color: context.colorScheme.onSurface,
                       ),
                     ),
                     if (currentPreset.note.isNotEmpty) ...[
@@ -172,7 +163,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: context.textTheme.bodyMedium?.copyWith(
                           fontSize: 12,
-                          color: context.colors.onSurfaceMuted,
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -212,45 +203,16 @@ class _StepButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: semanticLabel,
-      child: Material(
-        color: enabled
-            ? context.colors.primaryContainer
-            : context.colors.surfaceHigh,
-        borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-        child: InkWell(
-          key: buttonKey,
-          borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-          onTap: enabled ? onTap : null,
-          child: Container(
-            constraints: BoxConstraints(
-              minWidth: context.dimens.minTouchTarget + 8,
-              minHeight: context.dimens.minTouchTarget,
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: context.dimens.spaceSmPlus4,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-              border: Border.all(
-                color: enabled
-                    ? context.colors.neonGhostBorder
-                    : context.colors.ghostBorder,
-              ),
-            ),
-            child: Icon(
-              icon,
-              size: 26,
-              color: enabled
-                  ? context.colors.primaryAccent
-                  : context.colors.onSurfaceMuted.withValues(alpha: 0.4),
-            ),
-          ),
-        ),
-      ),
+    return M3EIconButton(
+      key: buttonKey,
+      variant: M3EIconButtonVariant.tonal,
+      size: M3EIconButtonSize.md,
+      width: M3EIconButtonWidth.wide,
+      shape: M3EIconButtonShapeVariant.round,
+      icon: Icon(icon),
+      tooltip: semanticLabel,
+      semanticLabel: semanticLabel,
+      onPressed: enabled ? onTap : null,
     );
   }
 }

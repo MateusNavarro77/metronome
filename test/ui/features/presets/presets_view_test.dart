@@ -8,7 +8,7 @@ import 'package:metronome/data/services/simulated_metronome_engine.dart';
 import 'package:metronome/domain/models/bpm.dart';
 import 'package:metronome/domain/models/subdivision.dart';
 import 'package:metronome/domain/models/time_signature.dart';
-import 'package:metronome/ui/core/theme/sonic_theme.dart';
+import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/presets/view_models/presets_view_model.dart';
 import 'package:metronome/ui/features/presets/views/presets_view.dart';
@@ -48,7 +48,7 @@ void main() {
 
     Widget buildTestApp() {
       return MaterialApp(
-        theme: SonicTheme.darkTheme,
+        theme: AppTheme.darkTheme,
         home: PresetsView(viewModel: presetsVm),
       );
     }
@@ -232,5 +232,42 @@ void main() {
         check(libraryRepo.setlists.first.presetIds).deepEquals([beta.id]);
       },
     );
+
+    test('PresetsViewModel ignores beat tick updates and notifies on active preset changes', () async {
+      final presetOne = await libraryRepo.createPreset(
+        name: 'Stage Opener',
+        bpm: const Bpm(128),
+        timeSignature: TimeSignature.fourFour,
+        subdivision: Subdivision.none,
+        isAccentEnabled: true,
+      );
+      final presetTwo = await libraryRepo.createPreset(
+        name: 'Encore',
+        bpm: const Bpm(140),
+        timeSignature: TimeSignature.fourFour,
+        subdivision: Subdivision.none,
+        isAccentEnabled: true,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      var notifications = 0;
+      presetsVm.addListener(() => notifications++);
+
+      metronomeVm.togglePlayStop();
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(0);
+
+      engine.advancePulses(3);
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(0);
+
+      presetsVm.loadPreset(presetOne);
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(1);
+
+      presetsVm.loadPreset(presetTwo);
+      await Future<void>.delayed(Duration.zero);
+      check(notifications).equals(2);
+    });
   });
 }

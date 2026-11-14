@@ -1,0 +1,29 @@
+{
+  "skill_name": "material-3-expressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Convert our adaptive navigation shell (portrait NavigationBar + wide NavigationRail) and Preferences appearance selector to Material 3 Expressive widgets using package:material_3_expressive, keeping existing testability and theme mode switching.",
+      "expected_output": "Uses M3ENavigationBar, M3ENavigationRail (with M3ENavigationRailSection), and M3ESegmentedButton (with String M3ESegment labels), imports material_ui with hide CornerRounding, RoundedPolygon if both packages are imported, and never imports package:flutter/material.dart.",
+      "files": [
+        "lib/ui/features/navigation/views/adaptive_navigation_shell.dart",
+        "lib/ui/features/preferences/views/preferences_view.dart"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Upgrade the Metronome BPM control section and transport bar to M3E components: replace the Slider with a medium M3ESlider and the Play/Stop + Tap Tempo controls appropriately without breaking zero-latency pointer-down Tap Tempo accuracy.",
+      "expected_output": "Uses M3ESlider(size: M3ESliderSize.m) and M3EButton for Play/Stop, while explicitly preserving raw Listener.onPointerDown for Tap Tempo rather than wrapping Tap Tempo in an ink-only button.",
+      "files": [
+        "lib/ui/features/metronome/views/widgets/bpm_control_section.dart",
+        "lib/ui/features/metronome/views/widgets/transport_controls_bar.dart"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a standalone M3E settings card + modal editor sheet snippet in Dart using package:material_3_expressive with an outlined card, an M3ETextField with clear button, a segmented toggle button, and a dialog confirmation.",
+      "expected_output": "Uses M3EMaterialApp or M3ETheme, M3ECard(variant: M3ECardVariant.outlined), M3ETextField(label: String, showClearButton: true), M3EButton, and M3EDialog.show / M3EBottomSheet.show with valid 1.2.1 constructor parameters.",
+      "files": []
+    }
+  ]
+}

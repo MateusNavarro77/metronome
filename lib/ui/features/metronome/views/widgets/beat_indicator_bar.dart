@@ -1,8 +1,10 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Visual pulse indicator displaying one marker per beat of the bar (FR-VIS-01, UI-13).
 ///
@@ -37,15 +39,11 @@ class BeatIndicatorBar extends StatelessWidget {
       label: isPlaying
           ? 'Beat ${currentBeat + 1} of $beatCount'
           : 'Pulse indicator stopped, $beatCount beats per bar',
-      child: Container(
+      child: M3ECard(
+        variant: M3ECardVariant.outlined,
         padding: EdgeInsets.symmetric(
           horizontal: context.dimens.spaceMd,
           vertical: isCompact ? context.dimens.spaceSm : context.dimens.spaceMd,
-        ),
-        decoration: BoxDecoration(
-          color: context.colors.surfaceLow,
-          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-          border: Border.all(color: context.colors.ghostBorder),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -83,7 +81,8 @@ class BeatIndicatorBar extends StatelessWidget {
                   final isSubActive =
                       isPlaying && currentSubdivision == subIndex;
                   return AnimatedContainer(
-                    duration: const Duration(milliseconds: 60),
+                    duration: M3EMotion.short1,
+                    curve: M3EMotion.emphasized,
                     margin: EdgeInsets.symmetric(
                       horizontal: context.dimens.spaceXs,
                     ),
@@ -93,8 +92,8 @@ class BeatIndicatorBar extends StatelessWidget {
                     height: context.dimens.subdivisionPulseHeight,
                     decoration: BoxDecoration(
                       color: isSubActive
-                          ? context.colors.primaryAccent
-                          : context.colors.surfaceHigh,
+                          ? context.colorScheme.primary
+                          : context.colorScheme.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(
                         context.dimens.radiusFull,
                       ),
@@ -126,16 +125,23 @@ class _BeatCapsule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color fillColor;
+    final Color activeLabelColor;
     if (isActive) {
-      fillColor = isDownbeat
-          ? context.colors.primaryAccent
-          : isMedium
-          ? context.colors.secondaryAccent
-          : context.colors.onSurfacePrimary;
+      if (isDownbeat) {
+        fillColor = context.colorScheme.primary;
+        activeLabelColor = context.colorScheme.onPrimary;
+      } else if (isMedium) {
+        fillColor = context.colorScheme.tertiary;
+        activeLabelColor = context.colorScheme.onTertiary;
+      } else {
+        fillColor = context.colorScheme.secondary;
+        activeLabelColor = context.colorScheme.onSecondary;
+      }
     } else {
       fillColor = isDownbeat
-          ? context.colors.surfaceHighest
-          : context.colors.surfaceHigh;
+          ? context.colorScheme.surfaceContainerHighest
+          : context.colorScheme.surfaceContainerHigh;
+      activeLabelColor = context.colorScheme.onPrimary;
     }
 
     // Distinguish Beat 1 by height/shape as well as color (FR-VIS-01, UI-13)
@@ -151,20 +157,22 @@ class _BeatCapsule extends StatelessWidget {
       height: context.dimens.beatPillContainerHeight,
       child: Center(
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 70),
-          curve: Curves.easeOut,
+          duration: M3EMotion.short2,
+          curve: M3EMotion.emphasized,
           height: targetHeight,
           decoration: BoxDecoration(
             color: fillColor,
-            borderRadius: BorderRadius.circular(
-              isDownbeat ? context.dimens.radiusSm : context.dimens.radiusFull,
-            ),
+            borderRadius: isDownbeat
+                ? M3EShapes.radiusSmall
+                : M3EShapes.radiusExtraExtraLarge,
             boxShadow: isActive && isDownbeat
                 ? [
                     BoxShadow(
-                      color: context.colors.pulseGlow,
-                      blurRadius: 18,
-                      spreadRadius: 2,
+                      color: context.colorScheme.primary.withValues(
+                        alpha: 0.28,
+                      ),
+                      blurRadius: 12,
+                      spreadRadius: 1,
                     ),
                   ]
                 : null,
@@ -180,10 +188,10 @@ class _BeatCapsule extends StatelessWidget {
                     fontSize: 11,
                     letterSpacing: 0,
                     color: isActive
-                        ? context.colors.onPrimaryAccent
+                        ? activeLabelColor
                         : (isDownbeat
-                              ? context.colors.onSurfacePrimary
-                              : context.colors.onSurfaceMuted),
+                              ? context.colorScheme.onSurface
+                              : context.colorScheme.onSurfaceVariant),
                   ),
                 ),
               ),
