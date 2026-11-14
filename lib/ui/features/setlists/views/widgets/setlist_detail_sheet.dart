@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../../domain/models/preset.dart';
@@ -84,393 +82,385 @@ class SetlistDetailSheet extends StatelessWidget {
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(context.dimens.radiusLg),
               ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: context.colors.surfaceLow.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(context.dimens.radiusLg),
-                    ),
-                    border: Border(
-                      top: BorderSide(color: context.colors.ghostBorder),
-                    ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.colors.surfaceLow,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(context.dimens.radiusLg),
                   ),
-                  child: SafeArea(
-                    top: false,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        context.dimens.spaceLg,
-                        context.dimens.spaceSmPlus4,
-                        context.dimens.spaceLg,
-                        context.dimens.spaceLg,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Center(
-                            child: Container(
-                              width: 40,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: context.colors.surfaceHighest,
-                                borderRadius: BorderRadius.circular(
-                                  context.dimens.radiusFull,
-                                ),
+                  border: Border(
+                    top: BorderSide(color: context.colors.ghostBorder),
+                  ),
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      context.dimens.spaceLg,
+                      context.dimens.spaceSmPlus4,
+                      context.dimens.spaceLg,
+                      context.dimens.spaceLg,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: context.colors.surfaceHighest,
+                              borderRadius: BorderRadius.circular(
+                                context.dimens.radiusFull,
                               ),
                             ),
                           ),
-                          SizedBox(height: context.dimens.spaceMd),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      setlist.name,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: context.textTheme.titleSmall
-                                          ?.copyWith(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700,
-                                            color:
-                                                context.colors.onSurfacePrimary,
-                                          ),
-                                    ),
-                                    Text(
-                                      '${presets.length} ${presets.length == 1 ? 'song' : 'songs'} · Drag to reorder',
-                                      style: context.textTheme.bodyMedium
-                                          ?.copyWith(
-                                            fontSize: 12,
-                                            color:
-                                                context.colors.onSurfaceMuted,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                key: const Key('setlist_detail_rename_button'),
-                                tooltip: 'Rename setlist',
-                                constraints: BoxConstraints(
-                                  minWidth: context.dimens.minTouchTarget,
-                                  minHeight: context.dimens.minTouchTarget,
-                                ),
-                                onPressed: () =>
-                                    _renameSetlist(context, setlist.name),
-                                icon: Icon(
-                                  Icons.edit_outlined,
-                                  color: context.colors.onSurfaceMuted,
-                                ),
-                              ),
-                              SizedBox(width: context.dimens.spaceXs),
-                              FilledButton.icon(
-                                key: const Key('setlist_add_preset_button'),
-                                onPressed: () => _openAddPresetPicker(context),
-                                style: FilledButton.styleFrom(
-                                  minimumSize: Size(
-                                    0,
-                                    context.dimens.minTouchTarget,
+                        ),
+                        SizedBox(height: context.dimens.spaceMd),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    setlist.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: context.textTheme.titleSmall
+                                        ?.copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color:
+                                              context.colors.onSurfacePrimary,
+                                        ),
                                   ),
-                                  backgroundColor: context.colors.primaryAccent,
-                                  foregroundColor:
-                                      context.colors.onPrimaryAccent,
-                                  shape: const StadiumBorder(),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: context.dimens.spaceMd,
+                                  Text(
+                                    '${presets.length} ${presets.length == 1 ? 'song' : 'songs'} · Drag to reorder',
+                                    style: context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                          fontSize: 12,
+                                          color: context.colors.onSurfaceMuted,
+                                        ),
                                   ),
-                                ),
-                                icon: const Icon(Icons.add_rounded, size: 18),
-                                label: const Text('Add Preset'),
+                                ],
                               ),
-                            ],
-                          ),
-                          SizedBox(height: context.dimens.spaceMd),
+                            ),
+                            IconButton(
+                              key: const Key('setlist_detail_rename_button'),
+                              tooltip: 'Rename setlist',
+                              constraints: BoxConstraints(
+                                minWidth: context.dimens.minTouchTarget,
+                                minHeight: context.dimens.minTouchTarget,
+                              ),
+                              onPressed: () =>
+                                  _renameSetlist(context, setlist.name),
+                              icon: Icon(
+                                Icons.edit_outlined,
+                                color: context.colors.onSurfaceMuted,
+                              ),
+                            ),
+                            SizedBox(width: context.dimens.spaceXs),
+                            FilledButton.icon(
+                              key: const Key('setlist_add_preset_button'),
+                              onPressed: () => _openAddPresetPicker(context),
+                              style: FilledButton.styleFrom(
+                                minimumSize: Size(
+                                  0,
+                                  context.dimens.minTouchTarget,
+                                ),
+                                backgroundColor: context.colors.primaryAccent,
+                                foregroundColor: context.colors.onPrimaryAccent,
+                                shape: const StadiumBorder(),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.dimens.spaceMd,
+                                ),
+                              ),
+                              icon: const Icon(Icons.add_rounded, size: 18),
+                              label: const Text('Add Preset'),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: context.dimens.spaceMd),
 
-                          Expanded(
-                            child: presets.isEmpty
-                                ? Center(
-                                    child: Container(
-                                      padding: EdgeInsets.all(
-                                        context.dimens.spaceLg,
+                        Expanded(
+                          child: presets.isEmpty
+                              ? Center(
+                                  child: Container(
+                                    padding: EdgeInsets.all(
+                                      context.dimens.spaceLg,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: context.colors.surfaceContainer,
+                                      borderRadius: BorderRadius.circular(
+                                        context.dimens.radiusMd,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: context.colors.surfaceContainer,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.queue_music_rounded,
+                                          size: 32,
+                                          color: context.colors.primaryAccent,
+                                        ),
+                                        SizedBox(
+                                          height: context.dimens.spaceSm,
+                                        ),
+                                        Text(
+                                          'This setlist has no songs yet.',
+                                          textAlign: TextAlign.center,
+                                          style: context.textTheme.titleSmall
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                                color: context
+                                                    .colors
+                                                    .onSurfacePrimary,
+                                              ),
+                                        ),
+                                        SizedBox(
+                                          height: context.dimens.spaceXs,
+                                        ),
+                                        Text(
+                                          'Tap "Add Preset" above to build your song order.',
+                                          textAlign: TextAlign.center,
+                                          style: context.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                color: context
+                                                    .colors
+                                                    .onSurfaceMuted,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : ReorderableListView.builder(
+                                  key: const Key('setlist_reorderable_list'),
+                                  buildDefaultDragHandles: false,
+                                  itemCount: presets.length,
+                                  proxyDecorator: _proxyDecorator,
+                                  onReorderItem: (oldIndex, newIndex) {
+                                    // `onReorderItem` provides the post-removal target index,
+                                    // while `Setlist.reorder` expects pre-removal `onReorder` indices.
+                                    final rawNewIndex = oldIndex < newIndex
+                                        ? newIndex + 1
+                                        : newIndex;
+                                    viewModel.reorderPresets(
+                                      setlist.id,
+                                      oldIndex,
+                                      rawNewIndex,
+                                    );
+                                  },
+                                  itemBuilder: (context, index) {
+                                    final preset = presets[index];
+                                    final isCurrentSong =
+                                        isActiveSetlist &&
+                                        viewModel.activeSetlistIndex == index;
+
+                                    return Padding(
+                                      key: ValueKey(
+                                        'setlist_row_${setlist.id}_$index',
+                                      ),
+                                      padding: EdgeInsets.only(
+                                        bottom: context.dimens.spaceSm,
+                                      ),
+                                      child: Material(
+                                        color: isCurrentSong
+                                            ? context.colors.primaryContainer
+                                            : context.colors.surfaceContainer,
                                         borderRadius: BorderRadius.circular(
-                                          context.dimens.radiusMd,
+                                          context.dimens.radiusDefault,
                                         ),
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.queue_music_rounded,
-                                            size: 32,
-                                            color: context.colors.primaryAccent,
-                                          ),
-                                          SizedBox(
-                                            height: context.dimens.spaceSm,
-                                          ),
-                                          Text(
-                                            'This setlist has no songs yet.',
-                                            textAlign: TextAlign.center,
-                                            style: context.textTheme.titleSmall
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.w600,
-                                                  color: context
-                                                      .colors
-                                                      .onSurfacePrimary,
-                                                ),
-                                          ),
-                                          SizedBox(
-                                            height: context.dimens.spaceXs,
-                                          ),
-                                          Text(
-                                            'Tap "Add Preset" above to build your song order.',
-                                            textAlign: TextAlign.center,
-                                            style: context.textTheme.bodyMedium
-                                                ?.copyWith(
-                                                  color: context
-                                                      .colors
-                                                      .onSurfaceMuted,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : ReorderableListView.builder(
-                                    key: const Key('setlist_reorderable_list'),
-                                    buildDefaultDragHandles: false,
-                                    itemCount: presets.length,
-                                    proxyDecorator: _proxyDecorator,
-                                    onReorderItem: (oldIndex, newIndex) {
-                                      // `onReorderItem` provides the post-removal target index,
-                                      // while `Setlist.reorder` expects pre-removal `onReorder` indices.
-                                      final rawNewIndex = oldIndex < newIndex
-                                          ? newIndex + 1
-                                          : newIndex;
-                                      viewModel.reorderPresets(
-                                        setlist.id,
-                                        oldIndex,
-                                        rawNewIndex,
-                                      );
-                                    },
-                                    itemBuilder: (context, index) {
-                                      final preset = presets[index];
-                                      final isCurrentSong =
-                                          isActiveSetlist &&
-                                          viewModel.activeSetlistIndex == index;
-
-                                      return Padding(
-                                        key: ValueKey(
-                                          'setlist_row_${setlist.id}_$index',
-                                        ),
-                                        padding: EdgeInsets.only(
-                                          bottom: context.dimens.spaceSm,
-                                        ),
-                                        child: Material(
-                                          color: isCurrentSong
-                                              ? context.colors.primaryContainer
-                                              : context.colors.surfaceContainer,
+                                        child: InkWell(
+                                          key: Key('setlist_item_tap_$index'),
                                           borderRadius: BorderRadius.circular(
                                             context.dimens.radiusDefault,
                                           ),
-                                          child: InkWell(
-                                            key: Key('setlist_item_tap_$index'),
-                                            borderRadius: BorderRadius.circular(
-                                              context.dimens.radiusDefault,
+                                          onTap: () {
+                                            viewModel.activateSetlist(
+                                              setlist,
+                                              initialIndex: index,
+                                            );
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  context.dimens.spaceSmPlus4,
+                                              vertical: context.dimens.spaceSm,
                                             ),
-                                            onTap: () {
-                                              viewModel.activateSetlist(
-                                                setlist,
-                                                initialIndex: index,
-                                              );
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal:
-                                                    context.dimens.spaceSmPlus4,
-                                                vertical:
-                                                    context.dimens.spaceSm,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    context
+                                                        .dimens
+                                                        .radiusDefault,
+                                                  ),
+                                              border: Border.all(
+                                                color: isCurrentSong
+                                                    ? context
+                                                          .colors
+                                                          .neonGhostBorder
+                                                    : context
+                                                          .colors
+                                                          .ghostBorder,
                                               ),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                      context
-                                                          .dimens
-                                                          .radiusDefault,
-                                                    ),
-                                                border: Border.all(
-                                                  color: isCurrentSong
-                                                      ? context
-                                                            .colors
-                                                            .neonGhostBorder
-                                                      : context
-                                                            .colors
-                                                            .ghostBorder,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 30,
+                                                  height: 30,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: isCurrentSong
+                                                        ? context
+                                                              .colors
+                                                              .primaryAccent
+                                                        : context
+                                                              .colors
+                                                              .surfaceHigh,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Text(
+                                                    '${index + 1}',
+                                                    style: context
+                                                        .textTheme
+                                                        .labelMedium
+                                                        ?.copyWith(
+                                                          letterSpacing: 0,
+                                                          color: isCurrentSong
+                                                              ? context
+                                                                    .colors
+                                                                    .onPrimaryAccent
+                                                              : context
+                                                                    .colors
+                                                                    .onSurfacePrimary,
+                                                        ),
+                                                  ),
                                                 ),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 30,
-                                                    height: 30,
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
+                                                SizedBox(
+                                                  width: context
+                                                      .dimens
+                                                      .spaceSmPlus4,
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        preset.name,
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: context
+                                                            .textTheme
+                                                            .titleSmall
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color:
+                                                                  isCurrentSong
+                                                                  ? context
+                                                                        .colors
+                                                                        .onPrimaryContainer
+                                                                  : context
+                                                                        .colors
+                                                                        .onSurfacePrimary,
+                                                            ),
+                                                      ),
+                                                      Text(
+                                                        '${preset.bpm.value} BPM · ${preset.timeSignature.label} · ${preset.subdivision.label}',
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: context
+                                                            .textTheme
+                                                            .bodyMedium
+                                                            ?.copyWith(
+                                                              fontSize: 12,
+                                                              color:
+                                                                  isCurrentSong
+                                                                  ? context
+                                                                        .colors
+                                                                        .onPrimaryContainer
+                                                                        .withValues(
+                                                                          alpha:
+                                                                              0.8,
+                                                                        )
+                                                                  : context
+                                                                        .colors
+                                                                        .onSurfaceMuted,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  key: Key(
+                                                    'setlist_item_remove_$index',
+                                                  ),
+                                                  tooltip:
+                                                      'Remove ${preset.name}',
+                                                  constraints: BoxConstraints(
+                                                    minWidth: context
+                                                        .dimens
+                                                        .minTouchTarget,
+                                                    minHeight: context
+                                                        .dimens
+                                                        .minTouchTarget,
+                                                  ),
+                                                  onPressed: () {
+                                                    viewModel.removePresetAt(
+                                                      setlist.id,
+                                                      index,
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    Icons
+                                                        .remove_circle_outline_rounded,
+                                                    size: 20,
+                                                    color: context.colors.error,
+                                                  ),
+                                                ),
+                                                ReorderableDragStartListener(
+                                                  key: Key(
+                                                    'setlist_item_drag_$index',
+                                                  ),
+                                                  index: index,
+                                                  child: SizedBox(
+                                                    width: context
+                                                        .dimens
+                                                        .minTouchTarget,
+                                                    height: context
+                                                        .dimens
+                                                        .minTouchTarget,
+                                                    child: Icon(
+                                                      Icons.drag_handle_rounded,
                                                       color: isCurrentSong
                                                           ? context
                                                                 .colors
-                                                                .primaryAccent
+                                                                .onPrimaryContainer
                                                           : context
                                                                 .colors
-                                                                .surfaceHigh,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Text(
-                                                      '${index + 1}',
-                                                      style: context
-                                                          .textTheme
-                                                          .labelMedium
-                                                          ?.copyWith(
-                                                            letterSpacing: 0,
-                                                            color: isCurrentSong
-                                                                ? context
-                                                                      .colors
-                                                                      .onPrimaryAccent
-                                                                : context
-                                                                      .colors
-                                                                      .onSurfacePrimary,
-                                                          ),
+                                                                .onSurfaceMuted,
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    width: context
-                                                        .dimens
-                                                        .spaceSmPlus4,
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          preset.name,
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: context
-                                                              .textTheme
-                                                              .titleSmall
-                                                              ?.copyWith(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                color:
-                                                                    isCurrentSong
-                                                                    ? context
-                                                                          .colors
-                                                                          .onPrimaryContainer
-                                                                    : context
-                                                                          .colors
-                                                                          .onSurfacePrimary,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '${preset.bpm.value} BPM · ${preset.timeSignature.label} · ${preset.subdivision.label}',
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: context
-                                                              .textTheme
-                                                              .bodyMedium
-                                                              ?.copyWith(
-                                                                fontSize: 12,
-                                                                color:
-                                                                    isCurrentSong
-                                                                    ? context
-                                                                          .colors
-                                                                          .onPrimaryContainer
-                                                                          .withValues(
-                                                                            alpha:
-                                                                                0.8,
-                                                                          )
-                                                                    : context
-                                                                          .colors
-                                                                          .onSurfaceMuted,
-                                                              ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    key: Key(
-                                                      'setlist_item_remove_$index',
-                                                    ),
-                                                    tooltip:
-                                                        'Remove ${preset.name}',
-                                                    constraints: BoxConstraints(
-                                                      minWidth: context
-                                                          .dimens
-                                                          .minTouchTarget,
-                                                      minHeight: context
-                                                          .dimens
-                                                          .minTouchTarget,
-                                                    ),
-                                                    onPressed: () {
-                                                      viewModel.removePresetAt(
-                                                        setlist.id,
-                                                        index,
-                                                      );
-                                                    },
-                                                    icon: Icon(
-                                                      Icons
-                                                          .remove_circle_outline_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          context.colors.error,
-                                                    ),
-                                                  ),
-                                                  ReorderableDragStartListener(
-                                                    key: Key(
-                                                      'setlist_item_drag_$index',
-                                                    ),
-                                                    index: index,
-                                                    child: SizedBox(
-                                                      width: context
-                                                          .dimens
-                                                          .minTouchTarget,
-                                                      height: context
-                                                          .dimens
-                                                          .minTouchTarget,
-                                                      child: Icon(
-                                                        Icons
-                                                            .drag_handle_rounded,
-                                                        color: isCurrentSong
-                                                            ? context
-                                                                  .colors
-                                                                  .onPrimaryContainer
-                                                            : context
-                                                                  .colors
-                                                                  .onSurfaceMuted,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
-                          ),
-                        ],
-                      ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -514,124 +504,118 @@ class _AddPresetPickerSheet extends StatelessWidget {
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(context.dimens.radiusLg),
           ),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: context.colors.surfaceLow.withValues(alpha: 0.94),
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(context.dimens.radiusLg),
-                ),
-                border: Border(
-                  top: BorderSide(color: context.colors.ghostBorder),
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: context.colors.surfaceLow,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(context.dimens.radiusLg),
               ),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: EdgeInsets.all(context.dimens.spaceLg),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'ADD PRESET TO SETLIST',
-                        style: context.textTheme.titleSmall?.copyWith(
-                          letterSpacing: 1.4,
-                          fontWeight: FontWeight.w700,
-                          color: context.colors.onSurfacePrimary,
-                        ),
+              border: Border(
+                top: BorderSide(color: context.colors.ghostBorder),
+              ),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: EdgeInsets.all(context.dimens.spaceLg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'ADD PRESET TO SETLIST',
+                      style: context.textTheme.titleSmall?.copyWith(
+                        letterSpacing: 1.4,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.onSurfacePrimary,
                       ),
-                      SizedBox(height: context.dimens.spaceMd),
-                      if (presets.isEmpty)
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: context.dimens.spaceMd,
+                    ),
+                    SizedBox(height: context.dimens.spaceMd),
+                    if (presets.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: context.dimens.spaceMd,
+                        ),
+                        child: Text(
+                          'No presets saved yet. Create a preset in the Presets tab first.',
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.colors.onSurfaceMuted,
                           ),
-                          child: Text(
-                            'No presets saved yet. Create a preset in the Presets tab first.',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: context.colors.onSurfaceMuted,
-                            ),
-                          ),
-                        )
-                      else
-                        Flexible(
-                          child: ListView.separated(
-                            shrinkWrap: true,
-                            itemCount: presets.length,
-                            separatorBuilder: (_, _) =>
-                                SizedBox(height: context.dimens.spaceSm),
-                            itemBuilder: (context, index) {
-                              final preset = presets[index];
-                              return Material(
-                                color: context.colors.surfaceContainer,
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: presets.length,
+                          separatorBuilder: (_, _) =>
+                              SizedBox(height: context.dimens.spaceSm),
+                          itemBuilder: (context, index) {
+                            final preset = presets[index];
+                            return Material(
+                              color: context.colors.surfaceContainer,
+                              borderRadius: BorderRadius.circular(
+                                context.dimens.radiusDefault,
+                              ),
+                              child: InkWell(
+                                key: Key('add_preset_picker_item_${preset.id}'),
                                 borderRadius: BorderRadius.circular(
                                   context.dimens.radiusDefault,
                                 ),
-                                child: InkWell(
-                                  key: Key(
-                                    'add_preset_picker_item_${preset.id}',
+                                onTap: () =>
+                                    Navigator.of(context).pop(preset.id),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: context.dimens.spaceMd,
+                                    vertical: context.dimens.spaceSmPlus2,
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                    context.dimens.radiusDefault,
-                                  ),
-                                  onTap: () =>
-                                      Navigator.of(context).pop(preset.id),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: context.dimens.spaceMd,
-                                      vertical: context.dimens.spaceSmPlus2,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                preset.name,
-                                                style: context
-                                                    .textTheme
-                                                    .titleSmall
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color: context
-                                                          .colors
-                                                          .onSurfacePrimary,
-                                                    ),
-                                              ),
-                                              Text(
-                                                '${preset.bpm.value} BPM · ${preset.timeSignature.label} · ${preset.subdivision.label}',
-                                                style: context
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      fontSize: 12,
-                                                      color: context
-                                                          .colors
-                                                          .onSurfaceMuted,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              preset.name,
+                                              style: context
+                                                  .textTheme
+                                                  .titleSmall
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w700,
+                                                    color: context
+                                                        .colors
+                                                        .onSurfacePrimary,
+                                                  ),
+                                            ),
+                                            Text(
+                                              '${preset.bpm.value} BPM · ${preset.timeSignature.label} · ${preset.subdivision.label}',
+                                              style: context
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontSize: 12,
+                                                    color: context
+                                                        .colors
+                                                        .onSurfaceMuted,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
-                                        Icon(
-                                          Icons.add_circle_outline_rounded,
-                                          color: context.colors.primaryAccent,
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      Icon(
+                                        Icons.add_circle_outline_rounded,
+                                        color: context.colors.primaryAccent,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ),
             ),

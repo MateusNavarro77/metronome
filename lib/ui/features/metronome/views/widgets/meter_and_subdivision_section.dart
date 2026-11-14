@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../../domain/models/subdivision.dart';
@@ -661,61 +659,58 @@ class _SonicModalSheetContainer extends StatelessWidget {
       borderRadius: BorderRadius.vertical(
         top: Radius.circular(context.dimens.radiusLg),
       ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          constraints: BoxConstraints(maxWidth: context.dimens.maxContentWidth),
-          decoration: BoxDecoration(
-            color: context.colors.surfaceLow.withValues(alpha: 0.92),
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(context.dimens.radiusLg),
-            ),
-            border: Border(top: BorderSide(color: context.colors.ghostBorder)),
+      child: Container(
+        constraints: BoxConstraints(maxWidth: context.dimens.maxContentWidth),
+        decoration: BoxDecoration(
+          color: context.colors.surfaceLow,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(context.dimens.radiusLg),
           ),
-          child: SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                context.dimens.spaceLg,
-                context.dimens.spaceSmPlus4,
-                context.dimens.spaceLg,
-                context.dimens.spaceLg,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: context.colors.surfaceHighest,
-                        borderRadius: BorderRadius.circular(
-                          context.dimens.radiusFull,
-                        ),
+          border: Border(top: BorderSide(color: context.colors.ghostBorder)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              context.dimens.spaceLg,
+              context.dimens.spaceSmPlus4,
+              context.dimens.spaceLg,
+              context.dimens.spaceLg,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: context.colors.surfaceHighest,
+                      borderRadius: BorderRadius.circular(
+                        context.dimens.radiusFull,
                       ),
                     ),
                   ),
-                  SizedBox(height: context.dimens.spaceMd),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        title,
-                        style: context.textTheme.titleSmall?.copyWith(
-                          letterSpacing: 1.6,
-                          fontWeight: FontWeight.w700,
-                          color: context.colors.onSurfacePrimary,
-                        ),
+                ),
+                SizedBox(height: context.dimens.spaceMd),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: context.textTheme.titleSmall?.copyWith(
+                        letterSpacing: 1.6,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.onSurfacePrimary,
                       ),
-                      ?trailing,
-                    ],
-                  ),
-                  SizedBox(height: context.dimens.spaceMd),
-                  child,
-                ],
-              ),
+                    ),
+                    ?trailing,
+                  ],
+                ),
+                SizedBox(height: context.dimens.spaceMd),
+                child,
+              ],
             ),
           ),
         ),

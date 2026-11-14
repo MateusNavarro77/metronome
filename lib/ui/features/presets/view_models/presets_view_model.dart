@@ -17,6 +17,7 @@ class PresetsViewModel extends ChangeNotifier {
     required MetronomeViewModel metronomeViewModel,
   }) : _repository = repository,
        _metronomeViewModel = metronomeViewModel {
+    _lastActivePresetId = _metronomeViewModel.activePresetId;
     _librarySubscription = _repository.changes.listen((_) {
       notifyListeners();
     });
@@ -28,6 +29,7 @@ class PresetsViewModel extends ChangeNotifier {
 
   StreamSubscription<void>? _librarySubscription;
   String _searchQuery = '';
+  String? _lastActivePresetId;
 
   /// Current search query entered by the user (FR-PRE-05).
   String get searchQuery => _searchQuery;
@@ -110,6 +112,9 @@ class PresetsViewModel extends ChangeNotifier {
   }
 
   void _onMetronomeChanged() {
+    final currentActivePresetId = _metronomeViewModel.activePresetId;
+    if (currentActivePresetId == _lastActivePresetId) return;
+    _lastActivePresetId = currentActivePresetId;
     notifyListeners();
   }
 
