@@ -193,7 +193,7 @@ class _StepperButton extends StatelessWidget {
       child: M3EIconButton(
         key: buttonKey,
         variant: M3EIconButtonVariant.tonal,
-        size: M3EIconButtonSize.lg,
+        size: M3EIconButtonSize.md,
         shape: M3EIconButtonShapeVariant.round,
         icon: Icon(icon),
         tooltip: semanticLabel,

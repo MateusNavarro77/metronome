@@ -158,6 +158,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                       M3ENavigationRailSection(
                         destinations: destinations.map((item) {
                           return M3ENavigationRailDestination(
+
                             icon: Icon(item.icon, key: item.railKey),
                             selectedIcon: Icon(item.selectedIcon),
                             label: item.label,
