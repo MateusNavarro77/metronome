@@ -54,6 +54,9 @@ void main() {
       await tester.pumpAndSettle();
 
       check(viewModel.themeMode).equals(AppThemeMode.dark);
+
+      await tester.runAsync(() => GoogleFonts.pendingFonts());
+      await tester.pump();
     });
 
     testWidgets('back button pops the screen', (WidgetTester tester) async {
