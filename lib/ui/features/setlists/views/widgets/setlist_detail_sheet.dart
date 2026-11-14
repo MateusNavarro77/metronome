@@ -245,6 +245,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                     key: const Key('setlist_reorderable_list'),
                                     buildDefaultDragHandles: false,
                                     itemCount: presets.length,
+                                    proxyDecorator: _proxyDecorator,
                                     onReorderItem: (oldIndex, newIndex) {
                                       // `onReorderItem` provides the post-removal target index,
                                       // while `Setlist.reorder` expects pre-removal `onReorder` indices.
@@ -478,6 +479,16 @@ class SetlistDetailSheet extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? child) {
+        return Material(elevation: 0, color: Colors.transparent, child: child);
+      },
+      child: child,
     );
   }
 }
