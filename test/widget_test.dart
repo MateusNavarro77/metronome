@@ -1,5 +1,5 @@
 import 'package:checks/checks.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
@@ -123,6 +123,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('METRONOME'), findsOneWidget);
+
+      await tester.runAsync(() => GoogleFonts.pendingFonts());
+      await tester.pump();
     },
   );
 }
