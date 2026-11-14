@@ -10,8 +10,8 @@ void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   group('AppTheme', () {
-    test('exposes seed color 0xFF6750A4', () {
-      check(AppTheme.seedColor).equals(const Color(0xFF6750A4));
+    test('exposes seed color 0xFF00FF41', () {
+      check(AppTheme.seedColor).equals(const Color(0xFF00FF41));
     });
 
     test('builds light and dark M3EThemeData with matching brightness', () {
