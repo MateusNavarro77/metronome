@@ -24,6 +24,11 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
   TimeSignature _timeSignature = TimeSignature.fourFour;
   Subdivision _subdivision = Subdivision.none;
 
+  Bpm? _pendingBpm;
+  TimeSignature? _pendingTimeSignature;
+  Subdivision? _pendingSubdivision;
+  bool? _pendingAccentEnabled;
+
   int _currentBeat = 0;
   int _currentSubdivision = 0;
   Duration _elapsed = Duration.zero;
@@ -36,6 +41,11 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
   Subdivision get subdivision => _subdivision;
   bool get isAccentEnabled => _isAccentEnabled;
   bool get isInitialized => _isInitialized;
+  bool get hasPendingBarTransition =>
+      _pendingBpm != null ||
+      _pendingTimeSignature != null ||
+      _pendingSubdivision != null ||
+      _pendingAccentEnabled != null;
 
   @override
   Stream<BeatEvent> get beatEvents => _beatController.stream;
@@ -56,6 +66,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     bool isAccentEnabled = true,
   }) async {
     _isInitialized = true;
+    _clearPendingConfiguration();
     _bpm = bpm;
     _timeSignature = timeSignature;
     _subdivision = subdivision;
@@ -72,6 +83,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
 
   @override
   Future<void> stop() async {
+    _clearPendingConfiguration();
     _isPlaying = false;
     _currentBeat = 0;
     _currentSubdivision = 0;
@@ -84,22 +96,69 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     Subdivision? subdivision,
     bool? isAccentEnabled,
   }) {
-    if (bpm != null) _bpm = bpm;
+    if (bpm != null) {
+      _bpm = bpm;
+      _pendingBpm = null;
+    }
     if (timeSignature != null) {
       _timeSignature = timeSignature;
+      _pendingTimeSignature = null;
       if (_currentBeat >= _timeSignature.numerator) {
         _currentBeat = 0;
       }
     }
     if (subdivision != null) {
       _subdivision = subdivision;
+      _pendingSubdivision = null;
       if (_currentSubdivision >= _subdivision.pulsesPerBeat) {
         _currentSubdivision = 0;
       }
     }
     if (isAccentEnabled != null) {
       _isAccentEnabled = isAccentEnabled;
+      _pendingAccentEnabled = null;
     }
+  }
+
+  @override
+  void scheduleNextBarConfiguration({
+    Bpm? bpm,
+    TimeSignature? timeSignature,
+    Subdivision? subdivision,
+    bool? isAccentEnabled,
+  }) {
+    if (!_isPlaying) {
+      _clearPendingConfiguration();
+      updateConfiguration(
+        bpm: bpm,
+        timeSignature: timeSignature,
+        subdivision: subdivision,
+        isAccentEnabled: isAccentEnabled,
+      );
+      return;
+    }
+    if (bpm != null) _pendingBpm = bpm;
+    if (timeSignature != null) _pendingTimeSignature = timeSignature;
+    if (subdivision != null) _pendingSubdivision = subdivision;
+    if (isAccentEnabled != null) _pendingAccentEnabled = isAccentEnabled;
+  }
+
+  void _applyPendingBarConfigurationIfDownbeat() {
+    if (_currentBeat != 0 || _currentSubdivision != 0) return;
+    if (_pendingBpm != null) _bpm = _pendingBpm!;
+    if (_pendingTimeSignature != null) _timeSignature = _pendingTimeSignature!;
+    if (_pendingSubdivision != null) _subdivision = _pendingSubdivision!;
+    if (_pendingAccentEnabled != null) {
+      _isAccentEnabled = _pendingAccentEnabled!;
+    }
+    _clearPendingConfiguration();
+  }
+
+  void _clearPendingConfiguration() {
+    _pendingBpm = null;
+    _pendingTimeSignature = null;
+    _pendingSubdivision = null;
+    _pendingAccentEnabled = null;
   }
 
   /// Advances the simulated engine by [count] pulses, emitting each [BeatEvent].
@@ -118,6 +177,8 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
   /// Emits the current pulse and advances internal counters to the next position.
   void emitNextPulse() {
     if (!_isPlaying) return;
+
+    _applyPendingBarConfigurationIfDownbeat();
 
     final accent = _scheduler.resolveAccent(
       timeSignature: _timeSignature,

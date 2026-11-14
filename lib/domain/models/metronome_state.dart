@@ -14,6 +14,10 @@ class const MetronomeState({
   this.currentBeat = 0,
   this.currentSubdivision = 0,
   this.lastBeatEvent,
+  this.activePresetId,
+  this.activeSetlistId,
+  this.activeSetlistIndex = 0,
+  this.hasPendingBarTransition = false,
 }) {
   final Bpm bpm;
   final TimeSignature timeSignature;
@@ -30,6 +34,18 @@ class const MetronomeState({
   /// Most recent beat event emitted by the engine while playing, or `null` when stopped.
   final BeatEvent? lastBeatEvent;
 
+  /// Identifier of the currently loaded [Preset], if any.
+  final String? activePresetId;
+
+  /// Identifier of the currently active [Setlist], if any (FR-PRE-08).
+  final String? activeSetlistId;
+
+  /// 0-based index of the current song within the active setlist.
+  final int activeSetlistIndex;
+
+  /// Whether a preset/setlist transition is queued for the start of the next bar (FR-PRE-09).
+  final bool hasPendingBarTransition;
+
   /// Current tempo marking derived from [bpm] (FR-AND-01).
   TempoMarking get tempoMarking => bpm.tempoMarking;
 
@@ -43,6 +59,12 @@ class const MetronomeState({
     int? currentSubdivision,
     BeatEvent? lastBeatEvent,
     bool clearLastBeatEvent = false,
+    String? activePresetId,
+    bool clearActivePreset = false,
+    String? activeSetlistId,
+    bool clearActiveSetlist = false,
+    int? activeSetlistIndex,
+    bool? hasPendingBarTransition,
   }) {
     return MetronomeState(
       bpm: bpm ?? this.bpm,
@@ -55,6 +77,17 @@ class const MetronomeState({
       lastBeatEvent: clearLastBeatEvent
           ? null
           : (lastBeatEvent ?? this.lastBeatEvent),
+      activePresetId: clearActivePreset
+          ? null
+          : (activePresetId ?? this.activePresetId),
+      activeSetlistId: clearActiveSetlist
+          ? null
+          : (activeSetlistId ?? this.activeSetlistId),
+      activeSetlistIndex: clearActiveSetlist
+          ? (activeSetlistIndex ?? 0)
+          : (activeSetlistIndex ?? this.activeSetlistIndex),
+      hasPendingBarTransition:
+          hasPendingBarTransition ?? this.hasPendingBarTransition,
     );
   }
 
@@ -69,7 +102,11 @@ class const MetronomeState({
           other.isPlaying == isPlaying &&
           other.currentBeat == currentBeat &&
           other.currentSubdivision == currentSubdivision &&
-          other.lastBeatEvent == lastBeatEvent);
+          other.lastBeatEvent == lastBeatEvent &&
+          other.activePresetId == activePresetId &&
+          other.activeSetlistId == activeSetlistId &&
+          other.activeSetlistIndex == activeSetlistIndex &&
+          other.hasPendingBarTransition == hasPendingBarTransition);
 
   @override
   int get hashCode => Object.hash(
@@ -81,5 +118,9 @@ class const MetronomeState({
     currentBeat,
     currentSubdivision,
     lastBeatEvent,
+    activePresetId,
+    activeSetlistId,
+    activeSetlistIndex,
+    hasPendingBarTransition,
   );
 }
