@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Prompts the user to create or rename a setlist and returns the trimmed name,
 /// or `null` if cancelled.
@@ -66,7 +66,7 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       key: const Key('setlist_name_dialog'),
-      backgroundColor: context.colors.surfaceLow,
+      backgroundColor: context.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
       ),
@@ -74,7 +74,7 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
         widget.title,
         style: context.textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w700,
-          color: context.colors.onSurfacePrimary,
+          color: context.colorScheme.onSurface,
         ),
       ),
       content: Container(
@@ -85,7 +85,7 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
           context.dimens.spaceXs,
         ),
         decoration: BoxDecoration(
-          color: context.colors.surfaceContainer,
+          color: context.colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
         ),
         child: TextField(
@@ -100,12 +100,12 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
             }
           },
           style: context.textTheme.titleSmall?.copyWith(
-            color: context.colors.onSurfacePrimary,
+            color: context.colorScheme.onSurface,
           ),
           decoration: InputDecoration(
             hintText: 'e.g. Friday Gig',
             hintStyle: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.onSurfaceMuted,
+              color: context.colorScheme.onSurfaceVariant,
             ),
             errorText: _errorText,
             isDense: true,
@@ -113,7 +113,7 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
             enabledBorder: InputBorder.none,
             focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-                color: context.colors.primaryAccent,
+                color: context.colorScheme.primary,
                 width: 2.0,
               ),
             ),
@@ -126,14 +126,14 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
             'Cancel',
-            style: TextStyle(color: context.colors.onSurfacePrimary),
+            style: TextStyle(color: context.colorScheme.onSurface),
           ),
         ),
         FilledButton(
           key: const Key('setlist_name_save_button'),
           style: FilledButton.styleFrom(
-            backgroundColor: context.colors.primaryAccent,
-            foregroundColor: context.colors.onPrimaryAccent,
+            backgroundColor: context.colorScheme.primary,
+            foregroundColor: context.colorScheme.onPrimary,
           ),
           onPressed: _submit,
           child: Text(widget.confirmLabel),

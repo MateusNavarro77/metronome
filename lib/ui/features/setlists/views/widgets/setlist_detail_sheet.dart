@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../../domain/models/preset.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../view_models/setlists_view_model.dart';
 import 'setlist_name_dialog.dart';
 
@@ -84,12 +84,12 @@ class SetlistDetailSheet extends StatelessWidget {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: context.colors.surfaceLow,
+                  color: context.colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(context.dimens.radiusLg),
                   ),
                   border: Border(
-                    top: BorderSide(color: context.colors.ghostBorder),
+                    top: BorderSide(color: context.colorScheme.outlineVariant),
                   ),
                 ),
                 child: SafeArea(
@@ -109,7 +109,8 @@ class SetlistDetailSheet extends StatelessWidget {
                             width: 40,
                             height: 4,
                             decoration: BoxDecoration(
-                              color: context.colors.surfaceHighest,
+                              color:
+                                  context.colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(
                                 context.dimens.radiusFull,
                               ),
@@ -131,8 +132,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                         ?.copyWith(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w700,
-                                          color:
-                                              context.colors.onSurfacePrimary,
+                                          color: context.colorScheme.onSurface,
                                         ),
                                   ),
                                   Text(
@@ -140,7 +140,9 @@ class SetlistDetailSheet extends StatelessWidget {
                                     style: context.textTheme.bodyMedium
                                         ?.copyWith(
                                           fontSize: 12,
-                                          color: context.colors.onSurfaceMuted,
+                                          color: context
+                                              .colorScheme
+                                              .onSurfaceVariant,
                                         ),
                                   ),
                                 ],
@@ -157,7 +159,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                   _renameSetlist(context, setlist.name),
                               icon: Icon(
                                 Icons.edit_outlined,
-                                color: context.colors.onSurfaceMuted,
+                                color: context.colorScheme.onSurfaceVariant,
                               ),
                             ),
                             SizedBox(width: context.dimens.spaceXs),
@@ -169,8 +171,8 @@ class SetlistDetailSheet extends StatelessWidget {
                                   0,
                                   context.dimens.minTouchTarget,
                                 ),
-                                backgroundColor: context.colors.primaryAccent,
-                                foregroundColor: context.colors.onPrimaryAccent,
+                                backgroundColor: context.colorScheme.primary,
+                                foregroundColor: context.colorScheme.onPrimary,
                                 shape: const StadiumBorder(),
                                 padding: EdgeInsets.symmetric(
                                   horizontal: context.dimens.spaceMd,
@@ -191,7 +193,8 @@ class SetlistDetailSheet extends StatelessWidget {
                                       context.dimens.spaceLg,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: context.colors.surfaceContainer,
+                                      color:
+                                          context.colorScheme.surfaceContainer,
                                       borderRadius: BorderRadius.circular(
                                         context.dimens.radiusMd,
                                       ),
@@ -202,7 +205,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                         Icon(
                                           Icons.queue_music_rounded,
                                           size: 32,
-                                          color: context.colors.primaryAccent,
+                                          color: context.colorScheme.primary,
                                         ),
                                         SizedBox(
                                           height: context.dimens.spaceSm,
@@ -214,8 +217,8 @@ class SetlistDetailSheet extends StatelessWidget {
                                               ?.copyWith(
                                                 fontWeight: FontWeight.w600,
                                                 color: context
-                                                    .colors
-                                                    .onSurfacePrimary,
+                                                    .colorScheme
+                                                    .onSurface,
                                               ),
                                         ),
                                         SizedBox(
@@ -227,8 +230,8 @@ class SetlistDetailSheet extends StatelessWidget {
                                           style: context.textTheme.bodyMedium
                                               ?.copyWith(
                                                 color: context
-                                                    .colors
-                                                    .onSurfaceMuted,
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
                                               ),
                                         ),
                                       ],
@@ -267,8 +270,12 @@ class SetlistDetailSheet extends StatelessWidget {
                                       ),
                                       child: Material(
                                         color: isCurrentSong
-                                            ? context.colors.primaryContainer
-                                            : context.colors.surfaceContainer,
+                                            ? context
+                                                  .colorScheme
+                                                  .primaryContainer
+                                            : context
+                                                  .colorScheme
+                                                  .surfaceContainer,
                                         borderRadius: BorderRadius.circular(
                                           context.dimens.radiusDefault,
                                         ),
@@ -300,11 +307,14 @@ class SetlistDetailSheet extends StatelessWidget {
                                               border: Border.all(
                                                 color: isCurrentSong
                                                     ? context
-                                                          .colors
-                                                          .neonGhostBorder
+                                                          .colorScheme
+                                                          .primary
+                                                          .withValues(
+                                                            alpha: 0.45,
+                                                          )
                                                     : context
-                                                          .colors
-                                                          .ghostBorder,
+                                                          .colorScheme
+                                                          .outlineVariant,
                                               ),
                                             ),
                                             child: Row(
@@ -316,11 +326,11 @@ class SetlistDetailSheet extends StatelessWidget {
                                                   decoration: BoxDecoration(
                                                     color: isCurrentSong
                                                         ? context
-                                                              .colors
-                                                              .primaryAccent
+                                                              .colorScheme
+                                                              .primary
                                                         : context
-                                                              .colors
-                                                              .surfaceHigh,
+                                                              .colorScheme
+                                                              .surfaceContainerHigh,
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: Text(
@@ -332,11 +342,11 @@ class SetlistDetailSheet extends StatelessWidget {
                                                           letterSpacing: 0,
                                                           color: isCurrentSong
                                                               ? context
-                                                                    .colors
-                                                                    .onPrimaryAccent
+                                                                    .colorScheme
+                                                                    .onPrimary
                                                               : context
-                                                                    .colors
-                                                                    .onSurfacePrimary,
+                                                                    .colorScheme
+                                                                    .onSurface,
                                                         ),
                                                   ),
                                                 ),
@@ -366,11 +376,11 @@ class SetlistDetailSheet extends StatelessWidget {
                                                               color:
                                                                   isCurrentSong
                                                                   ? context
-                                                                        .colors
+                                                                        .colorScheme
                                                                         .onPrimaryContainer
                                                                   : context
-                                                                        .colors
-                                                                        .onSurfacePrimary,
+                                                                        .colorScheme
+                                                                        .onSurface,
                                                             ),
                                                       ),
                                                       Text(
@@ -378,24 +388,20 @@ class SetlistDetailSheet extends StatelessWidget {
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
-                                                        style: context
-                                                            .textTheme
-                                                            .bodyMedium
-                                                            ?.copyWith(
-                                                              fontSize: 12,
-                                                              color:
-                                                                  isCurrentSong
-                                                                  ? context
-                                                                        .colors
-                                                                        .onPrimaryContainer
-                                                                        .withValues(
-                                                                          alpha:
-                                                                              0.8,
-                                                                        )
-                                                                  : context
-                                                                        .colors
-                                                                        .onSurfaceMuted,
-                                                            ),
+                                                        style: context.textTheme.bodyMedium?.copyWith(
+                                                          fontSize: 12,
+                                                          color: isCurrentSong
+                                                              ? context
+                                                                    .colorScheme
+                                                                    .onPrimaryContainer
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.8,
+                                                                    )
+                                                              : context
+                                                                    .colorScheme
+                                                                    .onSurfaceVariant,
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -424,7 +430,9 @@ class SetlistDetailSheet extends StatelessWidget {
                                                     Icons
                                                         .remove_circle_outline_rounded,
                                                     size: 20,
-                                                    color: context.colors.error,
+                                                    color: context
+                                                        .colorScheme
+                                                        .error,
                                                   ),
                                                 ),
                                                 ReorderableDragStartListener(
@@ -443,11 +451,11 @@ class SetlistDetailSheet extends StatelessWidget {
                                                       Icons.drag_handle_rounded,
                                                       color: isCurrentSong
                                                           ? context
-                                                                .colors
+                                                                .colorScheme
                                                                 .onPrimaryContainer
                                                           : context
-                                                                .colors
-                                                                .onSurfaceMuted,
+                                                                .colorScheme
+                                                                .onSurfaceVariant,
                                                     ),
                                                   ),
                                                 ),
@@ -506,12 +514,12 @@ class _AddPresetPickerSheet extends StatelessWidget {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: context.colors.surfaceLow,
+              color: context.colorScheme.surfaceContainerLow,
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(context.dimens.radiusLg),
               ),
               border: Border(
-                top: BorderSide(color: context.colors.ghostBorder),
+                top: BorderSide(color: context.colorScheme.outlineVariant),
               ),
             ),
             child: SafeArea(
@@ -527,7 +535,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                       style: context.textTheme.titleSmall?.copyWith(
                         letterSpacing: 1.4,
                         fontWeight: FontWeight.w700,
-                        color: context.colors.onSurfacePrimary,
+                        color: context.colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: context.dimens.spaceMd),
@@ -539,7 +547,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                         child: Text(
                           'No presets saved yet. Create a preset in the Presets tab first.',
                           style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.onSurfaceMuted,
+                            color: context.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       )
@@ -553,7 +561,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final preset = presets[index];
                             return Material(
-                              color: context.colors.surfaceContainer,
+                              color: context.colorScheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(
                                 context.dimens.radiusDefault,
                               ),
@@ -584,8 +592,8 @@ class _AddPresetPickerSheet extends StatelessWidget {
                                                   ?.copyWith(
                                                     fontWeight: FontWeight.w700,
                                                     color: context
-                                                        .colors
-                                                        .onSurfacePrimary,
+                                                        .colorScheme
+                                                        .onSurface,
                                                   ),
                                             ),
                                             Text(
@@ -596,8 +604,8 @@ class _AddPresetPickerSheet extends StatelessWidget {
                                                   ?.copyWith(
                                                     fontSize: 12,
                                                     color: context
-                                                        .colors
-                                                        .onSurfaceMuted,
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
                                                   ),
                                             ),
                                           ],
@@ -605,7 +613,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                                       ),
                                       Icon(
                                         Icons.add_circle_outline_rounded,
-                                        color: context.colors.primaryAccent,
+                                        color: context.colorScheme.primary,
                                       ),
                                     ],
                                   ),

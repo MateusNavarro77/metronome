@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/tempo_marking.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Hero BPM display with tactile `-`/`+` step buttons and quick-adjust slider
 /// (FR-BPM-01..03, FR-AND-01..02).
@@ -51,14 +51,14 @@ class BpmControlSection extends StatelessWidget {
               vertical: context.dimens.spaceXs,
             ),
             decoration: BoxDecoration(
-              color: context.colors.surfaceHigh,
+              color: context.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(context.dimens.radiusFull),
             ),
             child: Text(
               tempoMarking.label.toUpperCase(),
               key: const Key('tempo_marking_text'),
               style: context.textTheme.labelMedium?.copyWith(
-                color: context.colors.secondaryAccent,
+                color: context.colorScheme.secondary,
               ),
             ),
           ),
@@ -91,17 +91,22 @@ class BpmControlSection extends StatelessWidget {
                         style: isCompact
                             ? context.textTheme.displayLarge?.copyWith(
                                 fontSize: 52,
-                                color: context.colors.onSurfacePrimary,
+                                fontWeight: FontWeight.w700,
+                                height: 1.0,
+                                color: context.colorScheme.onSurface,
                               )
                             : context.textTheme.displayLarge?.copyWith(
-                                color: context.colors.onSurfacePrimary,
+                                fontSize: 64,
+                                fontWeight: FontWeight.w700,
+                                height: 1.0,
+                                color: context.colorScheme.onSurface,
                               ),
                       ),
                     ),
                     Text(
                       'BPM',
                       style: context.textTheme.labelMedium?.copyWith(
-                        color: context.colors.onSurfaceMuted,
+                        color: context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -138,13 +143,13 @@ class BpmControlSection extends StatelessWidget {
                 Text(
                   '${Bpm.min}',
                   style: context.textTheme.labelMedium?.copyWith(
-                    color: context.colors.onSurfaceMuted,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
                   '${Bpm.max}',
                   style: context.textTheme.labelMedium?.copyWith(
-                    color: context.colors.onSurfaceMuted,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -186,7 +191,7 @@ class _StepperButton extends StatelessWidget {
         onLongPressEnd: enabled ? (_) => onHoldEnd() : null,
         onLongPressCancel: enabled ? onHoldEnd : null,
         child: Material(
-          color: context.colors.surfaceHigh,
+          color: context.colorScheme.surfaceContainerHigh,
           shape: const CircleBorder(),
           child: InkWell(
             key: buttonKey,
@@ -199,8 +204,8 @@ class _StepperButton extends StatelessWidget {
                 icon,
                 size: context.dimens.stepperIconSize,
                 color: enabled
-                    ? context.colors.onSurfacePrimary
-                    : context.colors.onSurfaceMuted,
+                    ? context.colorScheme.onSurface
+                    : context.colorScheme.onSurfaceVariant,
               ),
             ),
           ),

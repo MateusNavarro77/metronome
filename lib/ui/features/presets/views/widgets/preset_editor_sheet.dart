@@ -4,7 +4,7 @@ import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/preset.dart';
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Result returned when the user confirms [PresetEditorSheet].
 class PresetEditorResult {
@@ -155,12 +155,12 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: context.colors.surfaceLow,
+                color: context.colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(context.dimens.radiusLg),
                 ),
                 border: Border(
-                  top: BorderSide(color: context.colors.ghostBorder),
+                  top: BorderSide(color: context.colorScheme.outlineVariant),
                 ),
               ),
               child: SafeArea(
@@ -180,7 +180,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                           width: 40,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: context.colors.surfaceHighest,
+                            color: context.colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(
                               context.dimens.radiusFull,
                             ),
@@ -208,7 +208,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                   style: context.textTheme.titleSmall?.copyWith(
                                     letterSpacing: 1.6,
                                     fontWeight: FontWeight.w700,
-                                    color: context.colors.onSurfacePrimary,
+                                    color: context.colorScheme.onSurface,
                                   ),
                                 ),
                                 IconButton(
@@ -228,8 +228,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         ? Icons.star_rounded
                                         : Icons.star_outline_rounded,
                                     color: _isFavorite
-                                        ? context.colors.primaryAccent
-                                        : context.colors.onSurfaceMuted,
+                                        ? context.colorScheme.primary
+                                        : context.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -267,12 +267,12 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                             Container(
                               padding: EdgeInsets.all(context.dimens.spaceMd),
                               decoration: BoxDecoration(
-                                color: context.colors.surfaceContainer,
+                                color: context.colorScheme.surfaceContainer,
                                 borderRadius: BorderRadius.circular(
                                   context.dimens.radiusDefault,
                                 ),
                                 border: Border.all(
-                                  color: context.colors.ghostBorder,
+                                  color: context.colorScheme.outlineVariant,
                                 ),
                               ),
                               child: Column(
@@ -286,17 +286,17 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         'TEMPO',
                                         style: context.textTheme.labelMedium
                                             ?.copyWith(
-                                              color:
-                                                  context.colors.onSurfaceMuted,
+                                              color: context
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
                                             ),
                                       ),
                                       Text(
                                         _bpm.tempoMarking.label.toUpperCase(),
                                         style: context.textTheme.labelMedium
                                             ?.copyWith(
-                                              color: context
-                                                  .colors
-                                                  .secondaryAccent,
+                                              color:
+                                                  context.colorScheme.secondary,
                                             ),
                                       ),
                                     ],
@@ -325,9 +325,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         style: context.textTheme.headlineMedium
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
-                                              color: context
-                                                  .colors
-                                                  .onSurfacePrimary,
+                                              color:
+                                                  context.colorScheme.onSurface,
                                             ),
                                       ),
                                       _CircleIconButton(
@@ -363,12 +362,12 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                             Container(
                               padding: EdgeInsets.all(context.dimens.spaceMd),
                               decoration: BoxDecoration(
-                                color: context.colors.surfaceContainer,
+                                color: context.colorScheme.surfaceContainer,
                                 borderRadius: BorderRadius.circular(
                                   context.dimens.radiusDefault,
                                 ),
                                 border: Border.all(
-                                  color: context.colors.ghostBorder,
+                                  color: context.colorScheme.outlineVariant,
                                 ),
                               ),
                               child: Column(
@@ -382,8 +381,9 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         'TIME SIGNATURE',
                                         style: context.textTheme.labelMedium
                                             ?.copyWith(
-                                              color:
-                                                  context.colors.onSurfaceMuted,
+                                              color: context
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
                                             ),
                                       ),
                                       Text(
@@ -395,7 +395,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
                                               color:
-                                                  context.colors.primaryAccent,
+                                                  context.colorScheme.primary,
                                             ),
                                       ),
                                     ],
@@ -432,8 +432,9 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         'Beats: ${_timeSignature.numerator}',
                                         style: context.textTheme.bodyMedium
                                             ?.copyWith(
-                                              color:
-                                                  context.colors.onSurfaceMuted,
+                                              color: context
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
                                             ),
                                       ),
                                       Row(
@@ -514,12 +515,12 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                             Container(
                               padding: EdgeInsets.all(context.dimens.spaceMd),
                               decoration: BoxDecoration(
-                                color: context.colors.surfaceContainer,
+                                color: context.colorScheme.surfaceContainer,
                                 borderRadius: BorderRadius.circular(
                                   context.dimens.radiusDefault,
                                 ),
                                 border: Border.all(
-                                  color: context.colors.ghostBorder,
+                                  color: context.colorScheme.outlineVariant,
                                 ),
                               ),
                               child: Column(
@@ -529,7 +530,9 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                     'SUBDIVISION',
                                     style: context.textTheme.labelMedium
                                         ?.copyWith(
-                                          color: context.colors.onSurfaceMuted,
+                                          color: context
+                                              .colorScheme
+                                              .onSurfaceVariant,
                                         ),
                                   ),
                                   SizedBox(height: context.dimens.spaceSm),
@@ -562,12 +565,12 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                 vertical: context.dimens.spaceSm,
                               ),
                               decoration: BoxDecoration(
-                                color: context.colors.surfaceContainer,
+                                color: context.colorScheme.surfaceContainer,
                                 borderRadius: BorderRadius.circular(
                                   context.dimens.radiusDefault,
                                 ),
                                 border: Border.all(
-                                  color: context.colors.ghostBorder,
+                                  color: context.colorScheme.outlineVariant,
                                 ),
                               ),
                               child: Row(
@@ -578,8 +581,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                     'ACCENT ON BEAT 1',
                                     style: context.textTheme.labelMedium
                                         ?.copyWith(
-                                          color:
-                                              context.colors.onSurfacePrimary,
+                                          color: context.colorScheme.onSurface,
                                         ),
                                   ),
                                   Switch(
@@ -587,8 +589,6 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                       'preset_editor_accent_toggle',
                                     ),
                                     value: _isAccentEnabled,
-                                    activeThumbColor:
-                                        context.colors.primaryAccent,
                                     onChanged: (value) {
                                       setState(() {
                                         _isAccentEnabled = value;
@@ -614,11 +614,12 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         context.dimens.minTouchTarget,
                                       ),
                                       side: BorderSide(
-                                        color: context.colors.ghostBorder,
+                                        color:
+                                            context.colorScheme.outlineVariant,
                                       ),
                                       shape: const StadiumBorder(),
                                       foregroundColor:
-                                          context.colors.onSurfacePrimary,
+                                          context.colorScheme.onSurface,
                                     ),
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
@@ -635,9 +636,9 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         context.dimens.minTouchTarget,
                                       ),
                                       backgroundColor:
-                                          context.colors.primaryAccent,
+                                          context.colorScheme.primary,
                                       foregroundColor:
-                                          context.colors.onPrimaryAccent,
+                                          context.colorScheme.onPrimary,
                                       shape: const StadiumBorder(),
                                     ),
                                     onPressed: _submit,
@@ -696,7 +697,7 @@ class _TonalTextField extends StatelessWidget {
         context.dimens.spaceXs,
       ),
       decoration: BoxDecoration(
-        color: context.colors.surfaceContainer,
+        color: context.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
       ),
       child: Column(
@@ -706,7 +707,7 @@ class _TonalTextField extends StatelessWidget {
             label,
             style: context.textTheme.labelMedium?.copyWith(
               fontSize: 10,
-              color: context.colors.onSurfaceMuted,
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
           TextField(
@@ -716,12 +717,14 @@ class _TonalTextField extends StatelessWidget {
             textInputAction: textInputAction,
             onChanged: onChanged,
             style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.onSurfacePrimary,
+              color: context.colorScheme.onSurface,
             ),
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: context.textTheme.bodyMedium?.copyWith(
-                color: context.colors.onSurfaceMuted.withValues(alpha: 0.7),
+                color: context.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.7,
+                ),
               ),
               errorText: errorText,
               isDense: true,
@@ -729,15 +732,21 @@ class _TonalTextField extends StatelessWidget {
               enabledBorder: InputBorder.none,
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                  color: context.colors.primaryAccent,
+                  color: context.colorScheme.primary,
                   width: 2.0,
                 ),
               ),
               errorBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: context.colors.error, width: 2.0),
+                borderSide: BorderSide(
+                  color: context.colorScheme.error,
+                  width: 2.0,
+                ),
               ),
               focusedErrorBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: context.colors.error, width: 2.0),
+                borderSide: BorderSide(
+                  color: context.colorScheme.error,
+                  width: 2.0,
+                ),
               ),
             ),
           ),
@@ -769,7 +778,9 @@ class _CircleIconButton extends StatelessWidget {
       enabled: enabled,
       label: semanticLabel,
       child: Material(
-        color: enabled ? context.colors.surfaceHigh : context.colors.surfaceLow,
+        color: enabled
+            ? context.colorScheme.surfaceContainerHigh
+            : context.colorScheme.surfaceContainerLow,
         shape: const CircleBorder(),
         child: InkWell(
           key: buttonKey,
@@ -782,8 +793,8 @@ class _CircleIconButton extends StatelessWidget {
               icon,
               size: 22,
               color: enabled
-                  ? context.colors.onSurfacePrimary
-                  : context.colors.onSurfaceMuted.withValues(alpha: 0.4),
+                  ? context.colorScheme.onSurface
+                  : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -809,8 +820,8 @@ class _SelectChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: isSelected
-          ? context.colors.primaryContainer
-          : context.colors.surfaceHigh,
+          ? context.colorScheme.primaryContainer
+          : context.colorScheme.surfaceContainerHigh,
       borderRadius: BorderRadius.circular(context.dimens.radiusFull),
       child: InkWell(
         key: chipKey,
@@ -826,8 +837,8 @@ class _SelectChip extends StatelessWidget {
             borderRadius: BorderRadius.circular(context.dimens.radiusFull),
             border: Border.all(
               color: isSelected
-                  ? context.colors.neonGhostBorder
-                  : context.colors.ghostBorder,
+                  ? context.colorScheme.primary.withValues(alpha: 0.45)
+                  : context.colorScheme.outlineVariant,
             ),
           ),
           alignment: Alignment.center,
@@ -838,8 +849,8 @@ class _SelectChip extends StatelessWidget {
             style: context.textTheme.labelMedium?.copyWith(
               letterSpacing: 0.4,
               color: isSelected
-                  ? context.colors.primaryAccent
-                  : context.colors.onSurfacePrimary,
+                  ? context.colorScheme.onPrimaryContainer
+                  : context.colorScheme.onSurface,
             ),
           ),
         ),

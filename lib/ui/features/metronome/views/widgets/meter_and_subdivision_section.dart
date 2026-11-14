@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Compact horizontal bar containing the Time Signature modal trigger,
 /// Subdivision modal trigger, and dedicated Accent toggle button
@@ -78,7 +78,7 @@ class MeterAndSubdivisionSection extends StatelessWidget {
                 style: context.textTheme.titleSmall?.copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: context.colors.onSurfacePrimary,
+                  color: context.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -101,7 +101,7 @@ class MeterAndSubdivisionSection extends StatelessWidget {
                 style: context.textTheme.titleSmall?.copyWith(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: context.colors.secondaryAccent,
+                  color: context.colorScheme.secondary,
                 ),
               ),
             ),
@@ -144,7 +144,7 @@ class _SummaryTriggerCard extends StatelessWidget {
       button: true,
       label: semanticLabel,
       child: Material(
-        color: context.colors.surfaceLow,
+        color: context.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
         child: InkWell(
           key: cardKey,
@@ -160,7 +160,7 @@ class _SummaryTriggerCard extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-              border: Border.all(color: context.colors.ghostBorder),
+              border: Border.all(color: context.colorScheme.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,14 +178,14 @@ class _SummaryTriggerCard extends StatelessWidget {
                         style: context.textTheme.labelMedium?.copyWith(
                           fontSize: 10,
                           letterSpacing: 1.1,
-                          color: context.colors.onSurfaceMuted,
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
                       size: 16,
-                      color: context.colors.onSurfaceMuted,
+                      color: context.colorScheme.onSurfaceVariant,
                     ),
                   ],
                 ),
@@ -237,15 +237,15 @@ class _AccentToggleCard extends StatelessWidget {
           onPressed: onToggle,
           style: IconButton.styleFrom(
             backgroundColor: isAccentEnabled
-                ? context.colors.primaryContainer
-                : context.colors.surfaceLow,
+                ? context.colorScheme.primaryContainer
+                : context.colorScheme.surfaceContainerLow,
             foregroundColor: isAccentEnabled
-                ? context.colors.primaryAccent
-                : context.colors.onSurfaceMuted,
+                ? context.colorScheme.onPrimaryContainer
+                : context.colorScheme.onSurfaceVariant,
             side: BorderSide(
               color: isAccentEnabled
-                  ? context.colors.neonGhostBorder
-                  : context.colors.ghostBorder,
+                  ? context.colorScheme.primary.withValues(alpha: 0.45)
+                  : context.colorScheme.outlineVariant,
             ),
             shape: const CircleBorder(),
           ),
@@ -319,16 +319,18 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           vertical: context.dimens.spaceXs,
         ),
         decoration: BoxDecoration(
-          color: context.colors.primaryContainer,
+          color: context.colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-          border: Border.all(color: context.colors.neonGhostBorder),
+          border: Border.all(
+            color: context.colorScheme.primary.withValues(alpha: 0.45),
+          ),
         ),
         child: Text(
           _current.label,
           style: context.textTheme.titleSmall?.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: context.colors.primaryAccent,
+            color: context.colorScheme.onPrimaryContainer,
           ),
         ),
       ),
@@ -339,7 +341,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           Text(
             'PRESETS',
             style: context.textTheme.labelMedium?.copyWith(
-              color: context.colors.onSurfaceMuted,
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: context.dimens.spaceSm),
@@ -366,7 +368,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           Text(
             'CUSTOM METER',
             style: context.textTheme.labelMedium?.copyWith(
-              color: context.colors.onSurfaceMuted,
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: context.dimens.spaceSm),
@@ -377,9 +379,9 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
               vertical: context.dimens.spaceSmPlus2,
             ),
             decoration: BoxDecoration(
-              color: context.colors.surfaceContainer,
+              color: context.colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
-              border: Border.all(color: context.colors.ghostBorder),
+              border: Border.all(color: context.colorScheme.outlineVariant),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -391,7 +393,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                       'BEATS PER BAR',
                       style: context.textTheme.labelMedium?.copyWith(
                         fontSize: 11,
-                        color: context.colors.onSurfaceMuted,
+                        color: context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     SizedBox(height: context.dimens.spaceXs),
@@ -399,7 +401,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                       'Numerator (1–16)',
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontSize: 12,
-                        color: context.colors.onSurfaceMuted,
+                        color: context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -424,7 +426,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                         style: context.textTheme.headlineMedium?.copyWith(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
-                          color: context.colors.onSurfacePrimary,
+                          color: context.colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -446,9 +448,9 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           Container(
             padding: EdgeInsets.all(context.dimens.spaceMd),
             decoration: BoxDecoration(
-              color: context.colors.surfaceContainer,
+              color: context.colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
-              border: Border.all(color: context.colors.ghostBorder),
+              border: Border.all(color: context.colorScheme.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,7 +459,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                   'NOTE VALUE (DENOMINATOR)',
                   style: context.textTheme.labelMedium?.copyWith(
                     fontSize: 11,
-                    color: context.colors.onSurfaceMuted,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 SizedBox(height: context.dimens.spaceSm),
@@ -519,8 +521,8 @@ class SubdivisionBottomSheet extends StatelessWidget {
                   'Subdivision ${subdivision.label} (${subdivision.pulsesPerBeat} per beat)',
               child: Material(
                 color: isSelected
-                    ? context.colors.primaryContainer
-                    : context.colors.surfaceHigh,
+                    ? context.colorScheme.primaryContainer
+                    : context.colorScheme.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(
                   context.dimens.radiusDefault,
                 ),
@@ -547,8 +549,10 @@ class SubdivisionBottomSheet extends StatelessWidget {
                       ),
                       border: Border.all(
                         color: isSelected
-                            ? context.colors.neonGhostBorder
-                            : context.colors.ghostBorder,
+                            ? context.colorScheme.primary.withValues(
+                                alpha: 0.45,
+                              )
+                            : context.colorScheme.outlineVariant,
                       ),
                     ),
                     child: Row(
@@ -559,10 +563,9 @@ class SubdivisionBottomSheet extends StatelessWidget {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? context.colors.surfaceLow.withValues(
-                                    alpha: 0.35,
-                                  )
-                                : context.colors.surfaceHighest,
+                                ? context.colorScheme.surfaceContainerLow
+                                      .withValues(alpha: 0.45)
+                                : context.colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(
                               context.dimens.radiusSm,
                             ),
@@ -573,8 +576,8 @@ class SubdivisionBottomSheet extends StatelessWidget {
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: isSelected
-                                  ? context.colors.primaryAccent
-                                  : context.colors.onSurfacePrimary,
+                                  ? context.colorScheme.onPrimaryContainer
+                                  : context.colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -590,8 +593,8 @@ class SubdivisionBottomSheet extends StatelessWidget {
                                       ? FontWeight.w700
                                       : FontWeight.w600,
                                   color: isSelected
-                                      ? context.colors.primaryAccent
-                                      : context.colors.onSurfacePrimary,
+                                      ? context.colorScheme.onPrimaryContainer
+                                      : context.colorScheme.onSurface,
                                 ),
                               ),
                               Text(
@@ -599,7 +602,10 @@ class SubdivisionBottomSheet extends StatelessWidget {
                                 '${subdivision.pulsesPerBeat == 1 ? 'pulse' : 'pulses'} per beat',
                                 style: context.textTheme.bodyMedium?.copyWith(
                                   fontSize: 12,
-                                  color: context.colors.onSurfaceMuted,
+                                  color: isSelected
+                                      ? context.colorScheme.onPrimaryContainer
+                                            .withValues(alpha: 0.8)
+                                      : context.colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -612,8 +618,8 @@ class SubdivisionBottomSheet extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? context.colors.primaryAccent
-                                : context.colors.surfaceHighest,
+                                ? context.colorScheme.primary
+                                : context.colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(
                               context.dimens.radiusFull,
                             ),
@@ -623,8 +629,8 @@ class SubdivisionBottomSheet extends StatelessWidget {
                             style: context.textTheme.labelMedium?.copyWith(
                               letterSpacing: 0.5,
                               color: isSelected
-                                  ? context.colors.onPrimaryAccent
-                                  : context.colors.onSurfaceMuted,
+                                  ? context.colorScheme.onPrimary
+                                  : context.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -662,11 +668,13 @@ class _SonicModalSheetContainer extends StatelessWidget {
       child: Container(
         constraints: BoxConstraints(maxWidth: context.dimens.maxContentWidth),
         decoration: BoxDecoration(
-          color: context.colors.surfaceLow,
+          color: context.colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(context.dimens.radiusLg),
           ),
-          border: Border(top: BorderSide(color: context.colors.ghostBorder)),
+          border: Border(
+            top: BorderSide(color: context.colorScheme.outlineVariant),
+          ),
         ),
         child: SafeArea(
           top: false,
@@ -686,7 +694,7 @@ class _SonicModalSheetContainer extends StatelessWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: context.colors.surfaceHighest,
+                      color: context.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(
                         context.dimens.radiusFull,
                       ),
@@ -702,7 +710,7 @@ class _SonicModalSheetContainer extends StatelessWidget {
                       style: context.textTheme.titleSmall?.copyWith(
                         letterSpacing: 1.6,
                         fontWeight: FontWeight.w700,
-                        color: context.colors.onSurfacePrimary,
+                        color: context.colorScheme.onSurface,
                       ),
                     ),
                     ?trailing,
@@ -741,7 +749,9 @@ class _ModalStepperButton extends StatelessWidget {
       enabled: enabled,
       label: semanticLabel,
       child: Material(
-        color: enabled ? context.colors.surfaceHigh : context.colors.surfaceLow,
+        color: enabled
+            ? context.colorScheme.surfaceContainerHigh
+            : context.colorScheme.surfaceContainerLow,
         shape: const CircleBorder(),
         child: InkWell(
           key: buttonKey,
@@ -754,8 +764,8 @@ class _ModalStepperButton extends StatelessWidget {
               icon,
               size: 22,
               color: enabled
-                  ? context.colors.onSurfacePrimary
-                  : context.colors.onSurfaceMuted.withValues(alpha: 0.4),
+                  ? context.colorScheme.onSurface
+                  : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -787,8 +797,8 @@ class _SelectionPill extends StatelessWidget {
       label: semanticLabel,
       child: Material(
         color: isSelected
-            ? context.colors.primaryContainer
-            : context.colors.surfaceHigh,
+            ? context.colorScheme.primaryContainer
+            : context.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(context.dimens.radiusFull),
         child: InkWell(
           key: pillKey,
@@ -803,8 +813,8 @@ class _SelectionPill extends StatelessWidget {
               borderRadius: BorderRadius.circular(context.dimens.radiusFull),
               border: Border.all(
                 color: isSelected
-                    ? context.colors.neonGhostBorder
-                    : context.colors.ghostBorder,
+                    ? context.colorScheme.primary.withValues(alpha: 0.45)
+                    : context.colorScheme.outlineVariant,
               ),
             ),
             child: Text(
@@ -813,8 +823,8 @@ class _SelectionPill extends StatelessWidget {
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected
-                    ? context.colors.primaryAccent
-                    : context.colors.onSurfaceMuted,
+                    ? context.colorScheme.onPrimaryContainer
+                    : context.colorScheme.onSurfaceVariant,
               ),
             ),
           ),

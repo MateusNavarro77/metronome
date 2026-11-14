@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 
 import '../../../../domain/models/preset.dart';
 import '../../../../domain/models/setlist.dart';
-import '../../../core/theme/sonic_theme.dart';
+import '../../../core/theme/app_theme.dart';
 import '../view_models/presets_view_model.dart';
 import 'widgets/preset_editor_sheet.dart';
 
-/// Presets management screen adhering to "The Sonic Architect" design system
+/// Presets management screen using Material 3 Expressive theming
 /// and PRD section 3.7 (FR-PRE-01..05, FR-PRE-10..11, UI-05..06).
 class PresetsView extends StatelessWidget {
   const PresetsView({super.key, this.viewModel});
@@ -134,7 +134,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
     final activePresetId = vm.activePresetId;
 
     return Scaffold(
-      backgroundColor: context.colors.surfaceLowest,
+      backgroundColor: context.colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -158,7 +158,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                       Text(
                         'PRESETS',
                         style: context.textTheme.labelMedium?.copyWith(
-                          color: context.colors.onSurfacePrimary,
+                          color: context.colorScheme.onSurface,
                           letterSpacing: 2.2,
                         ),
                       ),
@@ -167,8 +167,8 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                         onPressed: _openCreatePresetSheet,
                         style: FilledButton.styleFrom(
                           minimumSize: Size(0, context.dimens.minTouchTarget),
-                          backgroundColor: context.colors.primaryAccent,
-                          foregroundColor: context.colors.onPrimaryAccent,
+                          backgroundColor: context.colorScheme.primary,
+                          foregroundColor: context.colorScheme.onPrimary,
                           shape: const StadiumBorder(),
                           padding: EdgeInsets.symmetric(
                             horizontal: context.dimens.spaceMd,
@@ -192,18 +192,20 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                       vertical: context.dimens.spaceXs,
                     ),
                     decoration: BoxDecoration(
-                      color: context.colors.surfaceLow,
+                      color: context.colorScheme.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(
                         context.dimens.radiusFull,
                       ),
-                      border: Border.all(color: context.colors.ghostBorder),
+                      border: Border.all(
+                        color: context.colorScheme.outlineVariant,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.search_rounded,
                           size: 20,
-                          color: context.colors.onSurfaceMuted,
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                         SizedBox(width: context.dimens.spaceSm),
                         Expanded(
@@ -212,12 +214,12 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                             controller: _searchController,
                             onChanged: vm.setSearchQuery,
                             style: context.textTheme.bodyMedium?.copyWith(
-                              color: context.colors.onSurfacePrimary,
+                              color: context.colorScheme.onSurface,
                             ),
                             decoration: InputDecoration(
                               hintText: 'Search presets by name...',
                               hintStyle: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colors.onSurfaceMuted,
+                                color: context.colorScheme.onSurfaceVariant,
                               ),
                               isDense: true,
                               border: InputBorder.none,
@@ -235,7 +237,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                             icon: Icon(
                               Icons.close_rounded,
                               size: 18,
-                              color: context.colors.onSurfaceMuted,
+                              color: context.colorScheme.onSurfaceVariant,
                             ),
                           ),
                       ],
@@ -321,8 +323,8 @@ class _PresetCard extends StatelessWidget {
           '${preset.name}, ${preset.bpm.value} BPM, ${preset.timeSignature.label}',
       child: Material(
         color: isActive
-            ? context.colors.primaryContainer
-            : context.colors.surfaceLow,
+            ? context.colorScheme.primaryContainer
+            : context.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
         child: InkWell(
           key: Key('preset_card_${preset.id}'),
@@ -334,8 +336,8 @@ class _PresetCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(context.dimens.radiusMd),
               border: Border.all(
                 color: isActive
-                    ? context.colors.neonGhostBorder
-                    : context.colors.ghostBorder,
+                    ? context.colorScheme.primary.withValues(alpha: 0.45)
+                    : context.colorScheme.outlineVariant,
               ),
             ),
             child: Column(
@@ -358,8 +360,8 @@ class _PresetCard extends StatelessWidget {
                                   style: context.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: isActive
-                                        ? context.colors.onPrimaryContainer
-                                        : context.colors.onSurfacePrimary,
+                                        ? context.colorScheme.onPrimaryContainer
+                                        : context.colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -372,7 +374,7 @@ class _PresetCard extends StatelessWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: context.colors.primaryAccent,
+                                    color: context.colorScheme.primary,
                                     borderRadius: BorderRadius.circular(
                                       context.dimens.radiusFull,
                                     ),
@@ -383,7 +385,7 @@ class _PresetCard extends StatelessWidget {
                                         ?.copyWith(
                                           fontSize: 9,
                                           letterSpacing: 0.8,
-                                          color: context.colors.onPrimaryAccent,
+                                          color: context.colorScheme.onPrimary,
                                         ),
                                   ),
                                 ),
@@ -400,9 +402,9 @@ class _PresetCard extends StatelessWidget {
                               style: context.textTheme.bodyMedium?.copyWith(
                                 fontSize: 12,
                                 color: isActive
-                                    ? context.colors.onPrimaryContainer
+                                    ? context.colorScheme.onPrimaryContainer
                                           .withValues(alpha: 0.8)
-                                    : context.colors.onSurfaceMuted,
+                                    : context.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -424,8 +426,8 @@ class _PresetCard extends StatelessWidget {
                             ? Icons.star_rounded
                             : Icons.star_outline_rounded,
                         color: preset.isFavorite
-                            ? context.colors.primaryAccent
-                            : context.colors.onSurfaceMuted,
+                            ? context.colorScheme.primary
+                            : context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -506,8 +508,8 @@ class _ParameterBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: isActive
-            ? context.colors.surfaceLow.withValues(alpha: 0.72)
-            : context.colors.surfaceHigh,
+            ? context.colorScheme.surfaceContainerLow.withValues(alpha: 0.72)
+            : context.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(context.dimens.radiusFull),
       ),
       child: Text(
@@ -515,7 +517,7 @@ class _ParameterBadge extends StatelessWidget {
         style: context.textTheme.labelMedium?.copyWith(
           fontSize: 11,
           letterSpacing: 0.4,
-          color: context.colors.onSurfacePrimary,
+          color: context.colorScheme.onSurface,
         ),
       ),
     );
@@ -551,8 +553,8 @@ class _ActionIconButton extends StatelessWidget {
         icon,
         size: 20,
         color: isDestructive
-            ? context.colors.error
-            : context.colors.onSurfaceMuted,
+            ? context.colorScheme.error
+            : context.colorScheme.onSurfaceVariant,
       ),
     );
   }
@@ -576,9 +578,9 @@ class _EmptyPresetsCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.dimens.spaceLg),
       decoration: BoxDecoration(
-        color: context.colors.surfaceLow,
+        color: context.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(context.dimens.radiusLg),
-        border: Border.all(color: context.colors.ghostBorder),
+        border: Border.all(color: context.colorScheme.outlineVariant),
       ),
       child: Column(
         children: [
@@ -586,13 +588,13 @@ class _EmptyPresetsCard extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: context.colors.surfaceHigh,
+              color: context.colorScheme.surfaceContainerHigh,
               shape: BoxShape.circle,
             ),
             child: Icon(
               hasAnyPresets ? Icons.search_off_rounded : Icons.tune_rounded,
               size: 28,
-              color: context.colors.primaryAccent,
+              color: context.colorScheme.primary,
             ),
           ),
           SizedBox(height: context.dimens.spaceMd),
@@ -603,7 +605,7 @@ class _EmptyPresetsCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: context.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
-              color: context.colors.onSurfacePrimary,
+              color: context.colorScheme.onSurface,
             ),
           ),
           SizedBox(height: context.dimens.spaceXs),
@@ -611,7 +613,7 @@ class _EmptyPresetsCard extends StatelessWidget {
             hasAnyPresets ? 'Try another keyword or clear your search filter.' : 'Save tempo, time signature, subdivision, and rehearsal notes for one-tap recall.',
             textAlign: TextAlign.center,
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.onSurfaceMuted,
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: context.dimens.spaceMd),
@@ -623,8 +625,8 @@ class _EmptyPresetsCard extends StatelessWidget {
             ),
             style: FilledButton.styleFrom(
               minimumSize: Size(0, context.dimens.minTouchTarget),
-              backgroundColor: context.colors.primaryAccent,
-              foregroundColor: context.colors.onPrimaryAccent,
+              backgroundColor: context.colorScheme.primary,
+              foregroundColor: context.colorScheme.onPrimary,
               shape: const StadiumBorder(),
             ),
             onPressed: hasAnyPresets ? onClearSearch : onCreatePreset,
@@ -651,7 +653,7 @@ class _DeletePresetConfirmDialog extends StatelessWidget {
 
     return AlertDialog(
       key: const Key('delete_preset_confirm_dialog'),
-      backgroundColor: context.colors.surfaceLow,
+      backgroundColor: context.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
       ),
@@ -659,7 +661,7 @@ class _DeletePresetConfirmDialog extends StatelessWidget {
         'Delete Preset?',
         style: context.textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w700,
-          color: context.colors.onSurfacePrimary,
+          color: context.colorScheme.onSurface,
         ),
       ),
       content: Column(
@@ -669,7 +671,7 @@ class _DeletePresetConfirmDialog extends StatelessWidget {
           Text(
             'Are you sure you want to delete "${preset.name}"? This action cannot be undone.',
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.onSurfaceMuted,
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
           if (containingSetlists.isNotEmpty) ...[
@@ -678,7 +680,7 @@ class _DeletePresetConfirmDialog extends StatelessWidget {
               key: const Key('delete_preset_setlist_warning'),
               padding: EdgeInsets.all(context.dimens.spaceSmPlus4),
               decoration: BoxDecoration(
-                color: context.colors.error.withValues(alpha: 0.12),
+                color: context.colorScheme.error.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(context.dimens.radiusSm),
               ),
               child: Text(
@@ -687,7 +689,7 @@ class _DeletePresetConfirmDialog extends StatelessWidget {
                 '$setlistNames. Deleting this preset will remove it from those setlists.',
                 style: context.textTheme.bodyMedium?.copyWith(
                   fontSize: 13,
-                  color: context.colors.error,
+                  color: context.colorScheme.error,
                 ),
               ),
             ),
@@ -700,14 +702,14 @@ class _DeletePresetConfirmDialog extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(false),
           child: Text(
             'Cancel',
-            style: TextStyle(color: context.colors.onSurfacePrimary),
+            style: TextStyle(color: context.colorScheme.onSurface),
           ),
         ),
         FilledButton(
           key: const Key('confirm_delete_preset_button'),
           style: FilledButton.styleFrom(
-            backgroundColor: context.colors.error,
-            foregroundColor: context.colors.surfaceLowest,
+            backgroundColor: context.colorScheme.error,
+            foregroundColor: context.colorScheme.onError,
           ),
           onPressed: () => Navigator.of(context).pop(true),
           child: const Text('Delete'),
