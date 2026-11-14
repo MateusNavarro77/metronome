@@ -4,16 +4,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
+import 'package:metronome/data/repositories/preset_library_repository.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
 import 'package:metronome/ui/core/theme/sonic_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/navigation/views/adaptive_navigation_shell.dart';
 import 'package:metronome/ui/features/preferences/view_models/preferences_view_model.dart';
+import 'package:metronome/ui/features/presets/view_models/presets_view_model.dart';
+import 'package:metronome/ui/features/setlists/view_models/setlists_view_model.dart';
 import 'package:provider/provider.dart';
 
 Widget _buildTestApp({
   required MetronomeViewModel metronomeViewModel,
   required PreferencesViewModel preferencesViewModel,
+  required PresetsViewModel presetsViewModel,
+  required SetlistsViewModel setlistsViewModel,
 }) {
   return MultiProvider(
     providers: [
@@ -23,6 +28,8 @@ Widget _buildTestApp({
       ChangeNotifierProvider<PreferencesViewModel>.value(
         value: preferencesViewModel,
       ),
+      ChangeNotifierProvider<PresetsViewModel>.value(value: presetsViewModel),
+      ChangeNotifierProvider<SetlistsViewModel>.value(value: setlistsViewModel),
     ],
     child: MaterialApp(
       theme: SonicTheme.darkTheme,
@@ -39,22 +46,40 @@ void main() {
   group('AdaptiveNavigationShell', () {
     late SimulatedMetronomeEngine engine;
     late MetronomeRepository metronomeRepo;
+    late PresetLibraryRepository libraryRepo;
     late MetronomeViewModel metronomeViewModel;
     late PreferencesRepository preferencesRepo;
     late PreferencesViewModel preferencesViewModel;
+    late PresetsViewModel presetsViewModel;
+    late SetlistsViewModel setlistsViewModel;
 
     setUp(() {
       engine = SimulatedMetronomeEngine();
       metronomeRepo = MetronomeRepository(engine: engine);
-      metronomeViewModel = MetronomeViewModel(repository: metronomeRepo);
+      libraryRepo = PresetLibraryRepository();
+      metronomeViewModel = MetronomeViewModel(
+        repository: metronomeRepo,
+        presetLibraryRepository: libraryRepo,
+      );
       preferencesRepo = PreferencesRepository();
       preferencesViewModel = PreferencesViewModel(repository: preferencesRepo);
+      presetsViewModel = PresetsViewModel(
+        repository: libraryRepo,
+        metronomeViewModel: metronomeViewModel,
+      );
+      setlistsViewModel = SetlistsViewModel(
+        repository: libraryRepo,
+        metronomeViewModel: metronomeViewModel,
+      );
     });
 
-    tearDown(() {
+    tearDown(() async {
+      setlistsViewModel.dispose();
+      presetsViewModel.dispose();
       metronomeViewModel.dispose();
-      metronomeRepo.dispose();
-      engine.dispose();
+      await libraryRepo.dispose();
+      await metronomeRepo.dispose();
+      await engine.dispose();
       preferencesViewModel.dispose();
     });
 
@@ -69,6 +94,8 @@ void main() {
           _buildTestApp(
             metronomeViewModel: metronomeViewModel,
             preferencesViewModel: preferencesViewModel,
+            presetsViewModel: presetsViewModel,
+            setlistsViewModel: setlistsViewModel,
           ),
         );
         await tester.pumpAndSettle();
@@ -87,15 +114,13 @@ void main() {
         await tester.tap(find.byKey(const Key('nav_destination_presets')));
         await tester.pumpAndSettle();
         expect(find.text('PRESETS'), findsOneWidget);
-        expect(find.text('Preset Library'), findsOneWidget);
-        expect(find.text('One-Tap Recall (FR-PRE-02)'), findsOneWidget);
+        expect(find.text('No presets saved yet'), findsOneWidget);
 
         // Switch to Setlists
         await tester.tap(find.byKey(const Key('nav_destination_setlists')));
         await tester.pumpAndSettle();
         expect(find.text('SETLISTS'), findsOneWidget);
-        expect(find.text('Live Setlists'), findsOneWidget);
-        expect(find.text('Bar-Synced Transitions (FR-PRE-09)'), findsOneWidget);
+        expect(find.text('No setlists yet'), findsOneWidget);
 
         // Switch to Settings
         await tester.tap(find.byKey(const Key('nav_destination_settings')));
@@ -124,6 +149,8 @@ void main() {
         _buildTestApp(
           metronomeViewModel: metronomeViewModel,
           preferencesViewModel: preferencesViewModel,
+          presetsViewModel: presetsViewModel,
+          setlistsViewModel: setlistsViewModel,
         ),
       );
       await tester.pumpAndSettle();
@@ -153,6 +180,8 @@ void main() {
           _buildTestApp(
             metronomeViewModel: metronomeViewModel,
             preferencesViewModel: preferencesViewModel,
+            presetsViewModel: presetsViewModel,
+            setlistsViewModel: setlistsViewModel,
           ),
         );
         await tester.pumpAndSettle();
@@ -176,6 +205,8 @@ void main() {
         _buildTestApp(
           metronomeViewModel: metronomeViewModel,
           preferencesViewModel: preferencesViewModel,
+          presetsViewModel: presetsViewModel,
+          setlistsViewModel: setlistsViewModel,
         ),
       );
       await tester.pumpAndSettle();
