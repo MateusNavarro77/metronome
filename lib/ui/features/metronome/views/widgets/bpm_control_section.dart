@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/tempo_marking.dart';
