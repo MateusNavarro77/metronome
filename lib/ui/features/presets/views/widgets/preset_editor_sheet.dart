@@ -1,12 +1,12 @@
-import 'dart:ui';
-
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/preset.dart';
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Result returned when the user confirms [PresetEditorSheet].
 class PresetEditorResult {
@@ -39,10 +39,11 @@ Future<PresetEditorResult?> showPresetEditorSheet(
   required Subdivision initialSubdivision,
   required bool initialAccentEnabled,
 }) {
-  return showModalBottomSheet<PresetEditorResult>(
-    context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
+  return M3EBottomSheet.show<PresetEditorResult>(
+    context,
+    showDragHandle: false,
+    isDismissible: true,
+    initialValue: M3EBottomSheetValue.expanded,
     builder: (_) => PresetEditorSheet(
       existingPreset: existingPreset,
       initialBpm: existingPreset?.bpm ?? initialBpm,
@@ -143,566 +144,429 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
-      child: Center(
-        heightFactor: 1.0,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: context.dimens.maxContentWidth,
-            maxHeight: maxSheetHeight,
-          ),
-          child: ClipRRect(
-            key: const Key('preset_editor_sheet'),
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(context.dimens.radiusLg),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: context.colors.surfaceLow.withValues(alpha: 0.94),
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(context.dimens.radiusLg),
-                  ),
-                  border: Border(
-                    top: BorderSide(color: context.colors.ghostBorder),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: context.dimens.maxContentWidth,
+          maxHeight: maxSheetHeight,
+        ),
+        child: SafeArea(
+          key: const Key('preset_editor_sheet'),
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                  top: context.dimens.spaceSmPlus4,
+                  bottom: context.dimens.spaceSm,
+                ),
+                child: Center(
+                  child: Container(
+                    key: const Key('preset_editor_drag_handle'),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: context.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.4,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        context.dimens.radiusFull,
+                      ),
+                    ),
                   ),
                 ),
-                child: SafeArea(
-                  top: false,
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                      context.dimens.spaceLg,
-                      context.dimens.spaceSmPlus4,
-                      context.dimens.spaceLg,
-                      context.dimens.spaceLg,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Center(
-                          child: Container(
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: context.colors.surfaceHighest,
-                              borderRadius: BorderRadius.circular(
-                                context.dimens.radiusFull,
-                              ),
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    context.dimens.spaceLg,
+                    context.dimens.spaceSm,
+                    context.dimens.spaceLg,
+                    context.dimens.spaceLg,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _isEditing ? 'EDIT PRESET' : 'NEW PRESET',
+                            style: context.textTheme.titleSmall?.copyWith(
+                              letterSpacing: 1.6,
+                              fontWeight: FontWeight.w700,
+                              color: context.colorScheme.onSurface,
                             ),
                           ),
+                          M3EIconButton(
+                            key: const Key('preset_editor_favorite_toggle'),
+                            variant: M3EIconButtonVariant.standard,
+                            isSelected: _isFavorite,
+                            tooltip: _isFavorite
+                                ? 'Remove from favorites'
+                                : 'Mark as favorite',
+                            onPressed: () {
+                              setState(() {
+                                _isFavorite = !_isFavorite;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.star_outline_rounded,
+                              color: context.colorScheme.onSurfaceVariant,
+                            ),
+                            selectedIcon: Icon(
+                              Icons.star_rounded,
+                              color: context.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: context.dimens.spaceSm),
+
+                      M3ETextField(
+                        key: const Key('preset_name_input'),
+                        controller: _nameController,
+                        variant: M3ETextFieldVariant.outlined,
+                        label: 'Preset name',
+                        placeholder: 'e.g. Opening Groove',
+                        errorText: _nameError,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (_) {
+                          if (_nameError != null) {
+                            setState(() => _nameError = null);
+                          }
+                        },
+                      ),
+                      SizedBox(height: context.dimens.spaceSmPlus4),
+
+                      M3ETextField(
+                        key: const Key('preset_note_input'),
+                        controller: _noteController,
+                        variant: M3ETextFieldVariant.outlined,
+                        label: 'Note (optional)',
+                        placeholder: 'e.g. Count-in at the start',
+                        maxLines: 2,
+                        textInputAction: TextInputAction.done,
+                      ),
+                      SizedBox(height: context.dimens.spaceMd),
+
+                      // BPM editor section
+                      M3ECard(
+                        variant: M3ECardVariant.outlined,
+                        padding: EdgeInsets.all(context.dimens.spaceMd),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'TEMPO',
+                                  style: context.textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: context
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                ),
+                                Text(
+                                  _bpm.tempoMarking.label.toUpperCase(),
+                                  style: context.textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: context.colorScheme.secondary,
+                                      ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: context.dimens.spaceSm),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _CircleIconButton(
+                                  buttonKey: const Key(
+                                    'preset_editor_bpm_decrement',
+                                  ),
+                                  icon: Icons.remove_rounded,
+                                  semanticLabel: 'Decrease preset BPM',
+                                  enabled: _bpm.value > Bpm.min,
+                                  onTap: () => setState(() {
+                                    _bpm = _bpm.adjust(-1);
+                                  }),
+                                ),
+                                Text(
+                                  '${_bpm.value} BPM',
+                                  key: const Key('preset_editor_bpm_value'),
+                                  style: context.textTheme.headlineMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: context.colorScheme.onSurface,
+                                      ),
+                                ),
+                                _CircleIconButton(
+                                  buttonKey: const Key(
+                                    'preset_editor_bpm_increment',
+                                  ),
+                                  icon: Icons.add_rounded,
+                                  semanticLabel: 'Increase preset BPM',
+                                  enabled: _bpm.value < Bpm.max,
+                                  onTap: () => setState(() {
+                                    _bpm = _bpm.adjust(1);
+                                  }),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: context.dimens.spaceXs),
+                            M3ESlider(
+                              key: const Key('preset_editor_bpm_slider'),
+                              value: _bpm.value.toDouble(),
+                              min: Bpm.min.toDouble(),
+                              max: Bpm.max.toDouble(),
+                              divisions: Bpm.max - Bpm.min,
+                              size: M3ESliderSize.xs,
+                              label: '${_bpm.value} BPM',
+                              onChanged: (value) {
+                                setState(() {
+                                  _bpm = Bpm.clamped(value.round());
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                        SizedBox(height: context.dimens.spaceMd),
-                        Row(
+                      ),
+                      SizedBox(height: context.dimens.spaceSmPlus4),
+
+                      // Time signature section
+                      M3ECard(
+                        variant: M3ECardVariant.outlined,
+                        padding: EdgeInsets.all(context.dimens.spaceMd),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'TIME SIGNATURE',
+                                  style: context.textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: context
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                ),
+                                Text(
+                                  _timeSignature.label,
+                                  key: const Key(
+                                    'preset_editor_time_sig_value',
+                                  ),
+                                  style: context.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: context.colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: context.dimens.spaceSm),
+                            Row(
+                              children: TimeSignature.presets.map((sig) {
+                                final selected = sig == _timeSignature;
+                                return Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: context.dimens.spaceXs,
+                                    ),
+                                    child: _SelectChip(
+                                      chipKey: Key(
+                                        'preset_editor_time_sig_${sig.label}',
+                                      ),
+                                      label: sig.label,
+                                      isSelected: selected,
+                                      onTap: () => setState(() {
+                                        _timeSignature = sig;
+                                      }),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            SizedBox(height: context.dimens.spaceSmPlus2),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Beats: ${_timeSignature.numerator}',
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: context.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _CircleIconButton(
+                                      buttonKey: const Key(
+                                        'preset_editor_numerator_decrement',
+                                      ),
+                                      icon: Icons.remove_rounded,
+                                      semanticLabel: 'Decrease beats per bar',
+                                      enabled: _timeSignature.numerator > 1,
+                                      onTap: () => setState(() {
+                                        _timeSignature = TimeSignature(
+                                          _timeSignature.numerator - 1,
+                                          _timeSignature.denominator,
+                                        );
+                                      }),
+                                    ),
+                                    SizedBox(width: context.dimens.spaceSm),
+                                    _CircleIconButton(
+                                      buttonKey: const Key(
+                                        'preset_editor_numerator_increment',
+                                      ),
+                                      icon: Icons.add_rounded,
+                                      semanticLabel: 'Increase beats per bar',
+                                      enabled: _timeSignature.numerator < 16,
+                                      onTap: () => setState(() {
+                                        _timeSignature = TimeSignature(
+                                          _timeSignature.numerator + 1,
+                                          _timeSignature.denominator,
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: context.dimens.spaceSm),
+                            Row(
+                              children: _validDenominators.map((denom) {
+                                final selected =
+                                    _timeSignature.denominator == denom;
+                                return Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: context.dimens.spaceXs,
+                                    ),
+                                    child: _SelectChip(
+                                      chipKey: Key(
+                                        'preset_editor_denominator_$denom',
+                                      ),
+                                      label: '/$denom',
+                                      isSelected: selected,
+                                      onTap: () => setState(() {
+                                        _timeSignature = TimeSignature(
+                                          _timeSignature.numerator,
+                                          denom,
+                                        );
+                                      }),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: context.dimens.spaceSmPlus4),
+
+                      // Subdivision selector
+                      M3ECard(
+                        variant: M3ECardVariant.outlined,
+                        padding: EdgeInsets.all(context.dimens.spaceMd),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'SUBDIVISION',
+                              style: context.textTheme.labelMedium?.copyWith(
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            SizedBox(height: context.dimens.spaceSm),
+                            Wrap(
+                              spacing: context.dimens.spaceSm,
+                              runSpacing: context.dimens.spaceSm,
+                              children: Subdivision.values.map((sub) {
+                                final selected = sub == _subdivision;
+                                return _SelectChip(
+                                  chipKey: Key(
+                                    'preset_editor_subdivision_${sub.name}',
+                                  ),
+                                  label: '${sub.symbol} ${sub.label}',
+                                  isSelected: selected,
+                                  onTap: () => setState(() {
+                                    _subdivision = sub;
+                                  }),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: context.dimens.spaceSmPlus4),
+
+                      // Downbeat accent toggle
+                      M3ECard(
+                        variant: M3ECardVariant.outlined,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.dimens.spaceMd,
+                          vertical: context.dimens.spaceSm,
+                        ),
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              _isEditing ? 'EDIT PRESET' : 'NEW PRESET',
-                              style: context.textTheme.titleSmall?.copyWith(
-                                letterSpacing: 1.6,
-                                fontWeight: FontWeight.w700,
-                                color: context.colors.onSurfacePrimary,
+                              'ACCENT ON BEAT 1',
+                              style: context.textTheme.labelMedium?.copyWith(
+                                color: context.colorScheme.onSurface,
                               ),
                             ),
-                            IconButton(
-                              key: const Key('preset_editor_favorite_toggle'),
-                              tooltip: _isFavorite
-                                  ? 'Remove from favorites'
-                                  : 'Mark as favorite',
-                              onPressed: () {
+                            M3ESwitch(
+                              key: const Key('preset_editor_accent_toggle'),
+                              value: _isAccentEnabled,
+                              selectedIcon: const Icon(Icons.check_rounded),
+                              onChanged: (value) {
                                 setState(() {
-                                  _isFavorite = !_isFavorite;
+                                  _isAccentEnabled = value;
                                 });
                               },
-                              icon: Icon(
-                                _isFavorite
-                                    ? Icons.star_rounded
-                                    : Icons.star_outline_rounded,
-                                color: _isFavorite
-                                    ? context.colors.primaryAccent
-                                    : context.colors.onSurfaceMuted,
-                              ),
                             ),
                           ],
                         ),
-                        SizedBox(height: context.dimens.spaceSm),
+                      ),
+                      SizedBox(height: context.dimens.spaceLg),
 
-                        // Name input (borderless tonal container with neon bottom accent)
-                        _TonalTextField(
-                          fieldKey: const Key('preset_name_input'),
-                          controller: _nameController,
-                          label: 'PRESET NAME',
-                          hintText: 'e.g. Opening Groove',
-                          errorText: _nameError,
-                          textInputAction: TextInputAction.next,
-                          onChanged: (_) {
-                            if (_nameError != null) {
-                              setState(() => _nameError = null);
-                            }
-                          },
-                        ),
-                        SizedBox(height: context.dimens.spaceSmPlus4),
-
-                        // Optional Note input (FR-PRE-11)
-                        _TonalTextField(
-                          fieldKey: const Key('preset_note_input'),
-                          controller: _noteController,
-                          label: 'NOTE (OPTIONAL)',
-                          hintText: 'e.g. Count-in at the start',
-                          maxLines: 2,
-                          textInputAction: TextInputAction.done,
-                        ),
-                        SizedBox(height: context.dimens.spaceMd),
-
-                        // BPM editor section
-                        Container(
-                          padding: EdgeInsets.all(context.dimens.spaceMd),
-                          decoration: BoxDecoration(
-                            color: context.colors.surfaceContainer,
-                            borderRadius: BorderRadius.circular(
-                              context.dimens.radiusDefault,
-                            ),
-                            border: Border.all(
-                              color: context.colors.ghostBorder,
+                      // Action buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: M3EButton.outlined(
+                              key: const Key('preset_editor_cancel_button'),
+                              size: M3EButtonSize.md,
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Cancel'),
                             ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'TEMPO',
-                                    style: context.textTheme.labelMedium
-                                        ?.copyWith(
-                                          color: context.colors.onSurfaceMuted,
-                                        ),
-                                  ),
-                                  Text(
-                                    _bpm.tempoMarking.label.toUpperCase(),
-                                    style: context.textTheme.labelMedium
-                                        ?.copyWith(
-                                          color: context.colors.secondaryAccent,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: context.dimens.spaceSm),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _CircleIconButton(
-                                    buttonKey: const Key(
-                                      'preset_editor_bpm_decrement',
-                                    ),
-                                    icon: Icons.remove_rounded,
-                                    semanticLabel: 'Decrease preset BPM',
-                                    enabled: _bpm.value > Bpm.min,
-                                    onTap: () => setState(() {
-                                      _bpm = _bpm.adjust(-1);
-                                    }),
-                                  ),
-                                  Text(
-                                    '${_bpm.value} BPM',
-                                    key: const Key('preset_editor_bpm_value'),
-                                    style: context.textTheme.headlineMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color:
-                                              context.colors.onSurfacePrimary,
-                                        ),
-                                  ),
-                                  _CircleIconButton(
-                                    buttonKey: const Key(
-                                      'preset_editor_bpm_increment',
-                                    ),
-                                    icon: Icons.add_rounded,
-                                    semanticLabel: 'Increase preset BPM',
-                                    enabled: _bpm.value < Bpm.max,
-                                    onTap: () => setState(() {
-                                      _bpm = _bpm.adjust(1);
-                                    }),
-                                  ),
-                                ],
-                              ),
-                              Slider(
-                                key: const Key('preset_editor_bpm_slider'),
-                                value: _bpm.value.toDouble(),
-                                min: Bpm.min.toDouble(),
-                                max: Bpm.max.toDouble(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _bpm = Bpm.clamped(value.round());
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: context.dimens.spaceSmPlus4),
-
-                        // Time signature section
-                        Container(
-                          padding: EdgeInsets.all(context.dimens.spaceMd),
-                          decoration: BoxDecoration(
-                            color: context.colors.surfaceContainer,
-                            borderRadius: BorderRadius.circular(
-                              context.dimens.radiusDefault,
-                            ),
-                            border: Border.all(
-                              color: context.colors.ghostBorder,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'TIME SIGNATURE',
-                                    style: context.textTheme.labelMedium
-                                        ?.copyWith(
-                                          color: context.colors.onSurfaceMuted,
-                                        ),
-                                  ),
-                                  Text(
-                                    _timeSignature.label,
-                                    key: const Key(
-                                      'preset_editor_time_sig_value',
-                                    ),
-                                    style: context.textTheme.titleSmall
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: context.colors.primaryAccent,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: context.dimens.spaceSm),
-                              Row(
-                                children: TimeSignature.presets.map((sig) {
-                                  final selected = sig == _timeSignature;
-                                  return Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: context.dimens.spaceXs,
-                                      ),
-                                      child: _SelectChip(
-                                        chipKey: Key(
-                                          'preset_editor_time_sig_${sig.label}',
-                                        ),
-                                        label: sig.label,
-                                        isSelected: selected,
-                                        onTap: () => setState(() {
-                                          _timeSignature = sig;
-                                        }),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              SizedBox(height: context.dimens.spaceSmPlus2),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Beats: ${_timeSignature.numerator}',
-                                    style: context.textTheme.bodyMedium
-                                        ?.copyWith(
-                                          color: context.colors.onSurfaceMuted,
-                                        ),
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      _CircleIconButton(
-                                        buttonKey: const Key(
-                                          'preset_editor_numerator_decrement',
-                                        ),
-                                        icon: Icons.remove_rounded,
-                                        semanticLabel: 'Decrease beats per bar',
-                                        enabled: _timeSignature.numerator > 1,
-                                        onTap: () => setState(() {
-                                          _timeSignature = TimeSignature(
-                                            _timeSignature.numerator - 1,
-                                            _timeSignature.denominator,
-                                          );
-                                        }),
-                                      ),
-                                      SizedBox(width: context.dimens.spaceSm),
-                                      _CircleIconButton(
-                                        buttonKey: const Key(
-                                          'preset_editor_numerator_increment',
-                                        ),
-                                        icon: Icons.add_rounded,
-                                        semanticLabel: 'Increase beats per bar',
-                                        enabled: _timeSignature.numerator < 16,
-                                        onTap: () => setState(() {
-                                          _timeSignature = TimeSignature(
-                                            _timeSignature.numerator + 1,
-                                            _timeSignature.denominator,
-                                          );
-                                        }),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: context.dimens.spaceSm),
-                              Row(
-                                children: _validDenominators.map((denom) {
-                                  final selected =
-                                      _timeSignature.denominator == denom;
-                                  return Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: context.dimens.spaceXs,
-                                      ),
-                                      child: _SelectChip(
-                                        chipKey: Key(
-                                          'preset_editor_denominator_$denom',
-                                        ),
-                                        label: '/$denom',
-                                        isSelected: selected,
-                                        onTap: () => setState(() {
-                                          _timeSignature = TimeSignature(
-                                            _timeSignature.numerator,
-                                            denom,
-                                          );
-                                        }),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: context.dimens.spaceSmPlus4),
-
-                        // Subdivision selector
-                        Container(
-                          padding: EdgeInsets.all(context.dimens.spaceMd),
-                          decoration: BoxDecoration(
-                            color: context.colors.surfaceContainer,
-                            borderRadius: BorderRadius.circular(
-                              context.dimens.radiusDefault,
-                            ),
-                            border: Border.all(
-                              color: context.colors.ghostBorder,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                'SUBDIVISION',
-                                style: context.textTheme.labelMedium?.copyWith(
-                                  color: context.colors.onSurfaceMuted,
-                                ),
-                              ),
-                              SizedBox(height: context.dimens.spaceSm),
-                              Wrap(
-                                spacing: context.dimens.spaceSm,
-                                runSpacing: context.dimens.spaceSm,
-                                children: Subdivision.values.map((sub) {
-                                  final selected = sub == _subdivision;
-                                  return _SelectChip(
-                                    chipKey: Key(
-                                      'preset_editor_subdivision_${sub.name}',
-                                    ),
-                                    label: '${sub.symbol} ${sub.label}',
-                                    isSelected: selected,
-                                    onTap: () => setState(() {
-                                      _subdivision = sub;
-                                    }),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: context.dimens.spaceSmPlus4),
-
-                        // Downbeat accent toggle
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.dimens.spaceMd,
-                            vertical: context.dimens.spaceSm,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.colors.surfaceContainer,
-                            borderRadius: BorderRadius.circular(
-                              context.dimens.radiusDefault,
-                            ),
-                            border: Border.all(
-                              color: context.colors.ghostBorder,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'ACCENT ON BEAT 1',
-                                style: context.textTheme.labelMedium?.copyWith(
-                                  color: context.colors.onSurfacePrimary,
-                                ),
-                              ),
-                              Switch(
-                                key: const Key('preset_editor_accent_toggle'),
-                                value: _isAccentEnabled,
-                                activeThumbColor: context.colors.primaryAccent,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isAccentEnabled = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: context.dimens.spaceLg),
-
-                        // Action buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                key: const Key('preset_editor_cancel_button'),
-                                style: OutlinedButton.styleFrom(
-                                  minimumSize: Size(
-                                    0,
-                                    context.dimens.minTouchTarget,
-                                  ),
-                                  side: BorderSide(
-                                    color: context.colors.ghostBorder,
-                                  ),
-                                  shape: const StadiumBorder(),
-                                  foregroundColor:
-                                      context.colors.onSurfacePrimary,
-                                ),
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Cancel'),
+                          SizedBox(width: context.dimens.spaceSmPlus4),
+                          Expanded(
+                            child: M3EButton.filled(
+                              key: const Key('preset_editor_save_button'),
+                              size: M3EButtonSize.md,
+                              onPressed: _submit,
+                              child: Text(
+                                _isEditing ? 'Save Changes' : 'Save Preset',
                               ),
                             ),
-                            SizedBox(width: context.dimens.spaceSmPlus4),
-                            Expanded(
-                              child: FilledButton(
-                                key: const Key('preset_editor_save_button'),
-                                style: FilledButton.styleFrom(
-                                  minimumSize: Size(
-                                    0,
-                                    context.dimens.minTouchTarget,
-                                  ),
-                                  backgroundColor: context.colors.primaryAccent,
-                                  foregroundColor:
-                                      context.colors.onPrimaryAccent,
-                                  shape: const StadiumBorder(),
-                                ),
-                                onPressed: _submit,
-                                child: Text(
-                                  _isEditing ? 'Save Changes' : 'Save Preset',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _TonalTextField extends StatelessWidget {
-  const _TonalTextField({
-    required this.fieldKey,
-    required this.controller,
-    required this.label,
-    required this.hintText,
-    this.errorText,
-    this.maxLines = 1,
-    this.textInputAction,
-    this.onChanged,
-  });
-
-  final Key fieldKey;
-  final TextEditingController controller;
-  final String label;
-  final String hintText;
-  final String? errorText;
-  final int maxLines;
-  final TextInputAction? textInputAction;
-  final ValueChanged<String>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        context.dimens.spaceMd,
-        context.dimens.spaceSmPlus2,
-        context.dimens.spaceMd,
-        context.dimens.spaceXs,
-      ),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainer,
-        borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: context.textTheme.labelMedium?.copyWith(
-              fontSize: 10,
-              color: context.colors.onSurfaceMuted,
-            ),
-          ),
-          TextField(
-            key: fieldKey,
-            controller: controller,
-            maxLines: maxLines,
-            textInputAction: textInputAction,
-            onChanged: onChanged,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.onSurfacePrimary,
-            ),
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: context.textTheme.bodyMedium?.copyWith(
-                color: context.colors.onSurfaceMuted.withValues(alpha: 0.7),
-              ),
-              errorText: errorText,
-              isDense: true,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: context.colors.primaryAccent,
-                  width: 2.0,
-                ),
-              ),
-              errorBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: context.colors.error, width: 2.0),
-              ),
-              focusedErrorBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: context.colors.error, width: 2.0),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -725,30 +589,13 @@ class _CircleIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: semanticLabel,
-      child: Material(
-        color: enabled ? context.colors.surfaceHigh : context.colors.surfaceLow,
-        shape: const CircleBorder(),
-        child: InkWell(
-          key: buttonKey,
-          customBorder: const CircleBorder(),
-          onTap: enabled ? onTap : null,
-          child: SizedBox(
-            width: context.dimens.minTouchTarget,
-            height: context.dimens.minTouchTarget,
-            child: Icon(
-              icon,
-              size: 22,
-              color: enabled
-                  ? context.colors.onSurfacePrimary
-                  : context.colors.onSurfaceMuted.withValues(alpha: 0.4),
-            ),
-          ),
-        ),
-      ),
+    return M3EIconButton(
+      key: buttonKey,
+      variant: M3EIconButtonVariant.tonal,
+      size: M3EIconButtonSize.sm,
+      tooltip: semanticLabel,
+      onPressed: enabled ? onTap : null,
+      icon: Icon(icon, size: 22),
     );
   }
 }
@@ -768,43 +615,20 @@ class _SelectChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: isSelected
-          ? context.colors.primaryContainer
-          : context.colors.surfaceHigh,
-      borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-      child: InkWell(
+    final content = Text(label, maxLines: 1, overflow: TextOverflow.ellipsis);
+    if (isSelected) {
+      return M3EButton.filled(
         key: chipKey,
-        borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-        onTap: onTap,
-        child: Container(
-          constraints: BoxConstraints(minHeight: context.dimens.minTouchTarget),
-          padding: EdgeInsets.symmetric(
-            horizontal: context.dimens.spaceSmPlus4,
-            vertical: context.dimens.spaceSm,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(context.dimens.radiusFull),
-            border: Border.all(
-              color: isSelected
-                  ? context.colors.neonGhostBorder
-                  : context.colors.ghostBorder,
-            ),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.textTheme.labelMedium?.copyWith(
-              letterSpacing: 0.4,
-              color: isSelected
-                  ? context.colors.primaryAccent
-                  : context.colors.onSurfacePrimary,
-            ),
-          ),
-        ),
-      ),
+        size: M3EButtonSize.xs,
+        onPressed: onTap,
+        child: content,
+      );
+    }
+    return M3EButton.tonal(
+      key: chipKey,
+      size: M3EButtonSize.xs,
+      onPressed: onTap,
+      child: content,
     );
   }
 }

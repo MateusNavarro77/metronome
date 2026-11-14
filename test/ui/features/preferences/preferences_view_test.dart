@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
 import 'package:metronome/domain/models/app_theme_mode.dart';
-import 'package:metronome/ui/core/theme/sonic_theme.dart';
+import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/preferences/view_models/preferences_view_model.dart';
 import 'package:metronome/ui/features/preferences/views/preferences_view.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +25,8 @@ void main() {
         ChangeNotifierProvider<PreferencesViewModel>.value(
           value: viewModel,
           child: MaterialApp(
-            theme: SonicTheme.lightTheme,
-            darkTheme: SonicTheme.darkTheme,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
             home: const PreferencesView(),
           ),
         ),
@@ -67,7 +67,7 @@ void main() {
         ChangeNotifierProvider<PreferencesViewModel>.value(
           value: viewModel,
           child: MaterialApp(
-            theme: SonicTheme.darkTheme,
+            theme: AppTheme.darkTheme,
             home: Builder(
               builder: (context) {
                 return ElevatedButton(

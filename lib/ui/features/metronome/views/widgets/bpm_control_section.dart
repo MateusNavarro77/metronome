@@ -1,8 +1,10 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/tempo_marking.dart';
-import '../../../../core/theme/sonic_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Hero BPM display with tactile `-`/`+` step buttons and quick-adjust slider
 /// (FR-BPM-01..03, FR-AND-01..02).
@@ -51,14 +53,14 @@ class BpmControlSection extends StatelessWidget {
               vertical: context.dimens.spaceXs,
             ),
             decoration: BoxDecoration(
-              color: context.colors.surfaceHigh,
+              color: context.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(context.dimens.radiusFull),
             ),
             child: Text(
               tempoMarking.label.toUpperCase(),
               key: const Key('tempo_marking_text'),
               style: context.textTheme.labelMedium?.copyWith(
-                color: context.colors.secondaryAccent,
+                color: context.colorScheme.secondary,
               ),
             ),
           ),
@@ -91,17 +93,22 @@ class BpmControlSection extends StatelessWidget {
                         style: isCompact
                             ? context.textTheme.displayLarge?.copyWith(
                                 fontSize: 52,
-                                color: context.colors.onSurfacePrimary,
+                                fontWeight: FontWeight.w700,
+                                height: 1.0,
+                                color: context.colorScheme.onSurface,
                               )
                             : context.textTheme.displayLarge?.copyWith(
-                                color: context.colors.onSurfacePrimary,
+                                fontSize: 64,
+                                fontWeight: FontWeight.w700,
+                                height: 1.0,
+                                color: context.colorScheme.onSurface,
                               ),
                       ),
                     ),
                     Text(
                       'BPM',
                       style: context.textTheme.labelMedium?.copyWith(
-                        color: context.colors.onSurfaceMuted,
+                        color: context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -122,11 +129,13 @@ class BpmControlSection extends StatelessWidget {
           Semantics(
             label: 'BPM quick adjust slider',
             value: '$bpm BPM',
-            child: Slider(
+            child: M3ESlider(
               key: const Key('bpm_slider'),
               value: bpm.toDouble(),
               min: Bpm.min.toDouble(),
               max: Bpm.max.toDouble(),
+              size: isCompact ? M3ESliderSize.xs : M3ESliderSize.s,
+              label: '$bpm',
               onChanged: (value) => onSliderChanged(value.round()),
             ),
           ),
@@ -138,13 +147,13 @@ class BpmControlSection extends StatelessWidget {
                 Text(
                   '${Bpm.min}',
                   style: context.textTheme.labelMedium?.copyWith(
-                    color: context.colors.onSurfaceMuted,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
                   '${Bpm.max}',
                   style: context.textTheme.labelMedium?.copyWith(
-                    color: context.colors.onSurfaceMuted,
+                    color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -177,34 +186,19 @@ class _StepperButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: semanticLabel,
-      child: GestureDetector(
-        onLongPressStart: enabled ? (_) => onHoldStart() : null,
-        onLongPressEnd: enabled ? (_) => onHoldEnd() : null,
-        onLongPressCancel: enabled ? onHoldEnd : null,
-        child: Material(
-          color: context.colors.surfaceHigh,
-          shape: const CircleBorder(),
-          child: InkWell(
-            key: buttonKey,
-            customBorder: const CircleBorder(),
-            onTap: enabled ? onTap : null,
-            child: SizedBox(
-              width: context.dimens.stepperButtonSize,
-              height: context.dimens.stepperButtonSize,
-              child: Icon(
-                icon,
-                size: context.dimens.stepperIconSize,
-                color: enabled
-                    ? context.colors.onSurfacePrimary
-                    : context.colors.onSurfaceMuted,
-              ),
-            ),
-          ),
-        ),
+    return GestureDetector(
+      onLongPressStart: enabled ? (_) => onHoldStart() : null,
+      onLongPressEnd: enabled ? (_) => onHoldEnd() : null,
+      onLongPressCancel: enabled ? onHoldEnd : null,
+      child: M3EIconButton(
+        key: buttonKey,
+        variant: M3EIconButtonVariant.tonal,
+        size: M3EIconButtonSize.md,
+        shape: M3EIconButtonShapeVariant.round,
+        icon: Icon(icon),
+        tooltip: semanticLabel,
+        semanticLabel: semanticLabel,
+        onPressed: enabled ? onTap : null,
       ),
     );
   }

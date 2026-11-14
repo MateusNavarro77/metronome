@@ -6,7 +6,7 @@ import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
 import 'package:metronome/data/repositories/preset_library_repository.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
-import 'package:metronome/ui/core/theme/sonic_theme.dart';
+import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/navigation/views/adaptive_navigation_shell.dart';
 import 'package:metronome/ui/features/preferences/view_models/preferences_view_model.dart';
@@ -32,7 +32,7 @@ Widget _buildTestApp({
       ChangeNotifierProvider<SetlistsViewModel>.value(value: setlistsViewModel),
     ],
     child: MaterialApp(
-      theme: SonicTheme.darkTheme,
+      theme: AppTheme.darkTheme,
       home: AdaptiveNavigationShell(metronomeViewModel: metronomeViewModel),
     ),
   );

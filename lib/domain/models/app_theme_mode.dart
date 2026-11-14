@@ -1,4 +1,4 @@
-/// Domain representation of available application theme modes (specs/DESIGN_DARK.md, specs/DESIGN_LIGHT.md).
+/// Domain representation of available application theme modes.
 ///
 /// Kept as pure Dart with zero Flutter dependencies (NFR-MAN-01).
 enum AppThemeMode {

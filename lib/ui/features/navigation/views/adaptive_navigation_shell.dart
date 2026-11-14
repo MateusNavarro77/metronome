@@ -1,6 +1,8 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 
-import '../../../core/theme/sonic_theme.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../metronome/view_models/metronome_view_model.dart';
 import '../../metronome/views/metronome_view.dart';
 import '../../preferences/views/preferences_view.dart';
@@ -8,7 +10,7 @@ import '../../presets/views/presets_view.dart';
 import '../../setlists/views/setlists_view.dart';
 
 /// Top-level adaptive navigation shell providing responsive layout switching
-/// between [NavigationBar] (portrait) and [NavigationRail] (landscape / wide screen),
+/// between [M3ENavigationBar] (portrait) and [M3ENavigationRail] (landscape / wide screen),
 /// retaining page state via [IndexedStack] with smooth animated transitions.
 class AdaptiveNavigationShell extends StatefulWidget {
   const AdaptiveNavigationShell({
@@ -138,54 +140,31 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
 
         if (useRail) {
           return Scaffold(
-            backgroundColor: context.colors.surfaceLowest,
+            backgroundColor: context.colorScheme.surface,
             body: SafeArea(
               bottom: false,
               top: false,
               child: Row(
                 children: [
-                  NavigationRail(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  M3ENavigationRail(
                     key: const Key('adaptive_navigation_rail'),
+                    type: M3ENavigationRailType.alwaysCollapse,
+                    alignment: M3ENavigationRailAlignment.center,
+                    labelBehavior: M3ENavigationRailLabelBehavior.onlySelected,
+                    showDivider: true,
                     selectedIndex: _currentIndex,
                     onDestinationSelected: _onDestinationSelected,
-                    labelType: NavigationRailLabelType.selected,
-                    backgroundColor: context.colors.surfaceLow,
-                    indicatorColor: context.colors.primaryContainer,
-                    selectedIconTheme: IconThemeData(
-                      color: context.colors.onPrimaryContainer,
-                      size: 24,
-                    ),
-                    unselectedIconTheme: IconThemeData(
-                      color: context.colors.onSurfaceMuted,
-                      size: 24,
-                    ),
-                    selectedLabelTextStyle: context.textTheme.labelMedium
-                        ?.copyWith(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                          color: context.colors.primaryAccent,
-                        ),
-                    unselectedLabelTextStyle: context.textTheme.labelMedium
-                        ?.copyWith(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
-                          color: context.colors.onSurfaceMuted,
-                        ),
-                    destinations: destinations.map((item) {
-                      return NavigationRailDestination(
-                        icon: Icon(item.icon, key: item.railKey),
-                        selectedIcon: Icon(item.selectedIcon),
-                        label: Text(item.label),
-                      );
-                    }).toList(),
-                  ),
-                  VerticalDivider(
-                    width: 1,
-                    thickness: 1,
-                    color: context.colors.ghostBorder,
+                    sections: [
+                      M3ENavigationRailSection(
+                        destinations: destinations.map((item) {
+                          return M3ENavigationRailDestination(
+                            icon: Icon(item.icon, key: item.railKey),
+                            selectedIcon: Icon(item.selectedIcon),
+                            label: item.label,
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                   Expanded(child: content),
                 ],
@@ -195,56 +174,21 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
         }
 
         return Scaffold(
-          backgroundColor: context.colors.surfaceLowest,
+          backgroundColor: context.colorScheme.surface,
           body: content,
-          bottomNavigationBar: Theme(
-            data: Theme.of(context).copyWith(
-              navigationBarTheme: NavigationBarThemeData(
-                backgroundColor: context.colors.surfaceLow,
-                indicatorColor: context.colors.primaryContainer,
-                iconTheme: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return IconThemeData(
-                      color: context.colors.onPrimaryContainer,
-                      size: 24,
-                    );
-                  }
-                  return IconThemeData(
-                    color: context.colors.onSurfaceMuted,
-                    size: 24,
-                  );
-                }),
-                labelTextStyle: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return context.textTheme.labelMedium?.copyWith(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                      color: context.colors.primaryAccent,
-                    );
-                  }
-                  return context.textTheme.labelMedium?.copyWith(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.5,
-                    color: context.colors.onSurfaceMuted,
-                  );
-                }),
-              ),
-            ),
-            child: NavigationBar(
-              key: const Key('adaptive_navigation_bar'),
-              selectedIndex: _currentIndex,
-              onDestinationSelected: _onDestinationSelected,
-              destinations: destinations.map((item) {
-                return NavigationDestination(
-                  key: item.navKey,
-                  icon: Icon(item.icon),
-                  selectedIcon: Icon(item.selectedIcon),
-                  label: item.label,
-                );
-              }).toList(),
-            ),
+          bottomNavigationBar: M3ENavigationBar(
+            key: const Key('adaptive_navigation_bar'),
+            selectedIndex: _currentIndex,
+            onDestinationSelected: _onDestinationSelected,
+            labelBehavior: M3ENavBarLabelBehavior.alwaysShow,
+            indicatorStyle: M3ENavBarIndicatorStyle.pill,
+            destinations: destinations.map((item) {
+              return M3ENavigationBarDestination(
+                icon: Icon(item.icon, key: item.navKey),
+                selectedIcon: Icon(item.selectedIcon),
+                label: item.label,
+              );
+            }).toList(),
           ),
         );
       },

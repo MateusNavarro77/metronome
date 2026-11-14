@@ -1,4 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,7 +9,8 @@ import 'data/repositories/preferences_repository.dart';
 import 'data/repositories/preset_library_repository.dart';
 import 'data/services/metronome_engine.dart';
 import 'data/services/soloud_metronome_engine.dart';
-import 'ui/core/theme/sonic_theme.dart';
+import 'domain/models/app_theme_mode.dart';
+import 'ui/core/theme/app_theme.dart';
 import 'ui/features/metronome/view_models/metronome_view_model.dart';
 import 'ui/features/navigation/views/adaptive_navigation_shell.dart';
 import 'ui/features/preferences/view_models/preferences_view_model.dart';
@@ -21,8 +24,7 @@ Future<void> main() async {
 }
 
 /// Root application widget wiring Dependency Injection via `package:provider`
-/// and applying "The Sonic Architect" light and dark themes
-/// (`specs/DESIGN_DARK.md`, `specs/DESIGN_LIGHT.md`).
+/// and applying Material 3 Expressive theming (`package:material_3_expressive`).
 class MetronomeApp extends StatelessWidget {
   const MetronomeApp({
     super.key,
@@ -133,22 +135,93 @@ class MetronomeApp extends StatelessWidget {
       ],
       child: Consumer<PreferencesViewModel>(
         builder: (context, preferencesViewModel, _) {
-          return MaterialApp(
-            title: 'Metronome',
-            debugShowCheckedModeBanner: false,
-            theme: SonicTheme.lightTheme,
-            darkTheme: SonicTheme.darkTheme,
-            themeMode: preferencesViewModel.materialThemeMode,
-            home: Consumer<MetronomeViewModel>(
-              builder: (context, metronomeViewModel, _) {
+          return _M3EAppHost(
+            themeMode: preferencesViewModel.themeMode,
+            home: Builder(
+              builder: (context) {
                 return AdaptiveNavigationShell(
-                  metronomeViewModel: metronomeViewModel,
+                  metronomeViewModel: context.read<MetronomeViewModel>(),
                 );
               },
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _M3EAppHost extends StatefulWidget {
+  const _M3EAppHost({required this.themeMode, required this.home});
+
+  final AppThemeMode themeMode;
+  final Widget home;
+
+  @override
+  State<_M3EAppHost> createState() => _M3EAppHostState();
+}
+
+class _M3EAppHostState extends State<_M3EAppHost> {
+  late final M3EThemeController _themeController;
+  late final M3EThemeData _lightThemeData;
+  late final ThemeData _lightTheme;
+  late final ThemeData _darkTheme;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeController = M3EThemeController();
+    _lightThemeData = AppTheme.lightThemeData;
+    _lightTheme = _lightThemeData.toThemeData();
+    _darkTheme = AppTheme.darkThemeData.toThemeData();
+    _syncController(widget.themeMode);
+  }
+
+  @override
+  void didUpdateWidget(covariant _M3EAppHost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.themeMode != widget.themeMode) {
+      _syncController(widget.themeMode);
+    }
+  }
+
+  @override
+  void dispose() {
+    _themeController.dispose();
+    super.dispose();
+  }
+
+  void _syncController(AppThemeMode mode) {
+    switch (mode) {
+      case AppThemeMode.system:
+        _themeController.followSystem();
+      case AppThemeMode.light:
+        _themeController.setBrightness(Brightness.light);
+      case AppThemeMode.dark:
+        _themeController.setBrightness(Brightness.dark);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool autoTheming = widget.themeMode == AppThemeMode.system;
+    final Brightness? initialTheme = switch (widget.themeMode) {
+      AppThemeMode.system => null,
+      AppThemeMode.light => Brightness.light,
+      AppThemeMode.dark => Brightness.dark,
+    };
+
+    return M3EMaterialApp(
+      title: 'Metronome',
+      debugShowCheckedModeBanner: false,
+      data: _lightThemeData,
+      theme: _lightTheme,
+      darkTheme: _darkTheme,
+      autoTheming: autoTheming,
+      dynamicColoring: false,
+      initialTheme: initialTheme,
+      controller: _themeController,
+      home: widget.home,
     );
   }
 }
