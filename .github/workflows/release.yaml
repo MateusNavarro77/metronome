@@ -18,12 +18,22 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Cache Pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.50.0"
+          flutter-version-file: ".fvmrc"
           channel: "stable"
-          cache: true
 
       - name: Install dependencies
         run: flutter pub get
