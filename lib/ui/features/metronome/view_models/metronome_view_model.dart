@@ -37,6 +37,11 @@ class MetronomeViewModel extends ChangeNotifier {
         persistedAccent != _repository.state.isAccentEnabled) {
       _repository.setAccentEnabled(persistedAccent);
     }
+    final persistedSound = _preferencesRepository?.getSoundSettings();
+    if (persistedSound != null &&
+        persistedSound != _repository.state.soundSettings) {
+      _repository.setSoundSettings(persistedSound);
+    }
     _stateSubscription = _repository.stateChanges.listen((_) {
       notifyListeners();
     });

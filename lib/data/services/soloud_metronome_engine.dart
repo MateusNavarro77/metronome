@@ -5,28 +5,25 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 
 import '../../domain/models/beat_event.dart';
 import '../../domain/models/bpm.dart';
+import '../../domain/models/metronome_sound.dart';
+import '../../domain/models/sound_settings.dart';
 import '../../domain/models/subdivision.dart';
 import '../../domain/models/time_signature.dart';
 import '../../domain/use_cases/click_scheduler.dart';
 import 'metronome_engine.dart';
-import 'pcm_click_synthesizer.dart';
 
 /// Low-latency audio implementation of [MetronomeEngine] powered by preloaded
-/// in-memory PCM samples in `flutter_soloud` (C++ SoLoud/miniaudio engine)
-/// and drift-compensated monotonic scheduling.
+/// WAV assets in `flutter_soloud` (C++ SoLoud/miniaudio engine) and
+/// drift-compensated monotonic scheduling (NFR-LAT-02, FR-SND-01..08).
 class SoloudMetronomeEngine implements MetronomeEngine {
-  SoloudMetronomeEngine({
-    ClickScheduler scheduler = const ClickScheduler(),
-    PcmClickSynthesizer synthesizer = const PcmClickSynthesizer(),
-  }) : _scheduler = scheduler,
-       _synthesizer = synthesizer;
+  SoloudMetronomeEngine({ClickScheduler scheduler = const ClickScheduler()})
+    : _scheduler = scheduler;
 
   final ClickScheduler _scheduler;
-  final PcmClickSynthesizer _synthesizer;
   final StreamController<BeatEvent> _beatController =
       StreamController<BeatEvent>.broadcast();
 
-  final Map<BeatAccent, AudioSource> _preloadedSounds = {};
+  final Map<(MetronomeSound, BeatAccent), AudioSource> _preloadedSounds = {};
   final Stopwatch _stopwatch = Stopwatch();
 
   Timer? _nextPulseTimer;
@@ -34,6 +31,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
   bool _audioAvailable = false;
   bool _isPlaying = false;
   bool _isAccentEnabled = true;
+  SoundSettings _soundSettings = const SoundSettings();
 
   Bpm _bpm = Bpm.initial;
   TimeSignature _timeSignature = TimeSignature.fourFour;
@@ -64,13 +62,11 @@ class SoloudMetronomeEngine implements MetronomeEngine {
       if (!soloud.isInitialized) {
         await soloud.init(sampleRate: 44100, bufferSize: 512);
       }
-      for (final accent in BeatAccent.values) {
-        final wavBytes = _synthesizer.buildWavBytes(accent);
-        final source = await soloud.loadMem(
-          'click_${accent.name}.wav',
-          wavBytes,
-        );
-        _preloadedSounds[accent] = source;
+      for (final sound in MetronomeSound.values) {
+        for (final accent in BeatAccent.values) {
+          final source = await soloud.loadAsset(sound.assetPathFor(accent));
+          _preloadedSounds[(sound, accent)] = source;
+        }
       }
       _audioAvailable = true;
     } catch (_) {
@@ -85,6 +81,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     required TimeSignature timeSignature,
     required Subdivision subdivision,
     bool isAccentEnabled = true,
+    SoundSettings soundSettings = const SoundSettings(),
   }) async {
     if (!_isInitialized) {
       await initialize();
@@ -96,6 +93,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     _timeSignature = timeSignature;
     _subdivision = subdivision;
     _isAccentEnabled = isAccentEnabled;
+    _soundSettings = soundSettings;
     _currentBeat = 0;
     _currentSubdivision = 0;
     _isPlaying = true;
@@ -126,6 +124,7 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     TimeSignature? timeSignature,
     Subdivision? subdivision,
     bool? isAccentEnabled,
+    SoundSettings? soundSettings,
   }) {
     if (bpm != null) {
       _bpm = bpm;
@@ -152,6 +151,9 @@ class SoloudMetronomeEngine implements MetronomeEngine {
       _isAccentEnabled = isAccentEnabled;
       _pendingAccentEnabled = null;
     }
+    if (soundSettings != null) {
+      _soundSettings = soundSettings;
+    }
   }
 
   @override
@@ -175,6 +177,28 @@ class SoloudMetronomeEngine implements MetronomeEngine {
     if (timeSignature != null) _pendingTimeSignature = timeSignature;
     if (subdivision != null) _pendingSubdivision = subdivision;
     if (isAccentEnabled != null) _pendingAccentEnabled = isAccentEnabled;
+  }
+
+  @override
+  Future<void> previewSound({
+    required MetronomeSound sound,
+    BeatAccent accent = BeatAccent.strong,
+    double volume = 1.0,
+  }) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+    final clampedVolume = volume.clamp(0.0, 1.0);
+    if (clampedVolume <= 0.0) return;
+
+    if (_audioAvailable) {
+      final source = _preloadedSounds[(sound, accent)];
+      if (source != null) {
+        SoLoud.instance.play(source, volume: clampedVolume);
+        return;
+      }
+    }
+    SystemSound.play(SystemSoundType.click);
   }
 
   void _applyPendingBarConfigurationIfDownbeat() {
@@ -244,10 +268,13 @@ class SoloudMetronomeEngine implements MetronomeEngine {
   }
 
   void _triggerSound(BeatAccent accent) {
+    final volume = _soundSettings.effectiveVolumeFor(accent);
+    if (volume <= 0.0) return;
+
     if (_audioAvailable) {
-      final source = _preloadedSounds[accent];
+      final source = _preloadedSounds[(_soundSettings.sound, accent)];
       if (source != null) {
-        SoLoud.instance.play(source, volume: accent.defaultRelativeVolume);
+        SoLoud.instance.play(source, volume: volume);
         return;
       }
     }

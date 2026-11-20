@@ -2,6 +2,8 @@ import 'dart:async';
 
 import '../../domain/models/beat_event.dart';
 import '../../domain/models/bpm.dart';
+import '../../domain/models/metronome_sound.dart';
+import '../../domain/models/sound_settings.dart';
 import '../../domain/models/subdivision.dart';
 import '../../domain/models/time_signature.dart';
 import '../../domain/use_cases/click_scheduler.dart';
@@ -20,6 +22,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
   bool _isInitialized = false;
   bool _isPlaying = false;
   bool _isAccentEnabled = true;
+  SoundSettings _soundSettings = const SoundSettings();
   Bpm _bpm = Bpm.initial;
   TimeSignature _timeSignature = TimeSignature.fourFour;
   Subdivision _subdivision = Subdivision.none;
@@ -36,10 +39,15 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
   /// History of all [BeatEvent]s emitted since last [start].
   final List<BeatEvent> emittedEvents = [];
 
+  /// History of preview sound requests triggered via [previewSound].
+  final List<({MetronomeSound sound, BeatAccent accent, double volume})>
+  previewedSounds = [];
+
   Bpm get bpm => _bpm;
   TimeSignature get timeSignature => _timeSignature;
   Subdivision get subdivision => _subdivision;
   bool get isAccentEnabled => _isAccentEnabled;
+  SoundSettings get soundSettings => _soundSettings;
   bool get isInitialized => _isInitialized;
   bool get hasPendingBarTransition =>
       _pendingBpm != null ||
@@ -64,6 +72,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     required TimeSignature timeSignature,
     required Subdivision subdivision,
     bool isAccentEnabled = true,
+    SoundSettings soundSettings = const SoundSettings(),
   }) async {
     _isInitialized = true;
     _clearPendingConfiguration();
@@ -71,6 +80,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     _timeSignature = timeSignature;
     _subdivision = subdivision;
     _isAccentEnabled = isAccentEnabled;
+    _soundSettings = soundSettings;
     _currentBeat = 0;
     _currentSubdivision = 0;
     _elapsed = Duration.zero;
@@ -95,6 +105,7 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     TimeSignature? timeSignature,
     Subdivision? subdivision,
     bool? isAccentEnabled,
+    SoundSettings? soundSettings,
   }) {
     if (bpm != null) {
       _bpm = bpm;
@@ -117,6 +128,9 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     if (isAccentEnabled != null) {
       _isAccentEnabled = isAccentEnabled;
       _pendingAccentEnabled = null;
+    }
+    if (soundSettings != null) {
+      _soundSettings = soundSettings;
     }
   }
 
@@ -141,6 +155,20 @@ class SimulatedMetronomeEngine implements MetronomeEngine {
     if (timeSignature != null) _pendingTimeSignature = timeSignature;
     if (subdivision != null) _pendingSubdivision = subdivision;
     if (isAccentEnabled != null) _pendingAccentEnabled = isAccentEnabled;
+  }
+
+  @override
+  Future<void> previewSound({
+    required MetronomeSound sound,
+    BeatAccent accent = BeatAccent.strong,
+    double volume = 1.0,
+  }) async {
+    _isInitialized = true;
+    previewedSounds.add((
+      sound: sound,
+      accent: accent,
+      volume: volume.clamp(0.0, 1.0),
+    ));
   }
 
   void _applyPendingBarConfigurationIfDownbeat() {

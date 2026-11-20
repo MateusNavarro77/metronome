@@ -90,15 +90,21 @@ class MetronomeApp extends StatelessWidget {
                     presetLibraryRepository: presetLibrary,
                   ),
         ),
-        ChangeNotifierProxyProvider<
+        ChangeNotifierProxyProvider2<
           PreferencesRepository,
+          MetronomeRepository,
           PreferencesViewModel
         >(
           create: (context) => PreferencesViewModel(
             repository: context.read<PreferencesRepository>(),
+            metronomeRepository: context.read<MetronomeRepository>(),
           ),
-          update: (_, repository, previous) =>
-              previous ?? PreferencesViewModel(repository: repository),
+          update: (_, repository, metronomeRepository, previous) =>
+              previous ??
+              PreferencesViewModel(
+                repository: repository,
+                metronomeRepository: metronomeRepository,
+              ),
         ),
         ChangeNotifierProxyProvider2<
           PresetLibraryRepository,
