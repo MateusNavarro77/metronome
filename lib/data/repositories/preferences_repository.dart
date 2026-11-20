@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/models/app_theme_mode.dart';
+import '../../domain/models/metronome_sound.dart';
+import '../../domain/models/sound_settings.dart';
 
 /// Single source of truth for user preferences (FR-CFG-03, FR-CFG-04).
 ///
@@ -15,9 +17,15 @@ class PreferencesRepository {
   final SharedPreferences? _preferences;
   AppThemeMode _inMemoryThemeMode = AppThemeMode.system;
   bool _inMemoryAccentEnabled = true;
+  SoundSettings _inMemorySoundSettings = const SoundSettings();
 
   static const String _keyThemeMode = 'app_theme_mode';
   static const String _keyAccentEnabled = 'accent_enabled';
+  static const String _keySound = 'metronome_sound';
+  static const String _keyStrongVolume = 'sound_strong_volume';
+  static const String _keyWeakVolume = 'sound_weak_volume';
+  static const String _keySubdivisionVolume = 'sound_subdivision_volume';
+  static const String _keyMuted = 'sound_muted';
 
   /// Loads the persisted [AppThemeMode], defaulting to [AppThemeMode.system].
   AppThemeMode getThemeMode() {
@@ -70,5 +78,42 @@ class PreferencesRepository {
     final prefs = _preferences;
     if (prefs == null) return;
     await prefs.setBool(_keyAccentEnabled, enabled);
+  }
+
+  /// Loads persisted [SoundSettings], falling back to defaults (FR-SND-01..08, FR-CFG-03).
+  SoundSettings getSoundSettings() {
+    final prefs = _preferences;
+    if (prefs == null) return _inMemorySoundSettings;
+
+    final sound = MetronomeSound.fromId(prefs.getString(_keySound));
+    final strongVolume =
+        prefs.getInt(_keyStrongVolume) ?? SoundSettings.defaultStrongVolume;
+    final weakVolume =
+        prefs.getInt(_keyWeakVolume) ?? SoundSettings.defaultWeakVolume;
+    final subdivisionVolume =
+        prefs.getInt(_keySubdivisionVolume) ??
+        SoundSettings.defaultSubdivisionVolume;
+    final isMuted = prefs.getBool(_keyMuted) ?? false;
+
+    return SoundSettings.clamped(
+      sound: sound,
+      strongVolume: strongVolume,
+      weakVolume: weakVolume,
+      subdivisionVolume: subdivisionVolume,
+      isMuted: isMuted,
+    );
+  }
+
+  /// Persists [SoundSettings] to local storage.
+  Future<void> setSoundSettings(SoundSettings settings) async {
+    _inMemorySoundSettings = settings;
+    final prefs = _preferences;
+    if (prefs == null) return;
+
+    await prefs.setString(_keySound, settings.sound.id);
+    await prefs.setInt(_keyStrongVolume, settings.strongVolume);
+    await prefs.setInt(_keyWeakVolume, settings.weakVolume);
+    await prefs.setInt(_keySubdivisionVolume, settings.subdivisionVolume);
+    await prefs.setBool(_keyMuted, settings.isMuted);
   }
 }
