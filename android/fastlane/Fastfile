@@ -1,0 +1,143 @@
+default_platform(:android)
+
+PACKAGE_NAME = "com.mateusnavarro77.metronome"
+LOCALE = "en-US"
+REPO_ROOT = File.expand_path("../..", __dir__)
+METADATA_DIR = File.expand_path("metadata/android", __dir__)
+
+platform :android do
+  desc "Query Google Play tracks and return the next available versionCode"
+  private_lane :next_version_code do
+    tracks = %w[production beta alpha internal]
+    codes = tracks.flat_map do |track|
+      begin
+        google_play_track_version_codes(
+          package_name: PACKAGE_NAME,
+          track: track
+        )
+      rescue StandardError => e
+        UI.message("Skipping track '#{track}' when reading version codes: #{e.message}")
+        []
+      end
+    end
+
+    next_code = (codes.max || 1000) + 1
+    UI.important("Next versionCode resolved from Play Store: #{next_code}")
+    next_code
+  end
+
+  desc "Generate Play Store changelog (max 500 chars) from recent git commits"
+  private_lane :generate_changelog do |options|
+    version_code = options[:version_code]
+    UI.user_error!("version_code is required for generate_changelog") unless version_code
+
+    changelogs_dir = File.join(METADATA_DIR, LOCALE, "changelogs")
+    FileUtils.mkdir_p(changelogs_dir)
+
+    raw_log = Dir.chdir(REPO_ROOT) do
+      last_tag = `git describe --tags --abbrev=0 2>/dev/null`.strip
+      range = last_tag.empty? ? "-n 10" : "#{last_tag}..HEAD"
+      `git log #{range} --pretty=format:"- %s" --no-merges`.strip
+    end
+
+    if raw_log.empty?
+      default_file = File.join(changelogs_dir, "default.txt")
+      raw_log = File.exist?(default_file) ? File.read(default_file).strip : "- Bug fixes and improvements."
+    end
+
+    max_len = 500
+    changelog = if raw_log.length <= max_len
+                  raw_log
+                else
+                  "#{raw_log[0, max_len - 3].rstrip}..."
+                end
+
+    changelog_path = File.join(changelogs_dir, "#{version_code}.txt")
+    File.write(changelog_path, "#{changelog}\n")
+    UI.success("Generated changelog at #{changelog_path} (#{changelog.length} chars)")
+  end
+
+  desc "Generate Play Store phone screenshots using Flutter golden tests"
+  lane :screenshots do |options|
+    Dir.chdir(REPO_ROOT) do
+      sh("flutter", "test", "--tags", "screenshots", "--update-goldens", "test/screenshots/play_store_screenshots_test.dart")
+    end
+
+    if options[:upload].to_s == "true"
+      upload_to_play_store(
+        package_name: PACKAGE_NAME,
+        track: "internal",
+        metadata_path: METADATA_DIR,
+        skip_upload_aab: true,
+        skip_upload_apk: true,
+        skip_upload_metadata: true,
+        skip_upload_changelogs: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: false
+      )
+    end
+  end
+
+  desc "Build prod AAB with auto-incremented versionCode and upload to Play Store internal track"
+  lane :internal do
+    version_code = next_version_code
+    generate_changelog(version_code: version_code)
+
+    Dir.chdir(REPO_ROOT) do
+      sh(
+        "flutter", "build", "appbundle",
+        "--release",
+        "--flavor", "prod",
+        "--build-number", version_code.to_s
+      )
+    end
+
+    aab_path = Dir[File.join(REPO_ROOT, "build/app/outputs/bundle/prodRelease/*.aab")].first
+    UI.user_error!("Could not find release AAB in build/app/outputs/bundle/prodRelease/") unless aab_path
+
+    upload_to_play_store(
+      package_name: PACKAGE_NAME,
+      track: "internal",
+      aab: aab_path,
+      metadata_path: METADATA_DIR,
+      release_status: "completed",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promote latest internal release to beta track without rebuilding"
+  lane :promote_to_beta do
+    upload_to_play_store(
+      package_name: PACKAGE_NAME,
+      track: "internal",
+      track_promote_to: "beta",
+      metadata_path: METADATA_DIR,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promote latest beta release to production track with staged rollout"
+  lane :promote_to_prod do |options|
+    rollout = (options[:rollout] || "0.2").to_s
+    upload_to_play_store(
+      package_name: PACKAGE_NAME,
+      track: "beta",
+      track_promote_to: "production",
+      rollout: rollout,
+      metadata_path: METADATA_DIR,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
