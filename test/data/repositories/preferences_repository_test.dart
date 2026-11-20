@@ -2,6 +2,8 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
 import 'package:metronome/domain/models/app_theme_mode.dart';
+import 'package:metronome/domain/models/metronome_sound.dart';
+import 'package:metronome/domain/models/sound_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -71,6 +73,49 @@ void main() {
 
       final repo2 = PreferencesRepository(preferences: prefs);
       check(repo2.getAccentEnabled()).isFalse();
+    });
+
+    test('defaults sound settings and persists across instances', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = PreferencesRepository(preferences: prefs);
+
+      check(repo.getSoundSettings()).equals(const SoundSettings());
+
+      const custom = SoundSettings(
+        sound: MetronomeSound.drums,
+        strongVolume: 85,
+        weakVolume: 40,
+        subdivisionVolume: 15,
+        isMuted: true,
+      );
+      await repo.setSoundSettings(custom);
+      check(repo.getSoundSettings()).equals(custom);
+
+      final repo2 = PreferencesRepository(preferences: prefs);
+      check(repo2.getSoundSettings()).equals(custom);
+    });
+
+    test('clamps corrupted persisted volume values safely', () async {
+      SharedPreferences.setMockInitialValues({
+        'metronome_sound': 'wood_block',
+        'sound_strong_volume': 250,
+        'sound_weak_volume': -10,
+        'sound_subdivision_volume': 55,
+        'sound_muted': false,
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final repo = PreferencesRepository(preferences: prefs);
+
+      check(repo.getSoundSettings()).equals(
+        const SoundSettings(
+          sound: MetronomeSound.woodBlock,
+          strongVolume: 100,
+          weakVolume: 0,
+          subdivisionVolume: 55,
+          isMuted: false,
+        ),
+      );
     });
   });
 }

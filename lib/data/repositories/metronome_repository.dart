@@ -2,8 +2,10 @@ import 'dart:async';
 
 import '../../domain/models/beat_event.dart';
 import '../../domain/models/bpm.dart';
+import '../../domain/models/metronome_sound.dart';
 import '../../domain/models/metronome_state.dart';
 import '../../domain/models/preset.dart';
+import '../../domain/models/sound_settings.dart';
 import '../../domain/models/subdivision.dart';
 import '../../domain/models/time_signature.dart';
 import '../services/metronome_engine.dart';
@@ -75,6 +77,20 @@ class MetronomeRepository {
     _engine.updateConfiguration(isAccentEnabled: enabled);
     _updateState(_state.copyWith(isAccentEnabled: enabled));
   }
+
+  /// Updates the active sound timbre, volumes, and mute state (FR-SND-01..08).
+  void setSoundSettings(SoundSettings settings) {
+    if (_state.soundSettings == settings) return;
+    _engine.updateConfiguration(soundSettings: settings);
+    _updateState(_state.copyWith(soundSettings: settings));
+  }
+
+  /// Plays a preview click for [sound] when auditioning timbres (FR-SND-07).
+  Future<void> previewSound({
+    required MetronomeSound sound,
+    BeatAccent accent = BeatAccent.strong,
+    double volume = 1.0,
+  }) => _engine.previewSound(sound: sound, accent: accent, volume: volume);
 
   /// Applies all parameters of [preset] (FR-PRE-02, FR-PRE-09).
   ///
@@ -182,6 +198,7 @@ class MetronomeRepository {
       timeSignature: _state.timeSignature,
       subdivision: _state.subdivision,
       isAccentEnabled: _state.isAccentEnabled,
+      soundSettings: _state.soundSettings,
     );
   }
 

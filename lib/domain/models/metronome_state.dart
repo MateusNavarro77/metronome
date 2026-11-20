@@ -1,5 +1,6 @@
 import 'beat_event.dart';
 import 'bpm.dart';
+import 'sound_settings.dart';
 import 'subdivision.dart';
 import 'tempo_marking.dart';
 import 'time_signature.dart';
@@ -10,6 +11,7 @@ class const MetronomeState({
   this.timeSignature = TimeSignature.fourFour,
   this.subdivision = Subdivision.none,
   this.isAccentEnabled = true,
+  this.soundSettings = const SoundSettings(),
   this.isPlaying = false,
   this.currentBeat = 0,
   this.currentSubdivision = 0,
@@ -23,6 +25,7 @@ class const MetronomeState({
   final TimeSignature timeSignature;
   final Subdivision subdivision;
   final bool isAccentEnabled;
+  final SoundSettings soundSettings;
   final bool isPlaying;
 
   /// 0-based index of the current beat in the bar (`0 .. timeSignature.numerator - 1`).
@@ -54,6 +57,7 @@ class const MetronomeState({
     TimeSignature? timeSignature,
     Subdivision? subdivision,
     bool? isAccentEnabled,
+    SoundSettings? soundSettings,
     bool? isPlaying,
     int? currentBeat,
     int? currentSubdivision,
@@ -71,6 +75,7 @@ class const MetronomeState({
       timeSignature: timeSignature ?? this.timeSignature,
       subdivision: subdivision ?? this.subdivision,
       isAccentEnabled: isAccentEnabled ?? this.isAccentEnabled,
+      soundSettings: soundSettings ?? this.soundSettings,
       isPlaying: isPlaying ?? this.isPlaying,
       currentBeat: currentBeat ?? this.currentBeat,
       currentSubdivision: currentSubdivision ?? this.currentSubdivision,
@@ -99,6 +104,7 @@ class const MetronomeState({
           other.timeSignature == timeSignature &&
           other.subdivision == subdivision &&
           other.isAccentEnabled == isAccentEnabled &&
+          other.soundSettings == soundSettings &&
           other.isPlaying == isPlaying &&
           other.currentBeat == currentBeat &&
           other.currentSubdivision == currentSubdivision &&
@@ -114,6 +120,7 @@ class const MetronomeState({
     timeSignature,
     subdivision,
     isAccentEnabled,
+    soundSettings,
     isPlaying,
     currentBeat,
     currentSubdivision,
