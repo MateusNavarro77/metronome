@@ -49,8 +49,7 @@ void main() {
       check(MetronomeSound.drums.localizedLabel(en)).equals('Drums');
 
       check(MetronomeSound.click.localizedLabel(pt)).equals('Click');
-      check(MetronomeSound.woodBlock.localizedLabel(pt))
-          .equals('Bloco de Madeira');
+      check(MetronomeSound.woodBlock.localizedLabel(pt)).equals('Madeira');
       check(MetronomeSound.beep.localizedLabel(pt)).equals('Bipe');
       check(MetronomeSound.drums.localizedLabel(pt)).equals('Bateria');
 

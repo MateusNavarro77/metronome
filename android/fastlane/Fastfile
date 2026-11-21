@@ -1,7 +1,10 @@
 default_platform(:android)
 
 PACKAGE_NAME = "com.mateusnavarro77.metronome"
-LOCALE = "en-US"
+LOCALES = {
+  "en-US" => "- Bug fixes and improvements.",
+  "pt-BR" => "- Correções de bugs e melhorias."
+}.freeze
 REPO_ROOT = File.expand_path("../..", __dir__)
 METADATA_DIR = File.expand_path("metadata/android", __dir__)
 
@@ -26,13 +29,10 @@ platform :android do
     next_code
   end
 
-  desc "Generate Play Store changelog (max 500 chars) from recent git commits"
+  desc "Generate Play Store changelogs (max 500 chars) from recent git commits for all locales"
   private_lane :generate_changelog do |options|
     version_code = options[:version_code]
     UI.user_error!("version_code is required for generate_changelog") unless version_code
-
-    changelogs_dir = File.join(METADATA_DIR, LOCALE, "changelogs")
-    FileUtils.mkdir_p(changelogs_dir)
 
     raw_log = Dir.chdir(REPO_ROOT) do
       last_tag = `git describe --tags --abbrev=0 2>/dev/null`.strip
@@ -40,21 +40,27 @@ platform :android do
       `git log #{range} --pretty=format:"- %s" --no-merges`.strip
     end
 
-    if raw_log.empty?
-      default_file = File.join(changelogs_dir, "default.txt")
-      raw_log = File.exist?(default_file) ? File.read(default_file).strip : "- Bug fixes and improvements."
+    LOCALES.each do |locale, fallback_text|
+      changelogs_dir = File.join(METADATA_DIR, locale, "changelogs")
+      FileUtils.mkdir_p(changelogs_dir)
+
+      locale_log = raw_log
+      if locale_log.empty?
+        default_file = File.join(changelogs_dir, "default.txt")
+        locale_log = File.exist?(default_file) ? File.read(default_file).strip : fallback_text
+      end
+
+      max_len = 500
+      changelog = if locale_log.length <= max_len
+                    locale_log
+                  else
+                    "#{locale_log[0, max_len - 3].rstrip}..."
+                  end
+
+      changelog_path = File.join(changelogs_dir, "#{version_code}.txt")
+      File.write(changelog_path, "#{changelog}\n")
+      UI.success("Generated changelog at #{changelog_path} (#{changelog.length} chars)")
     end
-
-    max_len = 500
-    changelog = if raw_log.length <= max_len
-                  raw_log
-                else
-                  "#{raw_log[0, max_len - 3].rstrip}..."
-                end
-
-    changelog_path = File.join(changelogs_dir, "#{version_code}.txt")
-    File.write(changelog_path, "#{changelog}\n")
-    UI.success("Generated changelog at #{changelog_path} (#{changelog.length} chars)")
   end
 
   desc "Generate Play Store phone screenshots using Flutter golden tests"

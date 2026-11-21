@@ -136,7 +136,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: play-store-screenshots
-          path: android/fastlane/metadata/android/en-US/images/phoneScreenshots/*.png
+          path: android/fastlane/metadata/android/*/images/phoneScreenshots/*.png
 
       - name: Cleanup signing files
         if: always()

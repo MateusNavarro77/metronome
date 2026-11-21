@@ -78,7 +78,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get soundClickDescription => 'Clique nítido de precisão de estúdio';
 
   @override
-  String get soundWoodBlockLabel => 'Bloco de Madeira';
+  String get soundWoodBlockLabel => 'Madeira';
 
   @override
   String get soundWoodBlockDescription =>
