@@ -115,7 +115,9 @@ void main() {
       expect(find.text('APPEARANCE'), findsOneWidget);
 
       // Switch to Light theme
-      await tester.tap(find.text('Light'));
+      await tester.tap(find.byKey(const Key('theme_mode_dropdown')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Light').last);
       await tester.pumpAndSettle();
 
       // Return to Metronome view via navigation rail
@@ -141,6 +143,29 @@ void main() {
       await tester.tap(find.byKey(const Key('rail_destination_presets')));
       await tester.pumpAndSettle();
       expect(find.text('Odd Meter Triplets'), findsOneWidget);
+
+      // Switch language to Portuguese in Settings and verify localized UI
+      await tester.tap(find.byKey(const Key('rail_destination_settings')));
+      await tester.pumpAndSettle();
+      expect(find.text('LANGUAGE'), findsOneWidget);
+      final languageDropdown = find.byKey(const Key('language_dropdown'));
+      await tester.ensureVisible(languageDropdown);
+      await tester.tap(languageDropdown);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Português').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('PREFERÊNCIAS'), findsOneWidget);
+      expect(find.text('APARÊNCIA'), findsOneWidget);
+      expect(find.text('IDIOMA'), findsOneWidget);
+      expect(find.text('SONS E VOLUMES'), findsOneWidget);
+
+      // Navigate back to Metronome and verify Portuguese labels
+      await tester.tap(find.byKey(const Key('rail_destination_metronome')));
+      await tester.pumpAndSettle();
+      expect(find.text('METRÔNOMO'), findsOneWidget);
+      expect(find.text('COMPASSO'), findsOneWidget);
+      expect(find.text('SUBDIVISÃO'), findsOneWidget);
 
       await tester.runAsync(() => GoogleFonts.pendingFonts());
       await tester.pump();

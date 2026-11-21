@@ -14,17 +14,16 @@ enum const TempoMarking(
   final String label,
   final int minBpm,
   final int maxBpm,
-  final String description,
 ) {
-  largo('Largo', 30, 59, 'Broad and very slow'),
-  larghetto('Larghetto', 60, 65, 'Rather broad and slow'),
-  adagio('Adagio', 66, 75, 'Slow and stately'),
-  andante('Andante', 76, 107, 'At a walking pace'),
-  moderato('Moderato', 108, 119, 'Moderate speed'),
-  allegro('Allegro', 120, 155, 'Fast, quickly, and bright'),
-  vivace('Vivace', 156, 175, 'Lively and fast'),
-  presto('Presto', 176, 199, 'Very fast'),
-  prestissimo('Prestissimo', 200, 300, 'Extremely fast');
+  largo('Largo', 30, 59),
+  larghetto('Larghetto', 60, 65),
+  adagio('Adagio', 66, 75),
+  andante('Andante', 76, 107),
+  moderato('Moderato', 108, 119),
+  allegro('Allegro', 120, 155),
+  vivace('Vivace', 156, 175),
+  presto('Presto', 176, 199),
+  prestissimo('Prestissimo', 200, 300);
 
   /// Resolves the [TempoMarking] corresponding to a given [bpm] value.
   ///

@@ -5,8 +5,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
+import 'package:metronome/domain/models/app_language.dart';
 import 'package:metronome/domain/models/app_theme_mode.dart';
 import 'package:metronome/domain/models/metronome_sound.dart';
+import 'package:metronome/l10n/app_localizations.dart';
+import 'package:metronome/ui/core/l10n/l10n_extensions.dart';
 import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/preferences/view_models/preferences_view_model.dart';
 import 'package:metronome/ui/features/preferences/views/preferences_view.dart';
@@ -35,6 +38,8 @@ void main() {
             child: MaterialApp(
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
+              localizationsDelegates: appLocalizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: const PreferencesView(),
             ),
           ),
@@ -81,23 +86,44 @@ void main() {
           findsOneWidget,
         );
 
-        // Switch theme mode
-        expect(
-          find.byKey(const Key('theme_mode_segmented_button')),
-          findsOneWidget,
-        );
-        await tester.tap(find.text('Light'));
+        // Switch theme mode via M3EDropdownMenu
+        final themeDropdown = find.byKey(const Key('theme_mode_dropdown'));
+        expect(themeDropdown, findsOneWidget);
+        await tester.tap(themeDropdown);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Light').last);
         await tester.pumpAndSettle();
         check(viewModel.themeMode).equals(AppThemeMode.light);
 
-        await tester.tap(find.text('Dark'));
+        await tester.tap(themeDropdown);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Dark').last);
         await tester.pumpAndSettle();
         check(viewModel.themeMode).equals(AppThemeMode.dark);
 
+        // Re-tapping the active item keeps it selected instead of clearing
+        await tester.tap(themeDropdown);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Dark').last);
+        await tester.pumpAndSettle();
+        check(viewModel.themeMode).equals(AppThemeMode.dark);
+        expect(find.text('Dark'), findsOneWidget);
+
+        // Switch language mode via M3EDropdownMenu
+        final languageDropdown = find.byKey(const Key('language_dropdown'));
+        expect(languageDropdown, findsOneWidget);
+        await tester.ensureVisible(languageDropdown);
+        await tester.tap(languageDropdown);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Português').last);
+        await tester.pumpAndSettle();
+        check(viewModel.language).equals(AppLanguage.portuguese);
+
         // Verify all 4 timbres are shown inside Sounds section and tapping triggers preview
+        final enL10n = await AppLocalizations.delegate.load(const Locale('en'));
         for (final sound in MetronomeSound.values) {
           expect(find.byKey(Key('sound_option_${sound.id}')), findsOneWidget);
-          expect(find.text(sound.label), findsOneWidget);
+          expect(find.text(sound.localizedLabel(enL10n)), findsOneWidget);
         }
 
         final woodBlockFinder = find.byKey(
@@ -169,6 +195,8 @@ void main() {
             value: viewModel,
             child: MaterialApp(
               theme: AppTheme.lightTheme,
+              localizationsDelegates: appLocalizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: const PreferencesView(),
             ),
           ),
@@ -196,6 +224,8 @@ void main() {
           value: viewModel,
           child: MaterialApp(
             theme: AppTheme.darkTheme,
+            localizationsDelegates: appLocalizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Builder(
               builder: (context) {
                 return ElevatedButton(

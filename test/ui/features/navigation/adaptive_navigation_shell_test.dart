@@ -6,6 +6,8 @@ import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
 import 'package:metronome/data/repositories/preset_library_repository.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
+import 'package:metronome/l10n/app_localizations.dart';
+import 'package:metronome/ui/core/l10n/l10n_extensions.dart';
 import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/navigation/views/adaptive_navigation_shell.dart';
@@ -33,6 +35,8 @@ Widget _buildTestApp({
     ],
     child: MaterialApp(
       theme: AppTheme.darkTheme,
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: AdaptiveNavigationShell(metronomeViewModel: metronomeViewModel),
     ),
   );

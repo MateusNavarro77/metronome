@@ -1,16 +1,16 @@
 /// Accent level of a beat or subdivision click (FR-CMP-02, FR-CMP-05, FR-SUB-02).
-enum const BeatAccent(final String label, final double defaultRelativeVolume) {
+enum const BeatAccent(final double defaultRelativeVolume) {
   /// First beat of the bar (strong accent).
-  strong('Strong', 1.0),
+  strong(1.0),
 
   /// Secondary group accent in compound meters (e.g. beat 4 in 6/8).
-  medium('Medium', 0.8),
+  medium(0.8),
 
   /// Remaining main beats of the bar (weak beat).
-  weak('Weak', 0.65),
+  weak(0.65),
 
   /// Subdivision pulse inside a beat (quietest).
-  subdivision('Subdivision', 0.35),
+  subdivision(0.35),
 }
 
 /// Musical time signature such as 2/4, 3/4, 4/4, or 6/8 (FR-CMP-01, FR-CMP-03).

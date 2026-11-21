@@ -103,7 +103,7 @@ class PresetLibraryRepository {
     final trimmedName = name.trim();
     final preset = Preset(
       id: _nextId('preset', now),
-      name: trimmedName.isEmpty ? 'Untitled Preset' : trimmedName,
+      name: trimmedName,
       bpm: bpm,
       timeSignature: timeSignature,
       subdivision: subdivision,
@@ -127,7 +127,7 @@ class PresetLibraryRepository {
     }
     final trimmedName = updated.name.trim();
     final saved = updated.copyWith(
-      name: trimmedName.isEmpty ? 'Untitled Preset' : trimmedName,
+      name: trimmedName,
       note: updated.note.trim(),
       updatedAt: _clock(),
     );
@@ -137,8 +137,12 @@ class PresetLibraryRepository {
     return saved;
   }
 
-  /// Duplicates an existing preset with `' (Copy)'` suffix (FR-PRE-03).
-  Future<Preset> duplicatePreset(String presetId) async {
+  /// Duplicates an existing preset using [duplicatedName] provided by the caller
+  /// (FR-PRE-03).
+  Future<Preset> duplicatePreset(
+    String presetId, {
+    required String duplicatedName,
+  }) async {
     final original = getPresetById(presetId);
     if (original == null) {
       throw StateError('Preset not found: $presetId');
@@ -146,7 +150,7 @@ class PresetLibraryRepository {
     final now = _clock();
     final copy = original.copyWith(
       id: _nextId('preset', now),
-      name: '${original.name} (Copy)',
+      name: duplicatedName.trim(),
       createdAt: now,
       updatedAt: now,
     );
@@ -204,7 +208,7 @@ class PresetLibraryRepository {
     final trimmedName = name.trim();
     final setlist = Setlist(
       id: _nextId('setlist', now),
-      name: trimmedName.isEmpty ? 'Untitled Setlist' : trimmedName,
+      name: trimmedName,
       presetIds: List<String>.unmodifiable(presetIds),
       createdAt: now,
       updatedAt: now,
@@ -222,10 +226,7 @@ class PresetLibraryRepository {
       throw StateError('Setlist not found: ${updated.id}');
     }
     final trimmedName = updated.name.trim();
-    final saved = updated.copyWith(
-      name: trimmedName.isEmpty ? 'Untitled Setlist' : trimmedName,
-      updatedAt: _clock(),
-    );
+    final saved = updated.copyWith(name: trimmedName, updatedAt: _clock());
     _setlists[index] = saved;
     await _persistSetlists();
     _notifyChanges();

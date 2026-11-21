@@ -1,6 +1,7 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
+import 'package:metronome/domain/models/app_language.dart';
 import 'package:metronome/domain/models/app_theme_mode.dart';
 import 'package:metronome/domain/models/metronome_sound.dart';
 import 'package:metronome/domain/models/sound_settings.dart';
@@ -43,6 +44,10 @@ void main() {
       check(repo.getThemeMode()).equals(AppThemeMode.system);
       await repo.setThemeMode(AppThemeMode.light);
       check(repo.getThemeMode()).equals(AppThemeMode.light);
+
+      check(repo.getLanguage()).equals(AppLanguage.system);
+      await repo.setLanguage(AppLanguage.portuguese);
+      check(repo.getLanguage()).equals(AppLanguage.portuguese);
 
       check(repo.getAccentEnabled()).isTrue();
       await repo.setAccentEnabled(false);
@@ -95,6 +100,26 @@ void main() {
       final repo2 = PreferencesRepository(preferences: prefs);
       check(repo2.getSoundSettings()).equals(custom);
     });
+
+    test(
+      'defaults to AppLanguage.system and persists language choice',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final repo = PreferencesRepository(preferences: prefs);
+
+        check(repo.getLanguage()).equals(AppLanguage.system);
+
+        await repo.setLanguage(AppLanguage.portuguese);
+        check(repo.getLanguage()).equals(AppLanguage.portuguese);
+
+        final repo2 = PreferencesRepository(preferences: prefs);
+        check(repo2.getLanguage()).equals(AppLanguage.portuguese);
+
+        await repo2.setLanguage(AppLanguage.english);
+        check(repo2.getLanguage()).equals(AppLanguage.english);
+      },
+    );
 
     test('clamps corrupted persisted volume values safely', () async {
       SharedPreferences.setMockInitialValues({

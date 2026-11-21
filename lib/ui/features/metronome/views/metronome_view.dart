@@ -2,6 +2,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
 
+import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../presets/views/widgets/preset_editor_sheet.dart';
 import '../view_models/metronome_view_model.dart';
@@ -44,9 +45,10 @@ class MetronomeView extends StatelessWidget {
     );
     if (saved == null || !context.mounted) return;
 
+    final l10n = context.l10n;
     M3ESnackbar.show(
       context,
-      message: 'Saved preset "${saved.name}"',
+      message: l10n.savedPresetSnackbar(saved.displayName(l10n)),
       duration: const Duration(seconds: 2),
     );
   }
@@ -169,8 +171,9 @@ class MetronomeView extends StatelessWidget {
                                   setlist: viewModel.activeSetlist!,
                                   currentPreset:
                                       viewModel.currentSetlistPreset!,
-                                  positionLabel:
-                                      viewModel.activeSetlistPositionLabel,
+                                  currentPosition:
+                                      viewModel.activeSetlistCurrentPosition,
+                                  totalCount: viewModel.activeSetlistTotal,
                                   canStepPrevious:
                                       viewModel.canStepPreviousSetlistItem,
                                   canStepNext: viewModel.canStepNextSetlistItem,
@@ -214,11 +217,12 @@ class _HeaderBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'METRONOME',
+          l10n.metronomeHeader,
           style: context.textTheme.labelMedium?.copyWith(
             color: context.colorScheme.onSurface,
             letterSpacing: 2.2,
@@ -229,7 +233,7 @@ class _HeaderBar extends StatelessWidget {
             key: const Key('save_preset_header_button'),
             size: M3EButtonSize.xs,
             icon: const Icon(Icons.bookmark_add_outlined),
-            label: const Text('Save Preset'),
+            label: Text(l10n.savePresetAction),
             onPressed: onSavePreset,
           ),
       ],

@@ -1,0 +1,838 @@
+{
+  "@@locale": "en",
+  "appTitle": "Metronome",
+  "@appTitle": {
+    "description": "Application title"
+  },
+
+  "navMetronome": "Metronome",
+  "@navMetronome": {
+    "description": "Navigation label for the Metronome screen"
+  },
+  "navPresets": "Presets",
+  "@navPresets": {
+    "description": "Navigation label for the Presets screen"
+  },
+  "navSetlists": "Setlists",
+  "@navSetlists": {
+    "description": "Navigation label for the Setlists screen"
+  },
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "Navigation label for the Settings screen"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Generic cancel button label"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Generic save button label"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Generic create button label"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Generic delete button label"
+  },
+  "activeBadge": "ACTIVE",
+  "@activeBadge": {
+    "description": "Badge indicating the currently active preset or setlist"
+  },
+  "bpmUnit": "BPM",
+  "@bpmUnit": {
+    "description": "Beats per minute unit label"
+  },
+  "untitledPreset": "Untitled Preset",
+  "@untitledPreset": {
+    "description": "Fallback display name when a preset has no name"
+  },
+  "untitledSetlist": "Untitled Setlist",
+  "@untitledSetlist": {
+    "description": "Fallback display name when a setlist has no name"
+  },
+  "presetCopyName": "{originalName} (Copy)",
+  "@presetCopyName": {
+    "description": "Name template when duplicating a preset",
+    "placeholders": {
+      "originalName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "themeModeSystem": "System",
+  "@themeModeSystem": {
+    "description": "Theme option matching the device system theme"
+  },
+  "themeModeLight": "Light",
+  "@themeModeLight": {
+    "description": "Light theme option"
+  },
+  "themeModeDark": "Dark",
+  "@themeModeDark": {
+    "description": "Dark theme option"
+  },
+
+  "languageSystem": "System",
+  "@languageSystem": {
+    "description": "Language option matching the device system locale"
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language option"
+  },
+  "languagePortuguese": "Português",
+  "@languagePortuguese": {
+    "description": "Portuguese language option"
+  },
+
+  "soundClickLabel": "Click",
+  "@soundClickLabel": {
+    "description": "Display label for the Click sound timbre"
+  },
+  "soundClickDescription": "Crisp studio precision click",
+  "@soundClickDescription": {
+    "description": "Accessible description for the Click sound timbre"
+  },
+  "soundWoodBlockLabel": "Wood Block",
+  "@soundWoodBlockLabel": {
+    "description": "Display label for the Wood Block sound timbre"
+  },
+  "soundWoodBlockDescription": "Warm resonant wooden block",
+  "@soundWoodBlockDescription": {
+    "description": "Accessible description for the Wood Block sound timbre"
+  },
+  "soundBeepLabel": "Beep",
+  "@soundBeepLabel": {
+    "description": "Display label for the Beep sound timbre"
+  },
+  "soundBeepDescription": "Clear digital metronome tone",
+  "@soundBeepDescription": {
+    "description": "Accessible description for the Beep sound timbre"
+  },
+  "soundDrumsLabel": "Drums",
+  "@soundDrumsLabel": {
+    "description": "Display label for the Drums sound timbre"
+  },
+  "soundDrumsDescription": "Acoustic kick, rim & hi-hat",
+  "@soundDrumsDescription": {
+    "description": "Accessible description for the Drums sound timbre"
+  },
+
+  "subdivisionQuarter": "Quarter",
+  "@subdivisionQuarter": {
+    "description": "Display label for quarter-note (1 pulse per beat) subdivision"
+  },
+  "subdivisionEighths": "Eighths",
+  "@subdivisionEighths": {
+    "description": "Display label for eighth-note (2 pulses per beat) subdivision"
+  },
+  "subdivisionTriplets": "Triplets",
+  "@subdivisionTriplets": {
+    "description": "Display label for triplet (3 pulses per beat) subdivision"
+  },
+  "subdivisionSixteenths": "Sixteenths",
+  "@subdivisionSixteenths": {
+    "description": "Display label for sixteenth-note (4 pulses per beat) subdivision"
+  },
+  "pulsesPerBeat": "{count, plural, =1{1 pulse per beat} other{{count} pulses per beat}}",
+  "@pulsesPerBeat": {
+    "description": "Subtitle showing how many pulses occur per beat",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "subdivisionOptionSemantics": "Subdivision {label} ({count} per beat)",
+  "@subdivisionOptionSemantics": {
+    "description": "Accessibility label for a subdivision option",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "beatAccentStrong": "Strong",
+  "@beatAccentStrong": {
+    "description": "Display label for strong beat accent"
+  },
+  "beatAccentMedium": "Medium",
+  "@beatAccentMedium": {
+    "description": "Display label for medium beat accent"
+  },
+  "beatAccentWeak": "Weak",
+  "@beatAccentWeak": {
+    "description": "Display label for weak beat accent"
+  },
+  "beatAccentSubdivision": "Subdivision",
+  "@beatAccentSubdivision": {
+    "description": "Display label for subdivision click accent"
+  },
+
+  "metronomeHeader": "METRONOME",
+  "@metronomeHeader": {
+    "description": "Header title on the main metronome screen"
+  },
+  "savePresetAction": "Save Preset",
+  "@savePresetAction": {
+    "description": "Header button label to save current metronome settings as a preset"
+  },
+  "savedPresetSnackbar": "Saved preset \"{name}\"",
+  "@savedPresetSnackbar": {
+    "description": "Snackbar confirmation after saving a preset",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "beatIndicatorPlayingSemantics": "Beat {beat} of {total}",
+  "@beatIndicatorPlayingSemantics": {
+    "description": "Accessibility label for active beat indicator while playing",
+    "placeholders": {
+      "beat": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "beatIndicatorStoppedSemantics": "Pulse indicator stopped, {beatCount, plural, =1{1 beat} other{{beatCount} beats}} per bar",
+  "@beatIndicatorStoppedSemantics": {
+    "description": "Accessibility label for beat indicator when stopped",
+    "placeholders": {
+      "beatCount": {
+        "type": "int"
+      }
+    }
+  },
+
+  "decreaseBpmSemantics": "Decrease BPM by 1",
+  "@decreaseBpmSemantics": {
+    "description": "Tooltip and accessibility label for BPM decrement button"
+  },
+  "increaseBpmSemantics": "Increase BPM by 1",
+  "@increaseBpmSemantics": {
+    "description": "Tooltip and accessibility label for BPM increment button"
+  },
+  "bpmValueSemantics": "{bpm} beats per minute, {tempoMarking}",
+  "@bpmValueSemantics": {
+    "description": "Accessibility label for hero BPM display",
+    "placeholders": {
+      "bpm": {
+        "type": "int"
+      },
+      "tempoMarking": {
+        "type": "String"
+      }
+    }
+  },
+  "bpmSliderSemantics": "BPM quick adjust slider",
+  "@bpmSliderSemantics": {
+    "description": "Accessibility label for BPM slider"
+  },
+  "bpmWithUnit": "{bpm} BPM",
+  "@bpmWithUnit": {
+    "description": "BPM numeric value with unit",
+    "placeholders": {
+      "bpm": {
+        "type": "int"
+      }
+    }
+  },
+
+  "tapTempoSemantics": "Tap tempo",
+  "@tapTempoSemantics": {
+    "description": "Accessibility label for Tap Tempo button"
+  },
+  "tapTempoLabel": "TAP TEMPO",
+  "@tapTempoLabel": {
+    "description": "Visible label on Tap Tempo button"
+  },
+  "stopMetronomeSemantics": "Stop metronome",
+  "@stopMetronomeSemantics": {
+    "description": "Accessibility label for Play/Stop button while playing"
+  },
+  "startMetronomeSemantics": "Start metronome",
+  "@startMetronomeSemantics": {
+    "description": "Accessibility label for Play/Stop button while stopped"
+  },
+
+  "timeSignatureCaption": "TIME SIG",
+  "@timeSignatureCaption": {
+    "description": "Compact caption for time signature selector card"
+  },
+  "timeSignatureSelectorSemantics": "Time signature {label}. Tap to change.",
+  "@timeSignatureSelectorSemantics": {
+    "description": "Accessibility label for time signature selector card",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "subdivisionCaption": "SUBDIVISION",
+  "@subdivisionCaption": {
+    "description": "Compact caption for subdivision selector card"
+  },
+  "subdivisionSelectorSemantics": "Subdivision {label}. Tap to change.",
+  "@subdivisionSelectorSemantics": {
+    "description": "Accessibility label for subdivision selector card",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "downbeatAccentOnTooltip": "Downbeat accent ON",
+  "@downbeatAccentOnTooltip": {
+    "description": "Tooltip for accent toggle when enabled"
+  },
+  "downbeatAccentOffTooltip": "Downbeat accent OFF",
+  "@downbeatAccentOffTooltip": {
+    "description": "Tooltip for accent toggle when disabled"
+  },
+  "downbeatAccentOnSemantics": "Accent on Beat 1 enabled",
+  "@downbeatAccentOnSemantics": {
+    "description": "Accessibility label for accent toggle when enabled"
+  },
+  "downbeatAccentOffSemantics": "Accent on Beat 1 disabled",
+  "@downbeatAccentOffSemantics": {
+    "description": "Accessibility label for accent toggle when disabled"
+  },
+
+  "timeSignatureSheetTitle": "TIME SIGNATURE",
+  "@timeSignatureSheetTitle": {
+    "description": "Title of the time signature bottom sheet"
+  },
+  "timeSignaturePresetsSection": "PRESETS",
+  "@timeSignaturePresetsSection": {
+    "description": "Section header for standard preset time signatures"
+  },
+  "timeSignatureOptionSemantics": "Time signature {label}",
+  "@timeSignatureOptionSemantics": {
+    "description": "Accessibility label for a time signature preset pill",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "customMeterSection": "CUSTOM METER",
+  "@customMeterSection": {
+    "description": "Section header for custom numerator/denominator controls"
+  },
+  "beatsPerBarLabel": "BEATS PER BAR",
+  "@beatsPerBarLabel": {
+    "description": "Label for custom time signature numerator"
+  },
+  "numeratorRangeLabel": "Numerator (1–16)",
+  "@numeratorRangeLabel": {
+    "description": "Helper label showing valid numerator range"
+  },
+  "decreaseBeatsPerBarSemantics": "Decrease beats per bar",
+  "@decreaseBeatsPerBarSemantics": {
+    "description": "Tooltip and accessibility label for decrementing beats per bar"
+  },
+  "increaseBeatsPerBarSemantics": "Increase beats per bar",
+  "@increaseBeatsPerBarSemantics": {
+    "description": "Tooltip and accessibility label for incrementing beats per bar"
+  },
+  "noteValueDenominatorLabel": "NOTE VALUE (DENOMINATOR)",
+  "@noteValueDenominatorLabel": {
+    "description": "Label for custom time signature denominator"
+  },
+  "denominatorSemantics": "Denominator {denom}",
+  "@denominatorSemantics": {
+    "description": "Accessibility label for denominator pill",
+    "placeholders": {
+      "denom": {
+        "type": "int"
+      }
+    }
+  },
+  "subdivisionsSheetTitle": "SUBDIVISIONS",
+  "@subdivisionsSheetTitle": {
+    "description": "Title of the subdivisions bottom sheet"
+  },
+
+  "nextBarBadge": "NEXT BAR",
+  "@nextBarBadge": {
+    "description": "Badge indicating a pending bar-synced setlist transition"
+  },
+  "exitSetlistTooltip": "Exit setlist",
+  "@exitSetlistTooltip": {
+    "description": "Tooltip for closing the active setlist stepper bar"
+  },
+  "previousSongSemantics": "Previous song in setlist",
+  "@previousSongSemantics": {
+    "description": "Tooltip and accessibility label for stepping to previous song"
+  },
+  "nextSongSemantics": "Next song in setlist",
+  "@nextSongSemantics": {
+    "description": "Tooltip and accessibility label for stepping to next song"
+  },
+  "setlistPosition": "{current} of {total}",
+  "@setlistPosition": {
+    "description": "Setlist song position indicator",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+
+  "preferencesHeader": "PREFERENCES",
+  "@preferencesHeader": {
+    "description": "Header title on the Preferences screen"
+  },
+  "backToMetronomeTooltip": "Back to metronome",
+  "@backToMetronomeTooltip": {
+    "description": "Tooltip for back button on Preferences screen"
+  },
+  "appearanceSectionHeader": "APPEARANCE",
+  "@appearanceSectionHeader": {
+    "description": "Section header for theme settings"
+  },
+  "appearanceDescription": "Choose between dark mode, light mode, or match your device system appearance.",
+  "@appearanceDescription": {
+    "description": "Description text in the Appearance card"
+  },
+  "languageSectionHeader": "LANGUAGE",
+  "@languageSectionHeader": {
+    "description": "Section header for language settings"
+  },
+  "languageDescription": "Choose the app language or follow your device system language.",
+  "@languageDescription": {
+    "description": "Description text in the Language card"
+  },
+  "soundsSectionHeader": "SOUNDS & VOLUMES",
+  "@soundsSectionHeader": {
+    "description": "Section header for audio timbre and volume settings"
+  },
+  "soundsDescription": "Select the click timbre, balance strong, weak, and subdivision volumes, or mute audio while keeping the visual pulse.",
+  "@soundsDescription": {
+    "description": "Description text in the Sounds & Volumes card"
+  },
+  "muteAudioTitle": "Mute audio",
+  "@muteAudioTitle": {
+    "description": "Title for mute audio switch row"
+  },
+  "muteAudioSubtitle": "Silence click while keeping visual beat indicator active",
+  "@muteAudioSubtitle": {
+    "description": "Subtitle for mute audio switch row"
+  },
+  "strongBeatVolumeLabel": "Strong Beat",
+  "@strongBeatVolumeLabel": {
+    "description": "Slider label for strong beat volume"
+  },
+  "weakBeatsVolumeLabel": "Weak Beats",
+  "@weakBeatsVolumeLabel": {
+    "description": "Slider label for weak beats volume"
+  },
+  "subdivisionsVolumeLabel": "Subdivisions",
+  "@subdivisionsVolumeLabel": {
+    "description": "Slider label for subdivisions volume"
+  },
+  "volumeSliderSemantics": "{label} volume",
+  "@volumeSliderSemantics": {
+    "description": "Accessibility label for a volume slider",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+
+  "presetsHeader": "PRESETS",
+  "@presetsHeader": {
+    "description": "Header title on the Presets screen"
+  },
+  "newPresetButton": "New Preset",
+  "@newPresetButton": {
+    "description": "Primary button label to create a new preset"
+  },
+  "searchPresetsPlaceholder": "Search presets by name...",
+  "@searchPresetsPlaceholder": {
+    "description": "Placeholder text in the presets search field"
+  },
+  "clearSearchTooltip": "Clear search",
+  "@clearSearchTooltip": {
+    "description": "Tooltip for clearing the preset search field"
+  },
+  "presetCardSemantics": "{name}, {bpm} BPM, {timeSignature}",
+  "@presetCardSemantics": {
+    "description": "Accessibility label for a preset card",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "bpm": {
+        "type": "int"
+      },
+      "timeSignature": {
+        "type": "String"
+      }
+    }
+  },
+  "unfavoritePresetTooltip": "Unfavorite {name}",
+  "@unfavoritePresetTooltip": {
+    "description": "Tooltip to remove a preset from favorites",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "favoritePresetTooltip": "Favorite {name}",
+  "@favoritePresetTooltip": {
+    "description": "Tooltip to mark a preset as favorite",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "presetBpmTempoSummary": "{bpm} BPM · {tempoMarking}",
+  "@presetBpmTempoSummary": {
+    "description": "Badge text combining BPM and tempo marking",
+    "placeholders": {
+      "bpm": {
+        "type": "int"
+      },
+      "tempoMarking": {
+        "type": "String"
+      }
+    }
+  },
+  "accentOnBadge": "Accent ON",
+  "@accentOnBadge": {
+    "description": "Preset parameter badge when downbeat accent is enabled"
+  },
+  "accentOffBadge": "Accent OFF",
+  "@accentOffBadge": {
+    "description": "Preset parameter badge when downbeat accent is disabled"
+  },
+  "editPresetTooltip": "Edit {name}",
+  "@editPresetTooltip": {
+    "description": "Tooltip for editing a preset",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "duplicatePresetTooltip": "Duplicate {name}",
+  "@duplicatePresetTooltip": {
+    "description": "Tooltip for duplicating a preset",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deletePresetTooltip": "Delete {name}",
+  "@deletePresetTooltip": {
+    "description": "Tooltip for deleting a preset",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noPresetsMatchQuery": "No presets match \"{query}\"",
+  "@noPresetsMatchQuery": {
+    "description": "Empty search state title",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "noPresetsSavedTitle": "No presets saved yet",
+  "@noPresetsSavedTitle": {
+    "description": "Empty presets library title"
+  },
+  "noPresetsMatchSubtitle": "Try another keyword or clear your search filter.",
+  "@noPresetsMatchSubtitle": {
+    "description": "Empty search state subtitle"
+  },
+  "noPresetsSavedSubtitle": "Save tempo, time signature, subdivision, and rehearsal notes for one-tap recall.",
+  "@noPresetsSavedSubtitle": {
+    "description": "Empty presets library subtitle"
+  },
+  "clearSearchButton": "Clear Search",
+  "@clearSearchButton": {
+    "description": "Button label to clear search filter"
+  },
+  "createPresetButton": "Create Preset",
+  "@createPresetButton": {
+    "description": "Button label to create the first preset"
+  },
+  "deletePresetDialogTitle": "Delete Preset?",
+  "@deletePresetDialogTitle": {
+    "description": "Title of delete preset confirmation dialog"
+  },
+  "deletePresetDialogMessage": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+  "@deletePresetDialogMessage": {
+    "description": "Confirmation message for deleting a preset",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deletePresetSetlistWarning": "{count, plural, =1{Warning: Used in 1 setlist: {setlistNames}. Deleting this preset will remove it from those setlists.} other{Warning: Used in {count} setlists: {setlistNames}. Deleting this preset will remove it from those setlists.}}",
+  "@deletePresetSetlistWarning": {
+    "description": "Warning shown when deleting a preset that belongs to one or more setlists",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "setlistNames": {
+        "type": "String"
+      }
+    }
+  },
+
+  "presetNameRequiredError": "Enter a preset name to save.",
+  "@presetNameRequiredError": {
+    "description": "Validation error when saving a preset without a name"
+  },
+  "editPresetSheetTitle": "EDIT PRESET",
+  "@editPresetSheetTitle": {
+    "description": "Title of the preset editor sheet when editing"
+  },
+  "newPresetSheetTitle": "NEW PRESET",
+  "@newPresetSheetTitle": {
+    "description": "Title of the preset editor sheet when creating"
+  },
+  "removeFromFavoritesTooltip": "Remove from favorites",
+  "@removeFromFavoritesTooltip": {
+    "description": "Tooltip to unstar a preset in editor sheet"
+  },
+  "markAsFavoriteTooltip": "Mark as favorite",
+  "@markAsFavoriteTooltip": {
+    "description": "Tooltip to star a preset in editor sheet"
+  },
+  "presetNameLabel": "Preset name",
+  "@presetNameLabel": {
+    "description": "Input label for preset name"
+  },
+  "presetNamePlaceholder": "e.g. Opening Groove",
+  "@presetNamePlaceholder": {
+    "description": "Input placeholder for preset name"
+  },
+  "presetNoteLabel": "Note (optional)",
+  "@presetNoteLabel": {
+    "description": "Input label for optional preset rehearsal note"
+  },
+  "presetNotePlaceholder": "e.g. Count-in at the start",
+  "@presetNotePlaceholder": {
+    "description": "Input placeholder for preset rehearsal note"
+  },
+  "tempoSectionLabel": "TEMPO",
+  "@tempoSectionLabel": {
+    "description": "Section label for BPM editor in preset sheet"
+  },
+  "decreasePresetBpmSemantics": "Decrease preset BPM",
+  "@decreasePresetBpmSemantics": {
+    "description": "Tooltip for decrementing BPM in preset editor"
+  },
+  "increasePresetBpmSemantics": "Increase preset BPM",
+  "@increasePresetBpmSemantics": {
+    "description": "Tooltip for incrementing BPM in preset editor"
+  },
+  "beatsCountLabel": "Beats: {count}",
+  "@beatsCountLabel": {
+    "description": "Label showing current beat count in preset editor",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "accentOnBeat1Label": "ACCENT ON BEAT 1",
+  "@accentOnBeat1Label": {
+    "description": "Switch label for Beat 1 accent in preset editor"
+  },
+  "saveChangesButton": "Save Changes",
+  "@saveChangesButton": {
+    "description": "Save button label when editing an existing preset"
+  },
+  "savePresetButton": "Save Preset",
+  "@savePresetButton": {
+    "description": "Save button label when creating a new preset"
+  },
+
+  "setlistsHeader": "SETLISTS",
+  "@setlistsHeader": {
+    "description": "Header title on the Setlists screen"
+  },
+  "newSetlistButton": "New Setlist",
+  "@newSetlistButton": {
+    "description": "Button label to create a new setlist"
+  },
+  "newSetlistDialogTitle": "New Setlist",
+  "@newSetlistDialogTitle": {
+    "description": "Dialog title when creating a setlist"
+  },
+  "renameSetlistDialogTitle": "Rename Setlist",
+  "@renameSetlistDialogTitle": {
+    "description": "Dialog title when renaming a setlist"
+  },
+  "deleteSetlistDialogTitle": "Delete Setlist?",
+  "@deleteSetlistDialogTitle": {
+    "description": "Title of delete setlist confirmation dialog"
+  },
+  "deleteSetlistDialogMessage": "Are you sure you want to delete \"{name}\"? Your saved presets will remain in your library.",
+  "@deleteSetlistDialogMessage": {
+    "description": "Confirmation message when deleting a setlist",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "emptySetlistPreview": "Empty setlist — tap to add presets",
+  "@emptySetlistPreview": {
+    "description": "Preview text on an empty setlist card"
+  },
+  "songCount": "{count, plural, =0{0 songs} =1{1 song} other{{count} songs}}",
+  "@songCount": {
+    "description": "Formatted song count in a setlist",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "setlistCardSemantics": "{name}, {songCountLabel}",
+  "@setlistCardSemantics": {
+    "description": "Accessibility label for a setlist card",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "songCountLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "setlistCardSubtitle": "{songCountLabel} · {previewText}",
+  "@setlistCardSubtitle": {
+    "description": "Subtitle combining song count and preview text on a setlist card",
+    "placeholders": {
+      "songCountLabel": {
+        "type": "String"
+      },
+      "previewText": {
+        "type": "String"
+      }
+    }
+  },
+  "activateSetlistButton": "Activate",
+  "@activateSetlistButton": {
+    "description": "Button label to activate a setlist on the metronome"
+  },
+  "renameSetlistTooltip": "Rename {name}",
+  "@renameSetlistTooltip": {
+    "description": "Tooltip for renaming a specific setlist",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSetlistTooltip": "Delete {name}",
+  "@deleteSetlistTooltip": {
+    "description": "Tooltip for deleting a specific setlist",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noSetlistsTitle": "No setlists yet",
+  "@noSetlistsTitle": {
+    "description": "Empty state title on Setlists screen"
+  },
+  "noSetlistsSubtitle": "Group your saved presets into ordered gig or rehearsal setlists with seamless bar-synced transitions.",
+  "@noSetlistsSubtitle": {
+    "description": "Empty state subtitle on Setlists screen"
+  },
+  "createSetlistButton": "Create Setlist",
+  "@createSetlistButton": {
+    "description": "Button label to create the first setlist"
+  },
+
+  "setlistNameRequiredError": "Enter a setlist name.",
+  "@setlistNameRequiredError": {
+    "description": "Validation error when submitting an empty setlist name"
+  },
+  "setlistNameLabel": "Setlist name",
+  "@setlistNameLabel": {
+    "description": "Input label for setlist name"
+  },
+  "setlistNamePlaceholder": "e.g. Friday Gig",
+  "@setlistNamePlaceholder": {
+    "description": "Input placeholder for setlist name"
+  },
+
+  "setlistSongCountAndReorderHint": "{songCountLabel} · Drag to reorder",
+  "@setlistSongCountAndReorderHint": {
+    "description": "Subtitle in setlist detail sheet showing song count and drag hint",
+    "placeholders": {
+      "songCountLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "renameSetlistGenericTooltip": "Rename setlist",
+  "@renameSetlistGenericTooltip": {
+    "description": "Tooltip for rename button in setlist detail sheet"
+  },
+  "addPresetButton": "Add Preset",
+  "@addPresetButton": {
+    "description": "Button label to add a preset to the setlist"
+  },
+  "emptySetlistDetailTitle": "This setlist has no songs yet.",
+  "@emptySetlistDetailTitle": {
+    "description": "Empty state title inside setlist detail sheet"
+  },
+  "emptySetlistDetailSubtitle": "Tap \"Add Preset\" above to build your song order.",
+  "@emptySetlistDetailSubtitle": {
+    "description": "Empty state subtitle inside setlist detail sheet"
+  },
+  "removePresetTooltip": "Remove {name}",
+  "@removePresetTooltip": {
+    "description": "Tooltip to remove a preset from a setlist",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addPresetPickerTitle": "ADD PRESET TO SETLIST",
+  "@addPresetPickerTitle": {
+    "description": "Title of the bottom sheet for picking a preset to add to a setlist"
+  },
+  "addPresetPickerEmpty": "No presets saved yet. Create a preset in the Presets tab first.",
+  "@addPresetPickerEmpty": {
+    "description": "Message shown in add-preset picker when no presets exist"
+  }
+}

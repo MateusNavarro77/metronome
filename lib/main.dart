@@ -10,6 +10,8 @@ import 'data/repositories/preset_library_repository.dart';
 import 'data/services/metronome_engine.dart';
 import 'data/services/soloud_metronome_engine.dart';
 import 'domain/models/app_theme_mode.dart';
+import 'l10n/app_localizations.dart';
+import 'ui/core/l10n/l10n_extensions.dart';
 import 'ui/core/theme/app_theme.dart';
 import 'ui/features/metronome/view_models/metronome_view_model.dart';
 import 'ui/features/navigation/views/adaptive_navigation_shell.dart';
@@ -143,6 +145,7 @@ class MetronomeApp extends StatelessWidget {
         builder: (context, preferencesViewModel, _) {
           return _M3EAppHost(
             themeMode: preferencesViewModel.themeMode,
+            locale: preferencesViewModel.materialLocale,
             home: Builder(
               builder: (context) {
                 return AdaptiveNavigationShell(
@@ -158,9 +161,14 @@ class MetronomeApp extends StatelessWidget {
 }
 
 class _M3EAppHost extends StatefulWidget {
-  const _M3EAppHost({required this.themeMode, required this.home});
+  const _M3EAppHost({
+    required this.themeMode,
+    required this.locale,
+    required this.home,
+  });
 
   final AppThemeMode themeMode;
+  final Locale? locale;
   final Widget home;
 
   @override
@@ -218,8 +226,11 @@ class _M3EAppHostState extends State<_M3EAppHost> {
     };
 
     return M3EMaterialApp(
-      title: 'Metronome',
+      onGenerateTitle: (context) => context.l10n.appTitle,
       debugShowCheckedModeBanner: false,
+      locale: widget.locale,
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       data: _lightThemeData,
       theme: _lightTheme,
       darkTheme: _darkTheme,

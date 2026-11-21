@@ -2,6 +2,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
 
+import '../../../../core/l10n/l10n_extensions.dart';
+
 /// Prompts the user to create or rename a setlist and returns the trimmed name,
 /// or `null` if cancelled.
 Future<String?> showSetlistNameDialog(
@@ -55,7 +57,7 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
     final trimmed = _controller.text.trim();
     if (trimmed.isEmpty) {
       setState(() {
-        _errorText = 'Enter a setlist name.';
+        _errorText = context.l10n.setlistNameRequiredError;
       });
       return;
     }
@@ -64,6 +66,7 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return M3EDialog(
       key: const Key('setlist_name_dialog'),
       title: widget.title,
@@ -71,8 +74,8 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
         key: const Key('setlist_name_input'),
         controller: _controller,
         variant: M3ETextFieldVariant.outlined,
-        label: 'Setlist name',
-        placeholder: 'e.g. Friday Gig',
+        label: l10n.setlistNameLabel,
+        placeholder: l10n.setlistNamePlaceholder,
         errorText: _errorText,
         autofocus: true,
         textInputAction: TextInputAction.done,
@@ -87,7 +90,7 @@ class _SetlistNameDialogState extends State<_SetlistNameDialog> {
         M3EButton.text(
           key: const Key('setlist_name_cancel_button'),
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         M3EButton.filled(
           key: const Key('setlist_name_save_button'),

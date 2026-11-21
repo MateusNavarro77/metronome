@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../domain/models/preset.dart';
 import '../../../../domain/models/setlist.dart';
+import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../view_models/presets_view_model.dart';
 import 'widgets/preset_editor_sheet.dart';
@@ -131,6 +132,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final vm = widget.viewModel;
     final allPresets = vm.allPresets;
     final presets = vm.filteredPresets;
@@ -159,7 +161,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'PRESETS',
+                        l10n.presetsHeader,
                         style: context.textTheme.labelMedium?.copyWith(
                           color: context.colorScheme.onSurface,
                           letterSpacing: 2.2,
@@ -170,7 +172,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                         size: M3EButtonSize.sm,
                         icon: const Icon(Icons.add_rounded, size: 20),
                         onPressed: _openCreatePresetSheet,
-                        child: const Text('New Preset'),
+                        child: Text(l10n.newPresetButton),
                       ),
                     ],
                   ),
@@ -185,7 +187,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                     key: const Key('presets_search_field'),
                     controller: _searchController,
                     variant: M3ETextFieldVariant.outlined,
-                    placeholder: 'Search presets by name...',
+                    placeholder: l10n.searchPresetsPlaceholder,
                     density: -1,
                     leading: const Icon(Icons.search_rounded, size: 20),
                     trailing: vm.searchQuery.isNotEmpty
@@ -193,7 +195,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                             key: const Key('presets_search_clear_button'),
                             variant: M3EIconButtonVariant.standard,
                             size: M3EIconButtonSize.sm,
-                            tooltip: 'Clear search',
+                            tooltip: l10n.clearSearchTooltip,
                             onPressed: () {
                               _searchController.clear();
                               vm.setSearchQuery('');
@@ -240,7 +242,12 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                               onToggleFavorite: () =>
                                   vm.toggleFavorite(preset.id),
                               onEdit: () => _openEditPresetSheet(preset),
-                              onDuplicate: () => vm.duplicatePreset(preset.id),
+                              onDuplicate: () => vm.duplicatePreset(
+                                preset.id,
+                                duplicatedName: l10n.presetCopyName(
+                                  preset.displayName(l10n),
+                                ),
+                              ),
                               onDelete: () => _confirmDeletePreset(preset),
                             );
                           },
@@ -276,11 +283,17 @@ class _PresetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final presetName = preset.displayName(l10n);
+
     return Semantics(
       button: true,
       selected: isActive,
-      label:
-          '${preset.name}, ${preset.bpm.value} BPM, ${preset.timeSignature.label}',
+      label: l10n.presetCardSemantics(
+        presetName,
+        preset.bpm.value,
+        preset.timeSignature.label,
+      ),
       child: M3ECard(
         key: Key('preset_card_${preset.id}'),
         variant: isActive ? M3ECardVariant.filled : M3ECardVariant.outlined,
@@ -301,7 +314,7 @@ class _PresetCard extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              preset.name,
+                              presetName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: context.textTheme.titleSmall?.copyWith(
@@ -325,7 +338,7 @@ class _PresetCard extends StatelessWidget {
                                 ),
                               ),
                               child: Text(
-                                'ACTIVE',
+                                l10n.activeBadge,
                                 style: context.textTheme.labelMedium?.copyWith(
                                   fontSize: 9,
                                   letterSpacing: 0.8,
@@ -357,8 +370,8 @@ class _PresetCard extends StatelessWidget {
                   variant: M3EIconButtonVariant.standard,
                   isSelected: preset.isFavorite,
                   tooltip: preset.isFavorite
-                      ? 'Unfavorite ${preset.name}'
-                      : 'Favorite ${preset.name}',
+                      ? l10n.unfavoritePresetTooltip(presetName)
+                      : l10n.favoritePresetTooltip(presetName),
                   onPressed: onToggleFavorite,
                   icon: Icon(
                     Icons.star_outline_rounded,
@@ -377,8 +390,10 @@ class _PresetCard extends StatelessWidget {
               runSpacing: context.dimens.spaceXs,
               children: [
                 _ParameterBadge(
-                  label:
-                      '${preset.bpm.value} BPM · ${preset.bpm.tempoMarking.label}',
+                  label: l10n.presetBpmTempoSummary(
+                    preset.bpm.value,
+                    preset.bpm.tempoMarking.label,
+                  ),
                   isActive: isActive,
                 ),
                 _ParameterBadge(
@@ -387,11 +402,13 @@ class _PresetCard extends StatelessWidget {
                 ),
                 _ParameterBadge(
                   label:
-                      '${preset.subdivision.symbol} ${preset.subdivision.label}',
+                      '${preset.subdivision.symbol} ${preset.subdivision.localizedLabel(l10n)}',
                   isActive: isActive,
                 ),
                 _ParameterBadge(
-                  label: preset.isAccentEnabled ? 'Accent ON' : 'Accent OFF',
+                  label: preset.isAccentEnabled
+                      ? l10n.accentOnBadge
+                      : l10n.accentOffBadge,
                   isActive: isActive,
                 ),
               ],
@@ -403,19 +420,19 @@ class _PresetCard extends StatelessWidget {
                 _ActionIconButton(
                   buttonKey: Key('preset_edit_button_${preset.id}'),
                   icon: Icons.edit_outlined,
-                  tooltip: 'Edit ${preset.name}',
+                  tooltip: l10n.editPresetTooltip(presetName),
                   onPressed: onEdit,
                 ),
                 _ActionIconButton(
                   buttonKey: Key('preset_duplicate_button_${preset.id}'),
                   icon: Icons.copy_rounded,
-                  tooltip: 'Duplicate ${preset.name}',
+                  tooltip: l10n.duplicatePresetTooltip(presetName),
                   onPressed: onDuplicate,
                 ),
                 _ActionIconButton(
                   buttonKey: Key('preset_delete_button_${preset.id}'),
                   icon: Icons.delete_outline_rounded,
-                  tooltip: 'Delete ${preset.name}',
+                  tooltip: l10n.deletePresetTooltip(presetName),
                   isDestructive: true,
                   onPressed: onDelete,
                 ),
@@ -507,6 +524,7 @@ class _EmptyPresetsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return M3ECard(
       variant: M3ECardVariant.outlined,
       borderRadius: BorderRadius.circular(context.dimens.radiusLg),
@@ -529,8 +547,8 @@ class _EmptyPresetsCard extends StatelessWidget {
           SizedBox(height: context.dimens.spaceMd),
           Text(
             hasAnyPresets
-                ? 'No presets match "$searchQuery"'
-                : 'No presets saved yet',
+                ? l10n.noPresetsMatchQuery(searchQuery)
+                : l10n.noPresetsSavedTitle,
             textAlign: TextAlign.center,
             style: context.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
@@ -539,7 +557,9 @@ class _EmptyPresetsCard extends StatelessWidget {
           ),
           SizedBox(height: context.dimens.spaceXs),
           Text(
-            hasAnyPresets ? 'Try another keyword or clear your search filter.' : 'Save tempo, time signature, subdivision, and rehearsal notes for one-tap recall.',
+            hasAnyPresets
+                ? l10n.noPresetsMatchSubtitle
+                : l10n.noPresetsSavedSubtitle,
             textAlign: TextAlign.center,
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
@@ -554,7 +574,9 @@ class _EmptyPresetsCard extends StatelessWidget {
             ),
             size: M3EButtonSize.md,
             onPressed: hasAnyPresets ? onClearSearch : onCreatePreset,
-            child: Text(hasAnyPresets ? 'Clear Search' : 'Create Preset'),
+            child: Text(
+              hasAnyPresets ? l10n.clearSearchButton : l10n.createPresetButton,
+            ),
           ),
         ],
       ),
@@ -567,17 +589,21 @@ M3EDialog _buildDeletePresetDialog(
   required Preset preset,
   required List<Setlist> containingSetlists,
 }) {
-  final setlistNames = containingSetlists.map((s) => s.name).join(', ');
+  final l10n = context.l10n;
+  final presetName = preset.displayName(l10n);
+  final setlistNames = containingSetlists
+      .map((s) => s.displayName(l10n))
+      .join(', ');
 
   return M3EDialog(
     key: const Key('delete_preset_confirm_dialog'),
-    title: 'Delete Preset?',
+    title: l10n.deletePresetDialogTitle,
     content: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Are you sure you want to delete "${preset.name}"? This action cannot be undone.',
+          l10n.deletePresetDialogMessage(presetName),
           style: context.textTheme.bodyMedium?.copyWith(
             color: context.colorScheme.onSurfaceVariant,
           ),
@@ -592,9 +618,10 @@ M3EDialog _buildDeletePresetDialog(
               borderRadius: BorderRadius.circular(context.dimens.radiusSm),
             ),
             child: Text(
-              'Warning: Used in ${containingSetlists.length} '
-              '${containingSetlists.length == 1 ? 'setlist' : 'setlists'}: '
-              '$setlistNames. Deleting this preset will remove it from those setlists.',
+              l10n.deletePresetSetlistWarning(
+                containingSetlists.length,
+                setlistNames,
+              ),
               style: context.textTheme.bodyMedium?.copyWith(
                 fontSize: 13,
                 color: context.colorScheme.error,
@@ -608,12 +635,12 @@ M3EDialog _buildDeletePresetDialog(
       M3EButton.text(
         key: const Key('cancel_delete_preset_button'),
         onPressed: () => Navigator.of(context).pop(false),
-        child: const Text('Cancel'),
+        child: Text(l10n.cancel),
       ),
       M3EButton.filled(
         key: const Key('confirm_delete_preset_button'),
         onPressed: () => Navigator.of(context).pop(true),
-        child: const Text('Delete'),
+        child: Text(l10n.delete),
       ),
     ],
   );

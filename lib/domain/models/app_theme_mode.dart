@@ -1,20 +1,4 @@
 /// Domain representation of available application theme modes.
 ///
 /// Kept as pure Dart with zero Flutter dependencies (NFR-MAN-01).
-enum AppThemeMode {
-  system,
-  light,
-  dark;
-
-  /// Human-readable display label.
-  String get label {
-    switch (this) {
-      case AppThemeMode.system:
-        return 'System';
-      case AppThemeMode.light:
-        return 'Light';
-      case AppThemeMode.dark:
-        return 'Dark';
-    }
-  }
-}
+enum AppThemeMode { system, light, dark }

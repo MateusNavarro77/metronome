@@ -8,6 +8,8 @@ import 'package:metronome/data/services/simulated_metronome_engine.dart';
 import 'package:metronome/domain/models/bpm.dart';
 import 'package:metronome/domain/models/subdivision.dart';
 import 'package:metronome/domain/models/time_signature.dart';
+import 'package:metronome/l10n/app_localizations.dart';
+import 'package:metronome/ui/core/l10n/l10n_extensions.dart';
 import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/presets/view_models/presets_view_model.dart';
@@ -46,9 +48,12 @@ void main() {
       await metronomeRepo.dispose();
     });
 
-    Widget buildTestApp() {
+    Widget buildTestApp({Locale? locale}) {
       return MaterialApp(
         theme: AppTheme.darkTheme,
+        locale: locale,
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: PresetsView(viewModel: presetsVm),
       );
     }
@@ -269,5 +274,37 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       check(notifications).equals(2);
     });
+
+    testWidgets(
+      'displays localized untitled fallback and duplicates with Portuguese suffix',
+      (WidgetTester tester) async {
+        final untitled = await libraryRepo.createPreset(
+          name: '',
+          bpm: const Bpm(120),
+          timeSignature: TimeSignature.fourFour,
+          subdivision: Subdivision.none,
+          isAccentEnabled: true,
+        );
+        final rock = await libraryRepo.createPreset(
+          name: 'Alpha Rock',
+          bpm: const Bpm(128),
+          timeSignature: TimeSignature.fourFour,
+          subdivision: Subdivision.eighth,
+          isAccentEnabled: true,
+        );
+
+        await tester.pumpWidget(buildTestApp(locale: const Locale('pt')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Preset sem título'), findsOneWidget);
+        expect(find.text('♫ Colcheias'), findsOneWidget);
+
+        await tester.tap(find.byKey(Key('preset_duplicate_button_${rock.id}')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Alpha Rock (Cópia)'), findsOneWidget);
+        expect(libraryRepo.getPresetById(untitled.id)?.name, '');
+      },
+    );
   });
 }

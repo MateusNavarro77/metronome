@@ -6,6 +6,7 @@ import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/preset.dart';
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
+import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Result returned when the user confirms [PresetEditorSheet].
@@ -119,7 +120,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
     final trimmedName = _nameController.text.trim();
     if (trimmedName.isEmpty) {
       setState(() {
-        _nameError = 'Enter a preset name to save.';
+        _nameError = context.l10n.presetNameRequiredError;
       });
       return;
     }
@@ -139,6 +140,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final maxSheetHeight = MediaQuery.sizeOf(context).height * 0.9;
 
@@ -193,7 +195,9 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            _isEditing ? 'EDIT PRESET' : 'NEW PRESET',
+                            _isEditing
+                                ? l10n.editPresetSheetTitle
+                                : l10n.newPresetSheetTitle,
                             style: context.textTheme.titleSmall?.copyWith(
                               letterSpacing: 1.6,
                               fontWeight: FontWeight.w700,
@@ -205,8 +209,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                             variant: M3EIconButtonVariant.standard,
                             isSelected: _isFavorite,
                             tooltip: _isFavorite
-                                ? 'Remove from favorites'
-                                : 'Mark as favorite',
+                                ? l10n.removeFromFavoritesTooltip
+                                : l10n.markAsFavoriteTooltip,
                             onPressed: () {
                               setState(() {
                                 _isFavorite = !_isFavorite;
@@ -229,8 +233,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                         key: const Key('preset_name_input'),
                         controller: _nameController,
                         variant: M3ETextFieldVariant.outlined,
-                        label: 'Preset name',
-                        placeholder: 'e.g. Opening Groove',
+                        label: l10n.presetNameLabel,
+                        placeholder: l10n.presetNamePlaceholder,
                         errorText: _nameError,
                         textInputAction: TextInputAction.next,
                         onChanged: (_) {
@@ -245,8 +249,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                         key: const Key('preset_note_input'),
                         controller: _noteController,
                         variant: M3ETextFieldVariant.outlined,
-                        label: 'Note (optional)',
-                        placeholder: 'e.g. Count-in at the start',
+                        label: l10n.presetNoteLabel,
+                        placeholder: l10n.presetNotePlaceholder,
                         maxLines: 2,
                         textInputAction: TextInputAction.done,
                       ),
@@ -263,7 +267,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'TEMPO',
+                                  l10n.tempoSectionLabel,
                                   style: context.textTheme.labelMedium
                                       ?.copyWith(
                                         color: context
@@ -289,14 +293,15 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                     'preset_editor_bpm_decrement',
                                   ),
                                   icon: Icons.remove_rounded,
-                                  semanticLabel: 'Decrease preset BPM',
+                                  semanticLabel:
+                                      l10n.decreasePresetBpmSemantics,
                                   enabled: _bpm.value > Bpm.min,
                                   onTap: () => setState(() {
                                     _bpm = _bpm.adjust(-1);
                                   }),
                                 ),
                                 Text(
-                                  '${_bpm.value} BPM',
+                                  l10n.bpmWithUnit(_bpm.value),
                                   key: const Key('preset_editor_bpm_value'),
                                   style: context.textTheme.headlineMedium
                                       ?.copyWith(
@@ -309,7 +314,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                     'preset_editor_bpm_increment',
                                   ),
                                   icon: Icons.add_rounded,
-                                  semanticLabel: 'Increase preset BPM',
+                                  semanticLabel:
+                                      l10n.increasePresetBpmSemantics,
                                   enabled: _bpm.value < Bpm.max,
                                   onTap: () => setState(() {
                                     _bpm = _bpm.adjust(1);
@@ -325,7 +331,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               max: Bpm.max.toDouble(),
                               divisions: Bpm.max - Bpm.min,
                               size: M3ESliderSize.xs,
-                              label: '${_bpm.value} BPM',
+                              label: l10n.bpmWithUnit(_bpm.value),
                               onChanged: (value) {
                                 setState(() {
                                   _bpm = Bpm.clamped(value.round());
@@ -348,7 +354,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'TIME SIGNATURE',
+                                  l10n.timeSignatureSheetTitle,
                                   style: context.textTheme.labelMedium
                                       ?.copyWith(
                                         color: context
@@ -396,7 +402,9 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Beats: ${_timeSignature.numerator}',
+                                  l10n.beatsCountLabel(
+                                    _timeSignature.numerator,
+                                  ),
                                   style: context.textTheme.bodyMedium?.copyWith(
                                     color: context.colorScheme.onSurfaceVariant,
                                   ),
@@ -409,7 +417,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         'preset_editor_numerator_decrement',
                                       ),
                                       icon: Icons.remove_rounded,
-                                      semanticLabel: 'Decrease beats per bar',
+                                      semanticLabel:
+                                          l10n.decreaseBeatsPerBarSemantics,
                                       enabled: _timeSignature.numerator > 1,
                                       onTap: () => setState(() {
                                         _timeSignature = TimeSignature(
@@ -424,7 +433,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                         'preset_editor_numerator_increment',
                                       ),
                                       icon: Icons.add_rounded,
-                                      semanticLabel: 'Increase beats per bar',
+                                      semanticLabel:
+                                          l10n.increaseBeatsPerBarSemantics,
                                       enabled: _timeSignature.numerator < 16,
                                       onTap: () => setState(() {
                                         _timeSignature = TimeSignature(
@@ -477,7 +487,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'SUBDIVISION',
+                              l10n.subdivisionCaption,
                               style: context.textTheme.labelMedium?.copyWith(
                                 color: context.colorScheme.onSurfaceVariant,
                               ),
@@ -492,7 +502,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                                   chipKey: Key(
                                     'preset_editor_subdivision_${sub.name}',
                                   ),
-                                  label: '${sub.symbol} ${sub.label}',
+                                  label:
+                                      '${sub.symbol} ${sub.localizedLabel(l10n)}',
                                   isSelected: selected,
                                   onTap: () => setState(() {
                                     _subdivision = sub;
@@ -516,7 +527,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'ACCENT ON BEAT 1',
+                              l10n.accentOnBeat1Label,
                               style: context.textTheme.labelMedium?.copyWith(
                                 color: context.colorScheme.onSurface,
                               ),
@@ -544,7 +555,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               key: const Key('preset_editor_cancel_button'),
                               size: M3EButtonSize.md,
                               onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancel'),
+                              child: Text(l10n.cancel),
                             ),
                           ),
                           SizedBox(width: context.dimens.spaceSmPlus4),
@@ -554,7 +565,9 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               size: M3EButtonSize.md,
                               onPressed: _submit,
                               child: Text(
-                                _isEditing ? 'Save Changes' : 'Save Preset',
+                                _isEditing
+                                    ? l10n.saveChangesButton
+                                    : l10n.savePresetButton,
                               ),
                             ),
                           ),

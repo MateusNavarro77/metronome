@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../domain/models/app_language.dart';
 import '../../domain/models/app_theme_mode.dart';
 import '../../domain/models/metronome_sound.dart';
 import '../../domain/models/sound_settings.dart';
@@ -16,10 +17,12 @@ class PreferencesRepository {
 
   final SharedPreferences? _preferences;
   AppThemeMode _inMemoryThemeMode = AppThemeMode.system;
+  AppLanguage _inMemoryLanguage = AppLanguage.system;
   bool _inMemoryAccentEnabled = true;
   SoundSettings _inMemorySoundSettings = const SoundSettings();
 
   static const String _keyThemeMode = 'app_theme_mode';
+  static const String _keyLanguage = 'app_language';
   static const String _keyAccentEnabled = 'accent_enabled';
   static const String _keySound = 'metronome_sound';
   static const String _keyStrongVolume = 'sound_strong_volume';
@@ -63,6 +66,23 @@ class PreferencesRepository {
         break;
     }
     await prefs.setString(_keyThemeMode, value);
+  }
+
+  /// Loads the persisted [AppLanguage], defaulting to [AppLanguage.system].
+  AppLanguage getLanguage() {
+    final prefs = _preferences;
+    if (prefs == null) return _inMemoryLanguage;
+
+    return AppLanguage.fromCode(prefs.getString(_keyLanguage));
+  }
+
+  /// Persists the selected [AppLanguage].
+  Future<void> setLanguage(AppLanguage language) async {
+    _inMemoryLanguage = language;
+    final prefs = _preferences;
+    if (prefs == null) return;
+
+    await prefs.setString(_keyLanguage, language.code);
   }
 
   /// Loads whether the accented beat is enabled, defaulting to true.

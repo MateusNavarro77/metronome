@@ -139,12 +139,10 @@ class MetronomeViewModel extends ChangeNotifier {
     return presets[activeSetlistIndex];
   }
 
-  /// Position display label such as `'3 of 12'` (FR-PRE-08).
-  String get activeSetlistPositionLabel {
-    final total = activeSetlistTotal;
-    if (total == 0) return '';
-    return '${activeSetlistIndex + 1} of $total';
-  }
+  /// 1-based position of the current song in [activeSetlist], or `0` if empty
+  /// (FR-PRE-08).
+  int get activeSetlistCurrentPosition =>
+      activeSetlistTotal == 0 ? 0 : activeSetlistIndex + 1;
 
   /// Whether there is a previous item to step to in [activeSetlist].
   bool get canStepPreviousSetlistItem =>

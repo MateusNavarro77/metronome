@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart'
 
 import '../../../../../domain/models/preset.dart';
 import '../../../../../domain/models/setlist.dart';
+import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Stage-friendly stepper bar shown on the main Metronome screen when a
@@ -13,7 +14,8 @@ class ActiveSetlistStepperBar extends StatelessWidget {
     super.key,
     required this.setlist,
     required this.currentPreset,
-    required this.positionLabel,
+    required this.currentPosition,
+    required this.totalCount,
     required this.canStepPrevious,
     required this.canStepNext,
     required this.hasPendingBarTransition,
@@ -25,7 +27,8 @@ class ActiveSetlistStepperBar extends StatelessWidget {
 
   final Setlist setlist;
   final Preset currentPreset;
-  final String positionLabel;
+  final int currentPosition;
+  final int totalCount;
   final bool canStepPrevious;
   final bool canStepNext;
   final bool hasPendingBarTransition;
@@ -36,6 +39,10 @@ class ActiveSetlistStepperBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final positionLabel = totalCount == 0
+        ? ''
+        : l10n.setlistPosition(currentPosition, totalCount);
     final verticalPad = isCompact
         ? context.dimens.spaceSm
         : context.dimens.spaceSmPlus4;
@@ -61,7 +68,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
               SizedBox(width: context.dimens.spaceXs),
               Expanded(
                 child: Text(
-                  setlist.name.toUpperCase(),
+                  setlist.displayName(l10n).toUpperCase(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: context.textTheme.labelMedium?.copyWith(
@@ -85,7 +92,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'NEXT BAR',
+                    l10n.nextBarBadge,
                     style: context.textTheme.labelMedium?.copyWith(
                       fontSize: 9,
                       letterSpacing: 0.8,
@@ -121,7 +128,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                 key: const Key('setlist_deactivate_button'),
                 variant: M3EIconButtonVariant.standard,
                 size: M3EIconButtonSize.sm,
-                tooltip: 'Exit setlist',
+                tooltip: l10n.exitSetlistTooltip,
                 onPressed: onDeactivate,
                 icon: const Icon(Icons.close_rounded),
               ),
@@ -133,7 +140,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
               _StepButton(
                 buttonKey: const Key('setlist_prev_button'),
                 icon: Icons.skip_previous_rounded,
-                semanticLabel: 'Previous song in setlist',
+                semanticLabel: l10n.previousSongSemantics,
                 enabled: canStepPrevious,
                 onTap: onPrevious,
               ),
@@ -143,7 +150,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      currentPreset.name,
+                      currentPreset.displayName(l10n),
                       key: const Key('active_setlist_preset_name'),
                       textAlign: TextAlign.center,
                       maxLines: 1,
@@ -174,7 +181,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
               _StepButton(
                 buttonKey: const Key('setlist_next_button'),
                 icon: Icons.skip_next_rounded,
-                semanticLabel: 'Next song in setlist',
+                semanticLabel: l10n.nextSongSemantics,
                 enabled: canStepNext,
                 onTap: onNext,
               ),

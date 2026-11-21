@@ -28,5 +28,5 @@ class const BeatEvent({
 
   @override
   String toString() =>
-      'BeatEvent(beat: $beatIndex, sub: $subdivisionIndex, accent: ${accent.label}, t: ${timestamp.inMilliseconds}ms)';
+      'BeatEvent(beat: $beatIndex, sub: $subdivisionIndex, accent: ${accent.name}, t: ${timestamp.inMilliseconds}ms)';
 }
