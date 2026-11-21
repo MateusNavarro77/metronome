@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
 
 import '../../../../../domain/models/preset.dart';
+import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../view_models/setlists_view_model.dart';
 import 'setlist_name_dialog.dart';
@@ -37,10 +38,11 @@ class SetlistDetailSheet extends StatelessWidget {
   final String setlistId;
 
   Future<void> _renameSetlist(BuildContext context, String currentName) async {
+    final l10n = context.l10n;
     final newName = await showSetlistNameDialog(
       context,
-      title: 'Rename Setlist',
-      confirmLabel: 'Save',
+      title: l10n.renameSetlistDialogTitle,
+      confirmLabel: l10n.save,
       initialName: currentName,
     );
     if (newName == null) return;
@@ -62,6 +64,7 @@ class SetlistDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final sheetHeight = MediaQuery.sizeOf(context).height * 0.82;
 
     return ListenableBuilder(
@@ -99,7 +102,7 @@ class SetlistDetailSheet extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              setlist.name,
+                              setlist.displayName(l10n),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: context.textTheme.titleSmall?.copyWith(
@@ -109,7 +112,9 @@ class SetlistDetailSheet extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${presets.length} ${presets.length == 1 ? 'song' : 'songs'} · Drag to reorder',
+                              l10n.setlistSongCountAndReorderHint(
+                                l10n.songCount(presets.length),
+                              ),
                               style: context.textTheme.bodyMedium?.copyWith(
                                 fontSize: 12,
                                 color: context.colorScheme.onSurfaceVariant,
@@ -121,7 +126,7 @@ class SetlistDetailSheet extends StatelessWidget {
                       M3EIconButton(
                         key: const Key('setlist_detail_rename_button'),
                         variant: M3EIconButtonVariant.standard,
-                        tooltip: 'Rename setlist',
+                        tooltip: l10n.renameSetlistGenericTooltip,
                         onPressed: () => _renameSetlist(context, setlist.name),
                         icon: Icon(
                           Icons.edit_outlined,
@@ -134,7 +139,7 @@ class SetlistDetailSheet extends StatelessWidget {
                         size: M3EButtonSize.sm,
                         icon: const Icon(Icons.add_rounded, size: 18),
                         onPressed: () => _openAddPresetPicker(context),
-                        child: const Text('Add Preset'),
+                        child: Text(l10n.addPresetButton),
                       ),
                     ],
                   ),
@@ -156,7 +161,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                   ),
                                   SizedBox(height: context.dimens.spaceSm),
                                   Text(
-                                    'This setlist has no songs yet.',
+                                    l10n.emptySetlistDetailTitle,
                                     textAlign: TextAlign.center,
                                     style: context.textTheme.titleSmall
                                         ?.copyWith(
@@ -166,7 +171,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                   ),
                                   SizedBox(height: context.dimens.spaceXs),
                                   Text(
-                                    'Tap "Add Preset" above to build your song order.',
+                                    l10n.emptySetlistDetailSubtitle,
                                     textAlign: TextAlign.center,
                                     style: context.textTheme.bodyMedium
                                         ?.copyWith(
@@ -198,6 +203,7 @@ class SetlistDetailSheet extends StatelessWidget {
                             },
                             itemBuilder: (context, index) {
                               final preset = presets[index];
+                              final presetName = preset.displayName(l10n);
                               final isCurrentSong =
                                   isActiveSetlist &&
                                   viewModel.activeSetlistIndex == index;
@@ -266,7 +272,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              preset.name,
+                                              presetName,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: context
@@ -280,7 +286,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                                   ),
                                             ),
                                             Text(
-                                              '${preset.bpm.value} BPM · ${preset.timeSignature.label} · ${preset.subdivision.label}',
+                                              '${l10n.bpmWithUnit(preset.bpm.value)} · ${preset.timeSignature.label} · ${preset.subdivision.localizedLabel(l10n)}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: context
@@ -299,7 +305,9 @@ class SetlistDetailSheet extends StatelessWidget {
                                       M3EIconButton(
                                         key: Key('setlist_item_remove_$index'),
                                         variant: M3EIconButtonVariant.standard,
-                                        tooltip: 'Remove ${preset.name}',
+                                        tooltip: l10n.removePresetTooltip(
+                                          presetName,
+                                        ),
                                         onPressed: () {
                                           viewModel.removePresetAt(
                                             setlist.id,
@@ -360,6 +368,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final maxHeight = MediaQuery.sizeOf(context).height * 0.65;
 
     return ConstrainedBox(
@@ -377,7 +386,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'ADD PRESET TO SETLIST',
+                l10n.addPresetPickerTitle,
                 style: context.textTheme.titleSmall?.copyWith(
                   letterSpacing: 1.4,
                   fontWeight: FontWeight.w700,
@@ -391,7 +400,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                     vertical: context.dimens.spaceMd,
                   ),
                   child: Text(
-                    'No presets saved yet. Create a preset in the Presets tab first.',
+                    l10n.addPresetPickerEmpty,
                     style: context.textTheme.bodyMedium?.copyWith(
                       color: context.colorScheme.onSurfaceVariant,
                     ),
@@ -424,7 +433,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    preset.name,
+                                    preset.displayName(l10n),
                                     style: context.textTheme.titleSmall
                                         ?.copyWith(
                                           fontWeight: FontWeight.w700,
@@ -432,7 +441,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                                         ),
                                   ),
                                   Text(
-                                    '${preset.bpm.value} BPM · ${preset.timeSignature.label} · ${preset.subdivision.label}',
+                                    '${l10n.bpmWithUnit(preset.bpm.value)} · ${preset.timeSignature.label} · ${preset.subdivision.localizedLabel(l10n)}',
                                     style: context.textTheme.bodyMedium
                                         ?.copyWith(
                                           fontSize: 12,

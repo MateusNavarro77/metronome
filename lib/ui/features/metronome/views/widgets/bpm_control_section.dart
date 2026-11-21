@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart'
 
 import '../../../../../domain/models/bpm.dart';
 import '../../../../../domain/models/tempo_marking.dart';
+import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Hero BPM display with tactile `-`/`+` step buttons and quick-adjust slider
@@ -34,6 +35,7 @@ class BpmControlSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final verticalPad = isCompact
         ? context.dimens.spaceSm
         : context.dimens.spaceMd;
@@ -74,7 +76,7 @@ class BpmControlSection extends StatelessWidget {
               _StepperButton(
                 buttonKey: const Key('bpm_decrement_button'),
                 icon: Icons.remove_rounded,
-                semanticLabel: 'Decrease BPM by 1',
+                semanticLabel: l10n.decreaseBpmSemantics,
                 enabled: bpm > Bpm.min,
                 onTap: () => onAdjustBpm(-1),
                 onHoldStart: () => onStartHoldAdjust(-1),
@@ -85,7 +87,7 @@ class BpmControlSection extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Semantics(
-                      label: '$bpm beats per minute, ${tempoMarking.label}',
+                      label: l10n.bpmValueSemantics(bpm, tempoMarking.label),
                       child: Text(
                         '$bpm',
                         key: const Key('bpm_value_text'),
@@ -106,7 +108,7 @@ class BpmControlSection extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'BPM',
+                      l10n.bpmUnit,
                       style: context.textTheme.labelMedium?.copyWith(
                         color: context.colorScheme.onSurfaceVariant,
                       ),
@@ -117,7 +119,7 @@ class BpmControlSection extends StatelessWidget {
               _StepperButton(
                 buttonKey: const Key('bpm_increment_button'),
                 icon: Icons.add_rounded,
-                semanticLabel: 'Increase BPM by 1',
+                semanticLabel: l10n.increaseBpmSemantics,
                 enabled: bpm < Bpm.max,
                 onTap: () => onAdjustBpm(1),
                 onHoldStart: () => onStartHoldAdjust(1),
@@ -127,8 +129,8 @@ class BpmControlSection extends StatelessWidget {
           ),
           // Quick-adjust slider covering 30..300 BPM (FR-BPM-03)
           Semantics(
-            label: 'BPM quick adjust slider',
-            value: '$bpm BPM',
+            label: l10n.bpmSliderSemantics,
+            value: l10n.bpmWithUnit(bpm),
             child: M3ESlider(
               key: const Key('bpm_slider'),
               value: bpm.toDouble(),

@@ -89,9 +89,9 @@ class PresetsViewModel extends ChangeNotifier {
     return _repository.updatePreset(updated);
   }
 
-  /// Duplicates the preset identified by [id] (FR-PRE-03).
-  Future<Preset> duplicatePreset(String id) {
-    return _repository.duplicatePreset(id);
+  /// Duplicates the preset identified by [id] with [duplicatedName] (FR-PRE-03).
+  Future<Preset> duplicatePreset(String id, {required String duplicatedName}) {
+    return _repository.duplicatePreset(id, duplicatedName: duplicatedName);
   }
 
   /// Toggles favorite status for [id] (FR-PRE-04).

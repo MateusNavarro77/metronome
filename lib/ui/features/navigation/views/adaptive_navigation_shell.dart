@@ -2,6 +2,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
 
+import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../metronome/view_models/metronome_view_model.dart';
 import '../../metronome/views/metronome_view.dart';
@@ -84,10 +85,11 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
         final isWide = constraints.maxWidth > 600;
         final useRail = isLandscape || isWide;
 
+        final l10n = context.l10n;
         final destinations = [
           _NavigationItem(
             index: 0,
-            label: 'Metronome',
+            label: l10n.navMetronome,
             icon: Icons.speed_outlined,
             selectedIcon: Icons.speed,
             navKey: const Key('nav_destination_metronome'),
@@ -95,7 +97,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
           ),
           _NavigationItem(
             index: 1,
-            label: 'Presets',
+            label: l10n.navPresets,
             icon: Icons.tune_outlined,
             selectedIcon: Icons.tune_rounded,
             navKey: const Key('nav_destination_presets'),
@@ -103,7 +105,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
           ),
           _NavigationItem(
             index: 2,
-            label: 'Setlists',
+            label: l10n.navSetlists,
             icon: Icons.queue_music_outlined,
             selectedIcon: Icons.queue_music_rounded,
             navKey: const Key('nav_destination_setlists'),
@@ -111,7 +113,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
           ),
           _NavigationItem(
             index: 3,
-            label: 'Settings',
+            label: l10n.navSettings,
             icon: Icons.settings_outlined,
             selectedIcon: Icons.settings_rounded,
             navKey: const Key('nav_destination_settings'),

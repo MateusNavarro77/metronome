@@ -1,27 +1,71 @@
-name: Build and upload to Play Store
+name: Release Android (Fastlane)
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: "Fastlane lane to execute"
+        required: true
+        default: "internal"
+        type: choice
+        options:
+          - internal
+          - promote_to_beta
+          - promote_to_prod
+          - screenshots
+      rollout:
+        description: "Rollout fraction for promote_to_prod (0.0 - 1.0)"
+        required: false
+        default: "0.2"
+        type: string
+      upload_screenshots:
+        description: "Upload generated screenshots to Play Store (for screenshots lane)"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build:
+  ci:
+    name: Verify CI before Release
+    uses: ./.github/workflows/ci.yaml
+
+  release:
+    name: Fastlane Android (${{ inputs.lane || 'internal' }})
+    needs: ci
     runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Ruby & Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: android
 
       - name: Setup Java
+        if: github.event_name == 'push' || inputs.lane == 'internal'
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Setup Gradle
+        if: github.event_name == 'push' || inputs.lane == 'internal'
         uses: gradle/actions/setup-gradle@v4
 
       - name: Cache Pub dependencies
+        if: github.event_name == 'push' || inputs.lane == 'internal' || inputs.lane == 'screenshots'
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
@@ -30,42 +74,70 @@ jobs:
             ${{ runner.os }}-pub-
 
       - name: Setup Flutter
+        if: github.event_name == 'push' || inputs.lane == 'internal' || inputs.lane == 'screenshots'
         uses: subosito/flutter-action@v2
         with:
           flutter-version-file: ".fvmrc"
           channel: "stable"
 
-      - name: Install dependencies
+      - name: Install Flutter dependencies
+        if: github.event_name == 'push' || inputs.lane == 'internal' || inputs.lane == 'screenshots'
         run: flutter pub get
 
       - name: Decode Base64 keystore
+        if: github.event_name == 'push' || inputs.lane == 'internal'
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Create key.properties file
+        if: github.event_name == 'push' || inputs.lane == 'internal'
         run: |
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=upload-keystore.jks" >> android/key.properties
 
-      - name: Build AAB
-        run: |
-          VERSION_CODE=$((1000 + ${{ github.run_number }}))
-          echo "Using versionCode=$VERSION_CODE"
+      - name: Run Fastlane internal release
+        if: github.event_name == 'push' || inputs.lane == 'internal'
+        working-directory: android
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: bundle exec fastlane internal
 
-          flutter build appbundle \
-            --release \
-            --flavor prod \
-            --build-number $VERSION_CODE
+      - name: Run Fastlane promote_to_beta
+        if: github.event_name == 'workflow_dispatch' && inputs.lane == 'promote_to_beta'
+        working-directory: android
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: bundle exec fastlane promote_to_beta
 
-      - name: Upload to Google Play
-        uses: r0adkll/upload-google-play@v1
+      - name: Run Fastlane promote_to_prod
+        if: github.event_name == 'workflow_dispatch' && inputs.lane == 'promote_to_prod'
+        working-directory: android
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: bundle exec fastlane promote_to_prod rollout:${{ inputs.rollout }}
+
+      - name: Install symbol fallback font for screenshots
+        if: github.event_name == 'workflow_dispatch' && inputs.lane == 'screenshots'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-dejavu-core
+
+      - name: Run Fastlane screenshots
+        if: github.event_name == 'workflow_dispatch' && inputs.lane == 'screenshots'
+        working-directory: android
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: bundle exec fastlane screenshots upload:${{ inputs.upload_screenshots }}
+
+      - name: Upload generated screenshots artifact
+        if: github.event_name == 'workflow_dispatch' && inputs.lane == 'screenshots'
+        uses: actions/upload-artifact@v4
         with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: com.mateusnavarro77.metronome
-          releaseFiles: build/app/outputs/bundle/prodRelease/*.aab
-          track: internal
-          status: completed
+          name: play-store-screenshots
+          path: android/fastlane/metadata/android/*/images/phoneScreenshots/*.png
+
+      - name: Cleanup signing files
+        if: always()
+        run: rm -f android/app/upload-keystore.jks android/key.properties

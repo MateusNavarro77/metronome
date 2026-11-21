@@ -89,8 +89,8 @@ class const Setlist({
 
     final rawName = json['name'];
     final name = rawName is String && rawName.trim().isNotEmpty
-        ? rawName
-        : 'Untitled Setlist';
+        ? rawName.trim()
+        : '';
 
     final rawPresetIds = json['presetIds'];
     final presetIds = rawPresetIds is List<Object?>

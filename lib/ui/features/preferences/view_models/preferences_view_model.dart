@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../data/repositories/metronome_repository.dart';
 import '../../../../data/repositories/preferences_repository.dart';
+import '../../../../domain/models/app_language.dart';
 import '../../../../domain/models/app_theme_mode.dart';
 import '../../../../domain/models/metronome_sound.dart';
 import '../../../../domain/models/sound_settings.dart';
@@ -21,8 +22,19 @@ extension AppThemeModeFlutterMapping on AppThemeMode {
   }
 }
 
-/// ViewModel managing state for user preferences: theme mode and sound/volume
-/// configuration (FR-CFG-01..04, FR-SND-01..08).
+/// Mapping extension converting domain [AppLanguage] to Flutter [Locale].
+extension AppLanguageFlutterMapping on AppLanguage {
+  Locale? get toMaterialLocale {
+    return switch (this) {
+      AppLanguage.system => null,
+      AppLanguage.english => const Locale('en'),
+      AppLanguage.portuguese => const Locale('pt'),
+    };
+  }
+}
+
+/// ViewModel managing state for user preferences: theme mode, language, and
+/// sound/volume configuration (FR-CFG-01..04, FR-SND-01..08).
 class PreferencesViewModel extends ChangeNotifier {
   PreferencesViewModel({
     required PreferencesRepository repository,
@@ -30,6 +42,7 @@ class PreferencesViewModel extends ChangeNotifier {
   }) : _repository = repository,
        _metronomeRepository = metronomeRepository,
        _themeMode = repository.getThemeMode(),
+       _language = repository.getLanguage(),
        _soundSettings = repository.getSoundSettings() {
     _metronomeRepository?.setSoundSettings(_soundSettings);
   }
@@ -37,6 +50,7 @@ class PreferencesViewModel extends ChangeNotifier {
   final PreferencesRepository _repository;
   final MetronomeRepository? _metronomeRepository;
   AppThemeMode _themeMode;
+  AppLanguage _language;
   SoundSettings _soundSettings;
 
   /// Current active domain [AppThemeMode].
@@ -44,6 +58,12 @@ class PreferencesViewModel extends ChangeNotifier {
 
   /// Current active theme as Flutter's [ThemeMode] for `MaterialApp`.
   ThemeMode get materialThemeMode => _themeMode.toMaterialThemeMode;
+
+  /// Current active domain [AppLanguage].
+  AppLanguage get language => _language;
+
+  /// Current active [Locale] override for `MaterialApp`, or `null` for system.
+  Locale? get materialLocale => _language.toMaterialLocale;
 
   /// Current [SoundSettings] snapshot.
   SoundSettings get soundSettings => _soundSettings;
@@ -69,6 +89,14 @@ class PreferencesViewModel extends ChangeNotifier {
     _themeMode = mode;
     notifyListeners();
     await _repository.setThemeMode(mode);
+  }
+
+  /// Updates the app language, notifies listeners, and persists the choice.
+  Future<void> setLanguage(AppLanguage language) async {
+    if (_language == language) return;
+    _language = language;
+    notifyListeners();
+    await _repository.setLanguage(language);
   }
 
   /// Selects a [MetronomeSound], persists it, applies it to the engine, and

@@ -3,9 +3,11 @@ import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
 import 'package:provider/provider.dart';
 
+import '../../../../domain/models/app_language.dart';
 import '../../../../domain/models/app_theme_mode.dart';
 import '../../../../domain/models/metronome_sound.dart';
 import '../../../../domain/models/sound_settings.dart';
+import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../view_models/preferences_view_model.dart';
 
@@ -20,6 +22,7 @@ class PreferencesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final viewModel = context.watch<PreferencesViewModel>();
     final canPop = showBackButton ?? (ModalRoute.of(context)?.canPop ?? false);
 
@@ -47,18 +50,63 @@ class PreferencesView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const _SectionHeader(
-                            key: Key('appearance_section_header'),
+                          _SectionHeader(
+                            key: const Key('appearance_section_header'),
                             icon: Icons.palette_outlined,
-                            title: 'APPEARANCE',
+                            title: l10n.appearanceSectionHeader,
                           ),
                           SizedBox(height: context.dimens.spaceSm),
-                          _AppearanceSectionCard(viewModel: viewModel),
+                          _DropdownSectionCard<AppThemeMode>(
+                            cardKey: const Key('appearance_section_card'),
+                            dropdownKey: const Key('theme_mode_dropdown'),
+                            description: l10n.appearanceDescription,
+                            prefixIcon: Icon(switch (viewModel.themeMode) {
+                              AppThemeMode.system =>
+                                Icons.brightness_auto_rounded,
+                              AppThemeMode.light => Icons.light_mode_rounded,
+                              AppThemeMode.dark => Icons.dark_mode_rounded,
+                            }),
+                            value: viewModel.themeMode,
+                            items: AppThemeMode.values
+                                .map(
+                                  (mode) => M3EDropdownItem<AppThemeMode>(
+                                    label: mode.localizedLabel(l10n),
+                                    value: mode,
+                                    selected: mode == viewModel.themeMode,
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: viewModel.setThemeMode,
+                          ),
                           SizedBox(height: context.dimens.spaceLg),
-                          const _SectionHeader(
-                            key: Key('sounds_section_header'),
+                          _SectionHeader(
+                            key: const Key('language_section_header'),
+                            icon: Icons.language_rounded,
+                            title: l10n.languageSectionHeader,
+                          ),
+                          SizedBox(height: context.dimens.spaceSm),
+                          _DropdownSectionCard<AppLanguage>(
+                            cardKey: const Key('language_section_card'),
+                            dropdownKey: const Key('language_dropdown'),
+                            description: l10n.languageDescription,
+                            prefixIcon: const Icon(Icons.translate_rounded),
+                            value: viewModel.language,
+                            items: AppLanguage.values
+                                .map(
+                                  (language) => M3EDropdownItem<AppLanguage>(
+                                    label: language.localizedLabel(l10n),
+                                    value: language,
+                                    selected: language == viewModel.language,
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: viewModel.setLanguage,
+                          ),
+                          SizedBox(height: context.dimens.spaceLg),
+                          _SectionHeader(
+                            key: const Key('sounds_section_header'),
                             icon: Icons.equalizer_rounded,
-                            title: 'SOUNDS & VOLUMES',
+                            title: l10n.soundsSectionHeader,
                           ),
                           SizedBox(height: context.dimens.spaceSm),
                           _SoundsSectionCard(viewModel: viewModel),
@@ -84,6 +132,7 @@ class _PreferencesHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -92,11 +141,11 @@ class _PreferencesHeader extends StatelessWidget {
             key: const Key('preferences_back_button'),
             variant: M3EIconButtonVariant.standard,
             icon: const Icon(Icons.arrow_back_rounded),
-            tooltip: 'Back to metronome',
+            tooltip: l10n.backToMetronomeTooltip,
             onPressed: () => Navigator.of(context).pop(),
           ),
           Text(
-            'PREFERENCES',
+            l10n.preferencesHeader,
             style: context.textTheme.labelMedium?.copyWith(
               color: context.colorScheme.onSurface,
               letterSpacing: 2.2,
@@ -105,7 +154,7 @@ class _PreferencesHeader extends StatelessWidget {
           const SizedBox(width: 48.0),
         ] else ...[
           Text(
-            'PREFERENCES',
+            l10n.preferencesHeader,
             style: context.textTheme.labelMedium?.copyWith(
               color: context.colorScheme.onSurface,
               letterSpacing: 2.2,
@@ -146,59 +195,133 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _AppearanceSectionCard extends StatelessWidget {
-  const _AppearanceSectionCard({required this.viewModel});
+class _DropdownSectionCard<T> extends StatelessWidget {
+  const _DropdownSectionCard({
+    required this.cardKey,
+    required this.dropdownKey,
+    required this.description,
+    required this.prefixIcon,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
 
-  final PreferencesViewModel viewModel;
+  final Key cardKey;
+  final Key dropdownKey;
+  final String description;
+  final Widget prefixIcon;
+  final T value;
+  final List<M3EDropdownItem<T>> items;
+  final ValueChanged<T> onChanged;
 
   @override
   Widget build(BuildContext context) {
     return M3ECard(
-      key: const Key('appearance_section_card'),
+      key: cardKey,
       variant: M3ECardVariant.outlined,
       padding: EdgeInsets.all(context.dimens.spaceMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Choose between dark mode, light mode, or match your device system appearance.',
+            description,
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
               fontSize: 13,
             ),
           ),
           SizedBox(height: context.dimens.spaceMd),
-          SizedBox(
-            width: double.infinity,
-            child: M3ESegmentedButton<AppThemeMode>(
-              key: const Key('theme_mode_segmented_button'),
-              segments: const [
-                M3ESegment<AppThemeMode>(
-                  value: AppThemeMode.system,
-                  label: 'System',
-                  icon: Icon(Icons.brightness_auto_rounded),
-                ),
-                M3ESegment<AppThemeMode>(
-                  value: AppThemeMode.light,
-                  label: 'Light',
-                  icon: Icon(Icons.light_mode_rounded),
-                ),
-                M3ESegment<AppThemeMode>(
-                  value: AppThemeMode.dark,
-                  label: 'Dark',
-                  icon: Icon(Icons.dark_mode_rounded),
-                ),
-              ],
-              selected: {viewModel.themeMode},
-              onSelectionChanged: (selected) {
-                if (selected.isNotEmpty) {
-                  viewModel.setThemeMode(selected.first);
-                }
-              },
-            ),
+          _SingleSelectDropdown<T>(
+            dropdownKey: dropdownKey,
+            prefixIcon: prefixIcon,
+            value: value,
+            items: items,
+            onChanged: onChanged,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SingleSelectDropdown<T> extends StatefulWidget {
+  const _SingleSelectDropdown({
+    required this.dropdownKey,
+    required this.prefixIcon,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  final Key dropdownKey;
+  final Widget prefixIcon;
+  final T value;
+  final List<M3EDropdownItem<T>> items;
+  final ValueChanged<T> onChanged;
+
+  @override
+  State<_SingleSelectDropdown<T>> createState() =>
+      _SingleSelectDropdownState<T>();
+}
+
+class _SingleSelectDropdownState<T> extends State<_SingleSelectDropdown<T>> {
+  late final M3EDropdownController<T> _controller;
+  bool _restoringSelection = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = M3EDropdownController<T>();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleSelectionChanged(List<M3EDropdownItem<T>> selected) {
+    if (_restoringSelection) return;
+    if (selected.isEmpty) {
+      // M3EDropdownController.toggleOnly toggles off when tapping the active item;
+      // keep single-select preferences non-empty.
+      _restoringSelection = true;
+      _controller.selectWhere((item) => item.value == widget.value);
+      _restoringSelection = false;
+      return;
+    }
+    widget.onChanged(selected.first.value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return M3EDropdownMenu<T>(
+      key: widget.dropdownKey,
+      controller: _controller,
+      items: widget.items,
+      singleSelect: true,
+      showChipAnimation: false,
+      containerRadius: context.dimens.radiusDefault,
+      fieldStyle: M3EDropdownFieldStyle(
+        prefixIcon: widget.prefixIcon,
+        backgroundColor: context.colorScheme.surfaceContainerLow,
+        foregroundColor: context.colorScheme.onSurface,
+        borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
+        border: BorderSide(color: context.colorScheme.outlineVariant),
+        focusedBorder: BorderSide(
+          color: context.colorScheme.primary,
+          width: 1.5,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.dimens.spaceMd,
+          vertical: context.dimens.spaceSmPlus2,
+        ),
+      ),
+      dropdownStyle: M3EDropdownPanelStyle(
+        containerRadius: context.dimens.radiusDefault,
+        backgroundColor: context.colorScheme.surfaceContainerHigh,
+      ),
+      onSelectionChanged: _handleSelectionChanged,
     );
   }
 }
@@ -210,6 +333,7 @@ class _SoundsSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isMuted = viewModel.isMuted;
 
     return M3ECard(
@@ -220,7 +344,7 @@ class _SoundsSectionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Select the click timbre, balance strong, weak, and subdivision volumes, or mute audio while keeping the visual pulse.',
+            l10n.soundsDescription,
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
               fontSize: 13,
@@ -247,7 +371,7 @@ class _SoundsSectionCard extends StatelessWidget {
                 _VolumeSliderRow(
                   sliderKey: const Key('sound_strong_volume_slider'),
                   valueKey: const Key('sound_strong_volume_value'),
-                  label: 'Strong Beat',
+                  label: l10n.strongBeatVolumeLabel,
                   icon: Icons.looks_one_rounded,
                   value: viewModel.strongVolume,
                   enabled: !isMuted,
@@ -257,7 +381,7 @@ class _SoundsSectionCard extends StatelessWidget {
                 _VolumeSliderRow(
                   sliderKey: const Key('sound_weak_volume_slider'),
                   valueKey: const Key('sound_weak_volume_value'),
-                  label: 'Weak Beats',
+                  label: l10n.weakBeatsVolumeLabel,
                   icon: Icons.music_note_outlined,
                   value: viewModel.weakVolume,
                   enabled: !isMuted,
@@ -267,7 +391,7 @@ class _SoundsSectionCard extends StatelessWidget {
                 _VolumeSliderRow(
                   sliderKey: const Key('sound_subdivision_volume_slider'),
                   valueKey: const Key('sound_subdivision_volume_value'),
-                  label: 'Subdivisions',
+                  label: l10n.subdivisionsVolumeLabel,
                   icon: Icons.grain_rounded,
                   value: viewModel.subdivisionVolume,
                   enabled: !isMuted,
@@ -362,6 +486,9 @@ class _SoundTimbreTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final soundLabel = sound.localizedLabel(l10n);
+    final soundDescription = sound.localizedDescription(l10n);
     final foreground = isSelected
         ? context.colorScheme.onSecondaryContainer
         : context.colorScheme.onSurface;
@@ -372,7 +499,7 @@ class _SoundTimbreTile extends StatelessWidget {
     return Semantics(
       button: true,
       selected: isSelected,
-      label: '${sound.label}, ${sound.description}',
+      label: '$soundLabel, $soundDescription',
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: context.dimens.minTouchTarget),
         child: M3ECard(
@@ -390,7 +517,7 @@ class _SoundTimbreTile extends StatelessWidget {
               SizedBox(width: context.dimens.spaceSm),
               Expanded(
                 child: Text(
-                  sound.label,
+                  soundLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: context.textTheme.labelLarge?.copyWith(
@@ -430,6 +557,7 @@ class _MuteAudioRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Row(
       children: [
         Icon(
@@ -445,14 +573,14 @@ class _MuteAudioRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Mute audio',
+                l10n.muteAudioTitle,
                 style: context.textTheme.titleSmall?.copyWith(
                   color: context.colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                'Silence click while keeping visual beat indicator active',
+                l10n.muteAudioSubtitle,
                 style: context.textTheme.bodySmall?.copyWith(
                   color: context.colorScheme.onSurfaceVariant,
                 ),
@@ -465,7 +593,7 @@ class _MuteAudioRow extends StatelessWidget {
           key: const Key('sound_mute_switch'),
           value: isMuted,
           onChanged: onChanged,
-          semanticLabel: 'Mute audio',
+          semanticLabel: l10n.muteAudioTitle,
         ),
       ],
     );
@@ -519,7 +647,7 @@ class _VolumeSliderRow extends StatelessWidget {
           ],
         ),
         Semantics(
-          label: '$label volume',
+          label: context.l10n.volumeSliderSemantics(label),
           value: '$value%',
           child: M3ESlider(
             key: sliderKey,

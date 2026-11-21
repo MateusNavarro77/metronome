@@ -81,7 +81,7 @@ void main() {
         'subdivision': 'invalid_subdivision',
       });
 
-      check(sanitized.name).equals('Untitled Preset');
+      check(sanitized.name).equals('');
       check(sanitized.bpm).equals(const Bpm(Bpm.max));
       check(sanitized.timeSignature).equals(const TimeSignature(16, 4));
       check(sanitized.subdivision).equals(Subdivision.none);
@@ -167,6 +167,11 @@ void main() {
 
       final decoded = Setlist.fromJson(setlist.toJson());
       check(decoded).equals(setlist);
+    });
+
+    test('fromJson defaults blank setlist name to empty string', () {
+      final sanitized = Setlist.fromJson({'id': 's3', 'name': '   '});
+      check(sanitized.name).equals('');
     });
   });
 }

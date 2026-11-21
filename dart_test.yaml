@@ -1,0 +1,4 @@
+tags:
+  screenshots:
+    # Screenshot generation tests are excluded from default CI runs to avoid
+    # cross-platform font rasterization diffs; run with `--tags screenshots --update-goldens`.

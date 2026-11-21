@@ -62,7 +62,10 @@ void main() {
       check(repo.searchPresets('   ')).length.equals(3);
 
       // Duplicate preset (FR-PRE-03)
-      final copy = await repo.duplicatePreset(p2.id);
+      final copy = await repo.duplicatePreset(
+        p2.id,
+        duplicatedName: '${p2.name} (Copy)',
+      );
       check(copy.id).not((it) => it.equals(p2.id));
       check(copy.name).equals('Alpha Ballad (Copy)');
       check(copy.bpm).equals(p2.bpm);

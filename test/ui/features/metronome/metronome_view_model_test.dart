@@ -279,7 +279,8 @@ void main() {
       vm.activateSetlist(setlist);
       check(vm.activeSetlist).equals(setlist);
       check(vm.activeSetlistIndex).equals(0);
-      check(vm.activeSetlistPositionLabel).equals('1 of 2');
+      check(vm.activeSetlistCurrentPosition).equals(1);
+      check(vm.activeSetlistTotal).equals(2);
       check(vm.canStepPreviousSetlistItem).isFalse();
       check(vm.canStepNextSetlistItem).isTrue();
       check(vm.bpmValue).equals(100);
@@ -292,7 +293,8 @@ void main() {
       // Step next & previous
       vm.nextSetlistItem();
       check(vm.activeSetlistIndex).equals(1);
-      check(vm.activeSetlistPositionLabel).equals('2 of 2');
+      check(vm.activeSetlistCurrentPosition).equals(2);
+      check(vm.activeSetlistTotal).equals(2);
       check(vm.canStepPreviousSetlistItem).isTrue();
       check(vm.canStepNextSetlistItem).isFalse();
       check(vm.bpmValue).equals(140);
@@ -425,7 +427,8 @@ void main() {
       vm.activateSetlist(setlist);
       check(vm.activeSetlist).equals(setlist);
       check(vm.activeSetlistIndex).equals(0);
-      check(vm.activeSetlistPositionLabel).equals('1 of 2');
+      check(vm.activeSetlistCurrentPosition).equals(1);
+      check(vm.activeSetlistTotal).equals(2);
       check(vm.canStepPreviousSetlistItem).isFalse();
       check(vm.canStepNextSetlistItem).isTrue();
       check(vm.bpmValue).equals(100);
@@ -438,7 +441,8 @@ void main() {
       // Step next & previous
       vm.nextSetlistItem();
       check(vm.activeSetlistIndex).equals(1);
-      check(vm.activeSetlistPositionLabel).equals('2 of 2');
+      check(vm.activeSetlistCurrentPosition).equals(2);
+      check(vm.activeSetlistTotal).equals(2);
       check(vm.canStepPreviousSetlistItem).isTrue();
       check(vm.canStepNextSetlistItem).isFalse();
       check(vm.bpmValue).equals(140);

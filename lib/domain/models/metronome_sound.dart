@@ -3,15 +3,11 @@ import 'time_signature.dart';
 /// Available metronome click timbres (FR-SND-01, FR-SND-02).
 ///
 /// Pure Dart domain enum with zero Flutter dependencies (NFR-MAN-01).
-enum const MetronomeSound(
-  final String id,
-  final String label,
-  final String description,
-) {
-  click('click', 'Click', 'Crisp studio precision click'),
-  woodBlock('wood_block', 'Wood Block', 'Warm resonant wooden block'),
-  beep('beep', 'Beep', 'Clear digital metronome tone'),
-  drums('drums', 'Drums', 'Acoustic kick, rim & hi-hat');
+enum const MetronomeSound(final String id) {
+  click('click'),
+  woodBlock('wood_block'),
+  beep('beep'),
+  drums('drums');
 
   /// Resolves a [MetronomeSound] from its persisted [id], falling back to
   /// [MetronomeSound.click].

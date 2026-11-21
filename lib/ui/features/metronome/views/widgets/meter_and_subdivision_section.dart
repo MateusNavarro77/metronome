@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart'
 
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
+import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Compact horizontal bar containing the Time Signature modal trigger,
@@ -57,6 +58,8 @@ class MeterAndSubdivisionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final subdivisionLabel = selectedSubdivision.localizedLabel(l10n);
     final verticalPadding = isCompact
         ? context.dimens.spaceSm
         : context.dimens.spaceSmPlus4;
@@ -68,9 +71,10 @@ class MeterAndSubdivisionSection extends StatelessWidget {
         Expanded(
           child: _SummaryTriggerCard(
             cardKey: const Key('time_signature_selector_button'),
-            caption: 'TIME SIG',
-            semanticLabel:
-                'Time signature ${selectedTimeSignature.label}. Tap to change.',
+            caption: l10n.timeSignatureCaption,
+            semanticLabel: l10n.timeSignatureSelectorSemantics(
+              selectedTimeSignature.label,
+            ),
             verticalPadding: verticalPadding,
             onTap: () => _openTimeSignatureSheet(context),
             valueWidget: Text(
@@ -91,13 +95,12 @@ class MeterAndSubdivisionSection extends StatelessWidget {
         Expanded(
           child: _SummaryTriggerCard(
             cardKey: const Key('subdivision_selector_button'),
-            caption: 'SUBDIVISION',
-            semanticLabel:
-                'Subdivision ${selectedSubdivision.label}. Tap to change.',
+            caption: l10n.subdivisionCaption,
+            semanticLabel: l10n.subdivisionSelectorSemantics(subdivisionLabel),
             verticalPadding: verticalPadding,
             onTap: () => _openSubdivisionSheet(context),
             valueWidget: Text(
-              '${selectedSubdivision.symbol} ${selectedSubdivision.label}',
+              '${selectedSubdivision.symbol} $subdivisionLabel',
               key: const Key('active_subdivision_label'),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -202,6 +205,7 @@ class _AccentToggleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Center(
       child: M3EIconButton(
         key: const Key('accent_toggle_button'),
@@ -211,10 +215,12 @@ class _AccentToggleCard extends StatelessWidget {
         size: M3EIconButtonSize.md,
         shape: M3EIconButtonShapeVariant.round,
         isSelected: isAccentEnabled,
-        tooltip: isAccentEnabled ? 'Downbeat accent ON' : 'Downbeat accent OFF',
+        tooltip: isAccentEnabled
+            ? l10n.downbeatAccentOnTooltip
+            : l10n.downbeatAccentOffTooltip,
         semanticLabel: isAccentEnabled
-            ? 'Accent on Beat 1 enabled'
-            : 'Accent on Beat 1 disabled',
+            ? l10n.downbeatAccentOnSemantics
+            : l10n.downbeatAccentOffSemantics,
         icon: const Icon(Icons.volume_mute_rounded),
         selectedIcon: const Icon(Icons.volume_up_rounded),
         onPressed: onToggle,
@@ -272,9 +278,10 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return _SonicModalSheetContainer(
       key: const Key('time_signature_bottom_sheet'),
-      title: 'TIME SIGNATURE',
+      title: l10n.timeSignatureSheetTitle,
       trailing: Container(
         padding: EdgeInsets.symmetric(
           horizontal: context.dimens.spaceSmPlus4,
@@ -301,7 +308,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'PRESETS',
+            l10n.timeSignaturePresetsSection,
             style: context.textTheme.labelMedium?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
             ),
@@ -318,7 +325,9 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                   child: _SelectionPill(
                     pillKey: Key('time_sig_${signature.label}'),
                     label: signature.label,
-                    semanticLabel: 'Time signature ${signature.label}',
+                    semanticLabel: l10n.timeSignatureOptionSemantics(
+                      signature.label,
+                    ),
                     isSelected: isSelected,
                     onTap: () => _selectPreset(signature),
                   ),
@@ -328,7 +337,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           ),
           SizedBox(height: context.dimens.spaceLg),
           Text(
-            'CUSTOM METER',
+            l10n.customMeterSection,
             style: context.textTheme.labelMedium?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
             ),
@@ -348,7 +357,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'BEATS PER BAR',
+                      l10n.beatsPerBarLabel,
                       style: context.textTheme.labelMedium?.copyWith(
                         fontSize: 11,
                         color: context.colorScheme.onSurfaceVariant,
@@ -356,7 +365,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                     ),
                     SizedBox(height: context.dimens.spaceXs),
                     Text(
-                      'Numerator (1–16)',
+                      l10n.numeratorRangeLabel,
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontSize: 12,
                         color: context.colorScheme.onSurfaceVariant,
@@ -370,7 +379,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                     _ModalStepperButton(
                       buttonKey: const Key('custom_numerator_decrement'),
                       icon: Icons.remove_rounded,
-                      semanticLabel: 'Decrease beats per bar',
+                      semanticLabel: l10n.decreaseBeatsPerBarSemantics,
                       enabled: _current.numerator > 1,
                       onTap: () =>
                           _updateCustom(numerator: _current.numerator - 1),
@@ -391,7 +400,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                     _ModalStepperButton(
                       buttonKey: const Key('custom_numerator_increment'),
                       icon: Icons.add_rounded,
-                      semanticLabel: 'Increase beats per bar',
+                      semanticLabel: l10n.increaseBeatsPerBarSemantics,
                       enabled: _current.numerator < 16,
                       onTap: () =>
                           _updateCustom(numerator: _current.numerator + 1),
@@ -410,7 +419,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'NOTE VALUE (DENOMINATOR)',
+                  l10n.noteValueDenominatorLabel,
                   style: context.textTheme.labelMedium?.copyWith(
                     fontSize: 11,
                     color: context.colorScheme.onSurfaceVariant,
@@ -428,7 +437,7 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                         child: _SelectionPill(
                           pillKey: Key('custom_denominator_$denom'),
                           label: '/$denom',
-                          semanticLabel: 'Denominator $denom',
+                          semanticLabel: l10n.denominatorSemantics(denom),
                           isSelected: isSelected,
                           onTap: () => _updateCustom(denominator: denom),
                         ),
@@ -458,21 +467,25 @@ class SubdivisionBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return _SonicModalSheetContainer(
       key: const Key('subdivision_bottom_sheet'),
-      title: 'SUBDIVISIONS',
+      title: l10n.subdivisionsSheetTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: Subdivision.values.map((subdivision) {
           final isSelected = subdivision == selectedSubdivision;
+          final subdivisionLabel = subdivision.localizedLabel(l10n);
           return Padding(
             padding: EdgeInsets.only(bottom: context.dimens.spaceSm),
             child: Semantics(
               button: true,
               selected: isSelected,
-              label:
-                  'Subdivision ${subdivision.label} (${subdivision.pulsesPerBeat} per beat)',
+              label: l10n.subdivisionOptionSemantics(
+                subdivisionLabel,
+                subdivision.pulsesPerBeat,
+              ),
               child: M3ECard(
                 key: Key('subdivision_${subdivision.name}'),
                 variant: isSelected
@@ -519,7 +532,7 @@ class SubdivisionBottomSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            subdivision.label,
+                            subdivisionLabel,
                             style: context.textTheme.titleSmall?.copyWith(
                               fontWeight: isSelected
                                   ? FontWeight.w700
@@ -530,8 +543,7 @@ class SubdivisionBottomSheet extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${subdivision.pulsesPerBeat} '
-                            '${subdivision.pulsesPerBeat == 1 ? 'pulse' : 'pulses'} per beat',
+                            l10n.pulsesPerBeat(subdivision.pulsesPerBeat),
                             style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: 12,
                               color: isSelected

@@ -3,6 +3,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
 
+import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Bottom thumb-zone controls housing the large Tap Tempo button and the
@@ -46,6 +47,7 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final controlHeight = widget.isCompact
         ? context.dimens.pulseButtonSizeCompact
         : context.dimens.pulseButtonSize;
@@ -57,7 +59,7 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
         Expanded(
           child: Semantics(
             button: true,
-            label: 'Tap tempo',
+            label: l10n.tapTempoSemantics,
             child: Listener(
               key: const Key('tap_tempo_button'),
               behavior: HitTestBehavior.opaque,
@@ -99,7 +101,7 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                           ),
                           SizedBox(width: context.dimens.spaceSmPlus2),
                           Text(
-                            'TAP TEMPO',
+                            l10n.tapTempoLabel,
                             style: context.textTheme.labelMedium?.copyWith(
                               fontSize: widget.isCompact ? 13 : 15,
                               fontWeight: FontWeight.w700,
@@ -141,8 +143,8 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
           icon: const Icon(Icons.play_arrow_rounded),
           selectedIcon: const Icon(Icons.stop_rounded),
           semanticLabel: widget.isPlaying
-              ? 'Stop metronome'
-              : 'Start metronome',
+              ? l10n.stopMetronomeSemantics
+              : l10n.startMetronomeSemantics,
           onPressed: widget.onTogglePlayStop,
         ),
       ],

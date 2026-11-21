@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
+import 'package:metronome/domain/models/app_language.dart';
 import 'package:metronome/domain/models/app_theme_mode.dart';
 import 'package:metronome/domain/models/metronome_sound.dart';
 import 'package:metronome/domain/models/sound_settings.dart';
@@ -23,6 +24,8 @@ void main() {
 
       check(vm.themeMode).equals(AppThemeMode.system);
       check(vm.materialThemeMode).equals(ThemeMode.system);
+      check(vm.language).equals(AppLanguage.system);
+      check(vm.materialLocale).isNull();
       check(vm.soundSettings).equals(const SoundSettings());
       check(metronomeRepo.state.soundSettings).equals(const SoundSettings());
     });
@@ -44,6 +47,30 @@ void main() {
       // Setting same mode again does not re-notify
       await vm.setThemeMode(AppThemeMode.light);
       check(notified).equals(1);
+    });
+
+    test('updates language, resolves Locale, and notifies listeners', () async {
+      final repo = PreferencesRepository(preferences: null);
+      final vm = PreferencesViewModel(repository: repo);
+
+      var notified = 0;
+      vm.addListener(() => notified++);
+
+      await vm.setLanguage(AppLanguage.portuguese);
+
+      check(vm.language).equals(AppLanguage.portuguese);
+      check(vm.materialLocale).equals(const Locale('pt'));
+      check(repo.getLanguage()).equals(AppLanguage.portuguese);
+      check(notified).equals(1);
+
+      await vm.setLanguage(AppLanguage.portuguese);
+      check(notified).equals(1);
+
+      await vm.setLanguage(AppLanguage.english);
+      check(vm.materialLocale).equals(const Locale('en'));
+
+      await vm.setLanguage(AppLanguage.system);
+      check(vm.materialLocale).isNull();
     });
 
     test('selects sound, syncs to engine, and plays preview when stopped & unmuted', () async {

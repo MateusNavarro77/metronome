@@ -11,11 +11,5 @@ void main() {
         AppThemeMode.dark,
       ]);
     });
-
-    test('label returns human-readable name', () {
-      check(AppThemeMode.system.label).equals('System');
-      check(AppThemeMode.light.label).equals('Light');
-      check(AppThemeMode.dark.label).equals('Dark');
-    });
   });
 }

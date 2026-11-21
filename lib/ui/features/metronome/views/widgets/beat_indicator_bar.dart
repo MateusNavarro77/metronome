@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart'
 
 import '../../../../../domain/models/subdivision.dart';
 import '../../../../../domain/models/time_signature.dart';
+import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Visual pulse indicator displaying one marker per beat of the bar (FR-VIS-01, UI-13).
@@ -33,12 +34,13 @@ class BeatIndicatorBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final beatCount = timeSignature.numerator;
 
     return Semantics(
       label: isPlaying
-          ? 'Beat ${currentBeat + 1} of $beatCount'
-          : 'Pulse indicator stopped, $beatCount beats per bar',
+          ? l10n.beatIndicatorPlayingSemantics(currentBeat + 1, beatCount)
+          : l10n.beatIndicatorStoppedSemantics(beatCount),
       child: M3ECard(
         variant: M3ECardVariant.outlined,
         padding: EdgeInsets.symmetric(

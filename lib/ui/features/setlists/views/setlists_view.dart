@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../domain/models/preset.dart';
 import '../../../../domain/models/setlist.dart';
+import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
 import '../view_models/setlists_view_model.dart';
 import 'widgets/setlist_detail_sheet.dart';
@@ -38,10 +39,11 @@ class _SetlistsViewBody extends StatelessWidget {
   final SetlistsViewModel viewModel;
 
   Future<void> _createSetlist(BuildContext context) async {
+    final l10n = context.l10n;
     final name = await showSetlistNameDialog(
       context,
-      title: 'New Setlist',
-      confirmLabel: 'Create',
+      title: l10n.newSetlistDialogTitle,
+      confirmLabel: l10n.create,
     );
     if (name == null) return;
     final created = await viewModel.createSetlist(name: name);
@@ -54,10 +56,11 @@ class _SetlistsViewBody extends StatelessWidget {
   }
 
   Future<void> _renameSetlist(BuildContext context, Setlist setlist) async {
+    final l10n = context.l10n;
     final newName = await showSetlistNameDialog(
       context,
-      title: 'Rename Setlist',
-      confirmLabel: 'Save',
+      title: l10n.renameSetlistDialogTitle,
+      confirmLabel: l10n.save,
       initialName: setlist.name,
     );
     if (newName == null) return;
@@ -68,13 +71,14 @@ class _SetlistsViewBody extends StatelessWidget {
     BuildContext context,
     Setlist setlist,
   ) async {
+    final l10n = context.l10n;
     final confirmed = await M3EDialog.show<bool>(
       context,
       dialog: M3EDialog(
         key: const Key('delete_setlist_confirm_dialog'),
-        title: 'Delete Setlist?',
+        title: l10n.deleteSetlistDialogTitle,
         content: Text(
-          'Are you sure you want to delete "${setlist.name}"? Your saved presets will remain in your library.',
+          l10n.deleteSetlistDialogMessage(setlist.displayName(l10n)),
           style: context.textTheme.bodyMedium?.copyWith(
             color: context.colorScheme.onSurfaceVariant,
           ),
@@ -83,12 +87,12 @@ class _SetlistsViewBody extends StatelessWidget {
           M3EButton.text(
             key: const Key('cancel_delete_setlist_button'),
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           M3EButton.filled(
             key: const Key('confirm_delete_setlist_button'),
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -101,6 +105,7 @@ class _SetlistsViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final setlists = viewModel.setlists;
     final activeSetlistId = viewModel.activeSetlistId;
 
@@ -126,7 +131,7 @@ class _SetlistsViewBody extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'SETLISTS',
+                        l10n.setlistsHeader,
                         style: context.textTheme.labelMedium?.copyWith(
                           color: context.colorScheme.onSurface,
                           letterSpacing: 2.2,
@@ -137,7 +142,7 @@ class _SetlistsViewBody extends StatelessWidget {
                         size: M3EButtonSize.sm,
                         icon: const Icon(Icons.add_rounded, size: 20),
                         onPressed: () => _createSetlist(context),
-                        child: const Text('New Setlist'),
+                        child: Text(l10n.newSetlistButton),
                       ),
                     ],
                   ),
@@ -218,15 +223,18 @@ class _SetlistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final setlistName = setlist.displayName(l10n);
+    final songCountLabel = l10n.songCount(presets.length);
     final previewText = presets.isEmpty
-        ? 'Empty setlist — tap to add presets'
-        : presets.take(3).map((p) => p.name).join(' · ') +
+        ? l10n.emptySetlistPreview
+        : presets.take(3).map((p) => p.displayName(l10n)).join(' · ') +
               (presets.length > 3 ? ' (+${presets.length - 3})' : '');
 
     return Semantics(
       button: true,
       selected: isActive,
-      label: '${setlist.name}, ${presets.length} songs',
+      label: l10n.setlistCardSemantics(setlistName, songCountLabel),
       child: M3ECard(
         key: Key('setlist_card_${setlist.id}'),
         variant: isActive ? M3ECardVariant.filled : M3ECardVariant.outlined,
@@ -246,7 +254,7 @@ class _SetlistCard extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              setlist.name,
+                              setlistName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: context.textTheme.titleSmall?.copyWith(
@@ -270,7 +278,7 @@ class _SetlistCard extends StatelessWidget {
                                 ),
                               ),
                               child: Text(
-                                'ACTIVE',
+                                l10n.activeBadge,
                                 style: context.textTheme.labelMedium?.copyWith(
                                   fontSize: 9,
                                   letterSpacing: 0.8,
@@ -283,7 +291,7 @@ class _SetlistCard extends StatelessWidget {
                       ),
                       SizedBox(height: context.dimens.spaceXs),
                       Text(
-                        '${presets.length} ${presets.length == 1 ? 'song' : 'songs'} · $previewText',
+                        l10n.setlistCardSubtitle(songCountLabel, previewText),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: context.textTheme.bodyMedium?.copyWith(
@@ -304,13 +312,13 @@ class _SetlistCard extends StatelessWidget {
                   size: M3EButtonSize.sm,
                   icon: const Icon(Icons.playlist_play_rounded, size: 20),
                   onPressed: presets.isEmpty ? null : onActivate,
-                  child: const Text('Activate'),
+                  child: Text(l10n.activateSetlistButton),
                 ),
                 const Spacer(),
                 M3EIconButton(
                   key: Key('setlist_rename_button_${setlist.id}'),
                   variant: M3EIconButtonVariant.standard,
-                  tooltip: 'Rename ${setlist.name}',
+                  tooltip: l10n.renameSetlistTooltip(setlistName),
                   onPressed: onRename,
                   icon: Icon(
                     Icons.edit_outlined,
@@ -321,7 +329,7 @@ class _SetlistCard extends StatelessWidget {
                 M3EIconButton(
                   key: Key('setlist_delete_button_${setlist.id}'),
                   variant: M3EIconButtonVariant.standard,
-                  tooltip: 'Delete ${setlist.name}',
+                  tooltip: l10n.deleteSetlistTooltip(setlistName),
                   onPressed: onDelete,
                   icon: Icon(
                     Icons.delete_outline_rounded,
@@ -345,6 +353,7 @@ class _EmptySetlistsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return M3ECard(
       variant: M3ECardVariant.outlined,
       borderRadius: BorderRadius.circular(context.dimens.radiusLg),
@@ -366,7 +375,7 @@ class _EmptySetlistsCard extends StatelessWidget {
           ),
           SizedBox(height: context.dimens.spaceMd),
           Text(
-            'No setlists yet',
+            l10n.noSetlistsTitle,
             textAlign: TextAlign.center,
             style: context.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
@@ -375,7 +384,7 @@ class _EmptySetlistsCard extends StatelessWidget {
           ),
           SizedBox(height: context.dimens.spaceXs),
           Text(
-            'Group your saved presets into ordered gig or rehearsal setlists with seamless bar-synced transitions.',
+            l10n.noSetlistsSubtitle,
             textAlign: TextAlign.center,
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
@@ -386,7 +395,7 @@ class _EmptySetlistsCard extends StatelessWidget {
             key: const Key('empty_create_setlist_button'),
             size: M3EButtonSize.md,
             onPressed: onCreateSetlist,
-            child: const Text('Create Setlist'),
+            child: Text(l10n.createSetlistButton),
           ),
         ],
       ),

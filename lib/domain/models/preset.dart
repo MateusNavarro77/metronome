@@ -81,8 +81,8 @@ class const Preset({
 
     final rawName = json['name'];
     final name = rawName is String && rawName.trim().isNotEmpty
-        ? rawName
-        : 'Untitled Preset';
+        ? rawName.trim()
+        : '';
 
     final rawBpm = json['bpm'];
     final bpm = switch (rawBpm) {
