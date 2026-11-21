@@ -36,7 +36,7 @@ jobs:
     uses: ./.github/workflows/ci.yaml
 
   release:
-    name: Fastlane Android (${{ inputs.lane || 'internal' }})
+    name: Fastlane Android
     needs: ci
     runs-on: ubuntu-24.04
 
@@ -54,18 +54,18 @@ jobs:
           working-directory: android
 
       - name: Setup Java
-        if: github.event_name == 'push' || inputs.lane == 'internal'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.lane == 'internal')
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Setup Gradle
-        if: github.event_name == 'push' || inputs.lane == 'internal'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.lane == 'internal')
         uses: gradle/actions/setup-gradle@v4
 
       - name: Cache Pub dependencies
-        if: github.event_name == 'push' || inputs.lane == 'internal' || inputs.lane == 'screenshots'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.lane == 'internal' || inputs.lane == 'screenshots'))
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
@@ -74,25 +74,25 @@ jobs:
             ${{ runner.os }}-pub-
 
       - name: Setup Flutter
-        if: github.event_name == 'push' || inputs.lane == 'internal' || inputs.lane == 'screenshots'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.lane == 'internal' || inputs.lane == 'screenshots'))
         uses: subosito/flutter-action@v2
         with:
           flutter-version-file: ".fvmrc"
           channel: "stable"
 
       - name: Install Flutter dependencies
-        if: github.event_name == 'push' || inputs.lane == 'internal' || inputs.lane == 'screenshots'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.lane == 'internal' || inputs.lane == 'screenshots'))
         run: flutter pub get
 
       - name: Decode Base64 keystore
-        if: github.event_name == 'push' || inputs.lane == 'internal'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.lane == 'internal')
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Create key.properties file
-        if: github.event_name == 'push' || inputs.lane == 'internal'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.lane == 'internal')
         run: |
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
@@ -100,7 +100,7 @@ jobs:
           echo "storeFile=upload-keystore.jks" >> android/key.properties
 
       - name: Run Fastlane internal release
-        if: github.event_name == 'push' || inputs.lane == 'internal'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.lane == 'internal')
         working-directory: android
         env:
           SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
