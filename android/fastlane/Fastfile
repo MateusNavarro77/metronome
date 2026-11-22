@@ -35,7 +35,7 @@ platform :android do
     UI.user_error!(e.message)
   end
 
-  desc "Generate Play Store phone screenshots using Flutter golden tests"
+  desc "Generate Play Store phone and tablet screenshots using Flutter golden tests"
   lane :screenshots do |options|
     Dir.chdir(REPO_ROOT) do
       sh("flutter", "test", "--tags", "screenshots", "--update-goldens", "test/screenshots/play_store_screenshots_test.dart")
@@ -54,6 +54,23 @@ platform :android do
         skip_upload_screenshots: false
       )
     end
+  end
+
+  desc "Upload Play Store listing metadata, icons, feature graphics, and screenshots"
+  lane :deploy_metadata do |options|
+    validate_only = options[:validate_only].to_s == "true"
+    upload_to_play_store(
+      package_name: PACKAGE_NAME,
+      track: "internal",
+      metadata_path: METADATA_DIR,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_changelogs: true,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      validate_only: validate_only
+    )
   end
 
   desc "Build prod AAB with auto-incremented versionCode and upload to Play Store internal track"

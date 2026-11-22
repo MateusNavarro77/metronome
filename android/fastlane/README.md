@@ -21,7 +21,15 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane android screenshots
 ```
 
-Generate Play Store phone screenshots using Flutter golden tests
+Generate Play Store phone and tablet screenshots using Flutter golden tests
+
+### android deploy_metadata
+
+```sh
+[bundle exec] fastlane android deploy_metadata
+```
+
+Upload Play Store listing metadata, icons, feature graphics, and screenshots
 
 ### android internal
 
