@@ -1,0 +1,6 @@
+# fastlane specific
+report.xml
+
+# deliver temporary files
+Preview.html
+
