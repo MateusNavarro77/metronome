@@ -3,6 +3,12 @@ name: Release Android (Fastlane)
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "android/fastlane/metadata/android/*/title.txt"
+      - "android/fastlane/metadata/android/*/short_description.txt"
+      - "android/fastlane/metadata/android/*/full_description.txt"
+      - "android/fastlane/metadata/android/*/video.txt"
+      - "android/fastlane/metadata/android/*/images/**"
   workflow_dispatch:
     inputs:
       lane:
@@ -134,7 +140,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: play-store-screenshots
-          path: android/fastlane/metadata/android/*/images/phoneScreenshots/*.png
+          path: android/fastlane/metadata/android/*/images/*Screenshots/*.png
 
       - name: Cleanup signing files
         if: always()

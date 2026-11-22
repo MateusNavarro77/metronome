@@ -90,18 +90,54 @@ Future<void> _loadTestFonts() async {
   }
 }
 
-Future<void> _capturePhoneScreenshotsForLocale(
+typedef _ScreenshotDeviceProfile = ({
+  String folder,
+  Size physicalSize,
+  double devicePixelRatio,
+});
+
+const _deviceProfiles = <_ScreenshotDeviceProfile>[
+  (
+    folder: 'phoneScreenshots',
+    physicalSize: Size(1080, 2400),
+    devicePixelRatio: 2.625,
+  ),
+  (
+    folder: 'sevenInchScreenshots',
+    physicalSize: Size(1200, 1920),
+    devicePixelRatio: 1.5,
+  ),
+  (
+    folder: 'tenInchScreenshots',
+    physicalSize: Size(2560, 1600),
+    devicePixelRatio: 2.0,
+  ),
+];
+
+Future<void> _tapNavDestination(WidgetTester tester, String section) async {
+  final navFinder = find.byKey(Key('nav_destination_$section'));
+  if (navFinder.evaluate().isNotEmpty) {
+    await tester.tap(navFinder);
+  } else {
+    await tester.tap(find.byKey(Key('rail_destination_$section')));
+  }
+  await tester.pumpAndSettle();
+  await tester.runAsync(() => GoogleFonts.pendingFonts());
+  await tester.pumpAndSettle();
+}
+
+Future<void> _captureScreenshotsForLocaleAndProfile(
   WidgetTester tester, {
   required AppLanguage language,
   required String storeLocale,
+  required _ScreenshotDeviceProfile profile,
 }) async {
   SharedPreferences.setMockInitialValues({'app_language': language.code});
   final preferences = await SharedPreferences.getInstance();
   final simulatedEngine = SimulatedMetronomeEngine();
 
-  // Pixel phone resolution: ~411x914 logical * 2.625 DPR = 1080x2400 px
-  tester.view.physicalSize = const Size(1080, 2400);
-  tester.view.devicePixelRatio = 2.625;
+  tester.view.physicalSize = profile.physicalSize;
+  tester.view.devicePixelRatio = profile.devicePixelRatio;
   addTearDown(() {
     tester.view.resetPhysicalSize();
     tester.view.resetDevicePixelRatio();
@@ -109,7 +145,7 @@ Future<void> _capturePhoneScreenshotsForLocale(
 
   await tester.pumpWidget(
     MetronomeApp(
-      key: ValueKey('screenshot_app_${language.code}'),
+      key: ValueKey('screenshot_app_${language.code}_${profile.folder}'),
       engineOverride: simulatedEngine,
       preferences: preferences,
     ),
@@ -118,7 +154,7 @@ Future<void> _capturePhoneScreenshotsForLocale(
   await tester.pumpAndSettle();
 
   final basePath =
-      '../../android/fastlane/metadata/android/$storeLocale/images/phoneScreenshots';
+      '../../android/fastlane/metadata/android/$storeLocale/images/${profile.folder}';
 
   // 1. Metronome main screen
   await expectLater(
@@ -127,30 +163,21 @@ Future<void> _capturePhoneScreenshotsForLocale(
   );
 
   // 2. Presets screen
-  await tester.tap(find.byKey(const Key('nav_destination_presets')));
-  await tester.pumpAndSettle();
-  await tester.runAsync(() => GoogleFonts.pendingFonts());
-  await tester.pumpAndSettle();
+  await _tapNavDestination(tester, 'presets');
   await expectLater(
     find.byType(MetronomeApp),
     matchesGoldenFile('$basePath/02_presets.png'),
   );
 
   // 3. Setlists screen
-  await tester.tap(find.byKey(const Key('nav_destination_setlists')));
-  await tester.pumpAndSettle();
-  await tester.runAsync(() => GoogleFonts.pendingFonts());
-  await tester.pumpAndSettle();
+  await _tapNavDestination(tester, 'setlists');
   await expectLater(
     find.byType(MetronomeApp),
     matchesGoldenFile('$basePath/03_setlists.png'),
   );
 
   // 4. Preferences screen
-  await tester.tap(find.byKey(const Key('nav_destination_settings')));
-  await tester.pumpAndSettle();
-  await tester.runAsync(() => GoogleFonts.pendingFonts());
-  await tester.pumpAndSettle();
+  await _tapNavDestination(tester, 'settings');
   await expectLater(
     find.byType(MetronomeApp),
     matchesGoldenFile('$basePath/04_preferences.png'),
@@ -168,15 +195,19 @@ void main() {
   ];
 
   for (final (language, storeLocale) in screenshotLocales) {
-    testWidgets('Generate Play Store phone screenshots ($storeLocale)', (
-      WidgetTester tester,
-    ) async {
-      await tester.runAsync(_loadTestFonts);
-      await _capturePhoneScreenshotsForLocale(
-        tester,
-        language: language,
-        storeLocale: storeLocale,
+    for (final profile in _deviceProfiles) {
+      testWidgets(
+        'Generate Play Store ${profile.folder} screenshots ($storeLocale)',
+        (WidgetTester tester) async {
+          await tester.runAsync(_loadTestFonts);
+          await _captureScreenshotsForLocaleAndProfile(
+            tester,
+            language: language,
+            storeLocale: storeLocale,
+            profile: profile,
+          );
+        },
       );
-    });
+    }
   }
 }

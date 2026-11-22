@@ -1,0 +1,44 @@
+name: Deploy Play Store Metadata (Fastlane)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "android/fastlane/metadata/android/*/title.txt"
+      - "android/fastlane/metadata/android/*/short_description.txt"
+      - "android/fastlane/metadata/android/*/full_description.txt"
+      - "android/fastlane/metadata/android/*/video.txt"
+      - "android/fastlane/metadata/android/*/images/**"
+  workflow_dispatch:
+    inputs:
+      validate_only:
+        description: "Validate metadata with Google Play without publishing"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy_metadata:
+    name: Deploy Store Listing Metadata
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Setup Ruby & Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Run Fastlane deploy_metadata
+        working-directory: android
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: bundle exec fastlane deploy_metadata validate_only:${{ inputs.validate_only || false }}
