@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [ main ]
+    types: [ opened, synchronize, reopened ]
   workflow_call:
 
 concurrency:
@@ -16,10 +17,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Cache Pub dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
@@ -34,6 +35,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Validate Play Store changelogs
+        run: ruby android/fastlane/validate_changelogs.rb
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
