@@ -115,11 +115,23 @@ const _deviceProfiles = <_ScreenshotDeviceProfile>[
 ];
 
 Future<void> _tapNavDestination(WidgetTester tester, String section) async {
-  final navFinder = find.byKey(Key('nav_destination_$section'));
-  if (navFinder.evaluate().isNotEmpty) {
-    await tester.tap(navFinder);
+  final railFinder = find.byKey(Key('rail_destination_$section'));
+  if (railFinder.evaluate().isNotEmpty) {
+    await tester.tap(railFinder);
   } else {
-    await tester.tap(find.byKey(Key('rail_destination_$section')));
+    final icon = switch (section) {
+      'metronome' => Icons.speed_outlined,
+      'presets' => Icons.tune_outlined,
+      'setlists' => Icons.queue_music_outlined,
+      'settings' => Icons.settings_outlined,
+      _ => throw ArgumentError('Unknown navigation section: $section'),
+    };
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const Key('adaptive_navigation_toolbar')),
+        matching: find.byIcon(icon),
+      ),
+    );
   }
   await tester.pumpAndSettle();
   await tester.runAsync(() => GoogleFonts.pendingFonts());

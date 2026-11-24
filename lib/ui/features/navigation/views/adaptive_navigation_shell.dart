@@ -11,8 +11,9 @@ import '../../presets/views/presets_view.dart';
 import '../../setlists/views/setlists_view.dart';
 
 /// Top-level adaptive navigation shell providing responsive layout switching
-/// between [M3ENavigationBar] (portrait) and [M3ENavigationRail] (landscape / wide screen),
-/// retaining page state via [IndexedStack] with smooth animated transitions.
+/// between [M3EToolbar.floating] (portrait) and [M3ENavigationRail] (landscape / wide screen),
+/// retaining page state via [IndexedStack] with smooth animated transitions and
+/// exposing a persistent Play/Stop FAB across every destination.
 class AdaptiveNavigationShell extends StatefulWidget {
   const AdaptiveNavigationShell({
     super.key,
@@ -92,7 +93,6 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
             label: l10n.navMetronome,
             icon: Icons.speed_outlined,
             selectedIcon: Icons.speed,
-            navKey: const Key('nav_destination_metronome'),
             railKey: const Key('rail_destination_metronome'),
           ),
           _NavigationItem(
@@ -100,7 +100,6 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
             label: l10n.navPresets,
             icon: Icons.tune_outlined,
             selectedIcon: Icons.tune_rounded,
-            navKey: const Key('nav_destination_presets'),
             railKey: const Key('rail_destination_presets'),
           ),
           _NavigationItem(
@@ -108,7 +107,6 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
             label: l10n.navSetlists,
             icon: Icons.queue_music_outlined,
             selectedIcon: Icons.queue_music_rounded,
-            navKey: const Key('nav_destination_setlists'),
             railKey: const Key('rail_destination_setlists'),
           ),
           _NavigationItem(
@@ -116,7 +114,6 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
             label: l10n.navSettings,
             icon: Icons.settings_outlined,
             selectedIcon: Icons.settings_rounded,
-            navKey: const Key('nav_destination_settings'),
             railKey: const Key('rail_destination_settings'),
           ),
         ];
@@ -140,58 +137,136 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
           ),
         );
 
-        if (useRail) {
-          return Scaffold(
-            backgroundColor: context.colorScheme.surface,
-            body: SafeArea(
-              bottom: false,
-              top: false,
-              child: Row(
-                children: [
-                  M3ENavigationRail(
-                    key: const Key('adaptive_navigation_rail'),
-                    type: M3ENavigationRailType.alwaysCollapse,
-                    alignment: M3ENavigationRailAlignment.center,
-                    labelBehavior: M3ENavigationRailLabelBehavior.onlySelected,
-                    showDivider: true,
-                    selectedIndex: _currentIndex,
-                    onDestinationSelected: _onDestinationSelected,
-                    sections: [
-                      M3ENavigationRailSection(
-                        destinations: destinations.map((item) {
-                          return M3ENavigationRailDestination(
-                            icon: Icon(item.icon, key: item.railKey),
-                            selectedIcon: Icon(item.selectedIcon),
-                            label: item.label,
-                          );
-                        }).toList(),
+        return ListenableBuilder(
+          listenable: widget.metronomeViewModel,
+          builder: (context, _) {
+            final isPlaying = widget.metronomeViewModel.isPlaying;
+            final fabIcon = isPlaying
+                ? Icons.stop_rounded
+                : Icons.play_arrow_rounded;
+            final fabSemantics = isPlaying
+                ? l10n.stopMetronomeSemantics
+                : l10n.startMetronomeSemantics;
+            final fabColor = isPlaying
+                ? M3EFabColor.tertiary
+                : M3EFabColor.primary;
+
+            if (useRail) {
+              return Scaffold(
+                backgroundColor: context.colorScheme.surface,
+                body: SafeArea(
+                  bottom: false,
+                  top: false,
+                  child: Row(
+                    children: [
+                      M3ENavigationRail(
+                        key: const Key('adaptive_navigation_rail'),
+                        type: M3ENavigationRailType.alwaysCollapse,
+                        alignment: M3ENavigationRailAlignment.center,
+                        labelBehavior:
+                            M3ENavigationRailLabelBehavior.onlySelected,
+                        showDivider: true,
+                        selectedIndex: _currentIndex,
+                        onDestinationSelected: _onDestinationSelected,
+                        fab: M3ENavigationRailFabSlot(
+                          icon: Icon(
+                            fabIcon,
+                            key: const Key('rail_play_stop_fab_icon'),
+                          ),
+                          label: fabSemantics,
+                          tooltip: fabSemantics,
+                          semanticLabel: fabSemantics,
+                          color: fabColor,
+                          onPressed: widget.metronomeViewModel.togglePlayStop,
+                        ),
+                        sections: [
+                          M3ENavigationRailSection(
+                            destinations: destinations.map((item) {
+                              return M3ENavigationRailDestination(
+                                icon: Icon(item.icon, key: item.railKey),
+                                selectedIcon: Icon(item.selectedIcon),
+                                label: item.label,
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
+                      Expanded(child: content),
                     ],
                   ),
-                  Expanded(child: content),
-                ],
-              ),
-            ),
-          );
-        }
-
-        return Scaffold(
-          backgroundColor: context.colorScheme.surface,
-          body: content,
-          bottomNavigationBar: M3ENavigationBar(
-            key: const Key('adaptive_navigation_bar'),
-            selectedIndex: _currentIndex,
-            onDestinationSelected: _onDestinationSelected,
-            labelBehavior: M3ENavBarLabelBehavior.alwaysShow,
-            indicatorStyle: M3ENavBarIndicatorStyle.pill,
-            destinations: destinations.map((item) {
-              return M3ENavigationBarDestination(
-                icon: Icon(item.icon, key: item.navKey),
-                selectedIcon: Icon(item.selectedIcon),
-                label: item.label,
+                ),
               );
-            }).toList(),
-          ),
+            }
+
+            final baseM3E = context.m3e;
+            final compactToolbarTheme = baseM3E.copyWith(
+              toolbarTheme: baseM3E.toolbarTheme.copyWith(
+                actionGap: 0,
+                screenOffset: 8,
+              ),
+              typography: M3ETypography(
+                baseline: M3ETypeScale.fromTextTheme(
+                  baseM3E.typeScale.toTextTheme().copyWith(
+                    labelLarge: baseM3E.typeScale.labelLarge.copyWith(
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                emphasized: baseM3E.typography.emphasized,
+              ),
+            );
+
+            return Scaffold(
+              backgroundColor: context.colorScheme.surface,
+              body: content,
+              bottomNavigationBar: SafeArea(
+                top: false,
+                child: SizedBox(
+                  height: 96,
+                  child: M3ETheme(
+                    data: compactToolbarTheme,
+                    child: M3EToolbar.floating(
+                      key: const Key('adaptive_navigation_toolbar'),
+                      alignment: Alignment.bottomCenter,
+                      safeArea: false,
+                      dockEdge: M3EToolbarDockEdge.bottom,
+                      colorStyle: M3EToolbarColorStyle.standard,
+                      screenOffset: 8,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 8,
+                      ),
+                      activeIndex: _currentIndex,
+                      onActiveIndexChanged: _onDestinationSelected,
+                      fabPosition: M3EToolbarFabPosition.end,
+                      fabExpandsToolbar: false,
+                      onFabPressed: widget.metronomeViewModel.togglePlayStop,
+                      floatingActionButton: M3EFab(
+                        key: const Key('toolbar_play_stop_fab'),
+                        icon: Icon(
+                          fabIcon,
+                          key: const Key('toolbar_play_stop_fab_icon'),
+                        ),
+                        tooltip: fabSemantics,
+                        color: fabColor,
+                        onPressed: widget.metronomeViewModel.togglePlayStop,
+                      ),
+                      actions: destinations.map((item) {
+                        final isSelected = item.index == _currentIndex;
+                        return M3EToolbarAction(
+                          icon: isSelected ? item.selectedIcon : item.icon,
+                          label: item.label,
+                          tooltip: item.label,
+                          semanticLabel: item.label,
+                          onPressed: () => _onDestinationSelected(item.index),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -204,7 +279,6 @@ class _NavigationItem {
     required this.label,
     required this.icon,
     required this.selectedIcon,
-    required this.navKey,
     required this.railKey,
   });
 
@@ -212,6 +286,5 @@ class _NavigationItem {
   final String label;
   final IconData icon;
   final IconData selectedIcon;
-  final Key navKey;
   final Key railKey;
 }
