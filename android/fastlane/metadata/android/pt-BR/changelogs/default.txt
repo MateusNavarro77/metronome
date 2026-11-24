@@ -1,1 +1,5 @@
-- Correções de bugs e melhorias de desempenho.
+• Reprodução em segundo plano com notificação de mídia e controles na tela bloqueada
+• Nova barra de navegação flutuante com botão Play/Stop sempre acessível
+• Presets com busca, favoritos e notas de ensaio
+• Setlists com reordenação por arraste e troca sincronizada por compasso
+• Suporte a Português e Inglês e seleção de tema Claro/Escuro

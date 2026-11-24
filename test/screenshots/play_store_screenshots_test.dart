@@ -150,7 +150,10 @@ Future<void> _captureScreenshotsForLocaleAndProfile(
 
   tester.view.physicalSize = profile.physicalSize;
   tester.view.devicePixelRatio = profile.devicePixelRatio;
+  final previousDisableShadows = debugDisableShadows;
+  debugDisableShadows = false;
   addTearDown(() {
+    debugDisableShadows = previousDisableShadows;
     tester.view.resetPhysicalSize();
     tester.view.resetDevicePixelRatio();
   });

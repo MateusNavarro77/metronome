@@ -1,1 +1,33 @@
-Metronome was created to offer a "clean," uninterrupted experience. Just open it, set the tempo, and start practicing. No in-app purchases, no pop-ups, and no complicated features. Just what you need to master your rhythm
+Simple. Clean. Precise.
+
+Metronome was created to give musicians an uninterrupted, ad-free practice and stage experience. Open the app, set your tempo, and play — with zero ads, no in-app purchases, and no pop-ups.
+
+TEMPO & PRECISION
+• Wide tempo range from 30 to 300 BPM with quick slider and fine +/- 1 BPM controls
+• Dynamic Italian tempo markings (from Largo to Prestissimo)
+• Accurate Tap Tempo to lock in any groove on the fly
+• Clear visual beat indicator that stays in sync with every pulse
+
+TIME SIGNATURES & SUBDIVISIONS
+• Standard meters (2/4, 3/4, 4/4, 6/8) plus custom time signatures (1–16 beats per bar, denominators 2, 4, 8, and 16)
+• Toggleable Beat 1 accent and natural compound-meter accents
+• Four subdivisions: Quarter, Eighths, Triplets, and Sixteenths
+
+SOUNDS & MIXER
+• Four distinct timbres: Click, Wood Block, Beep, and Drums
+• Independent volume sliders for Strong Beat, Weak Beats, and Subdivisions
+• Visual-only mute mode to silence audio while keeping the visual pulse active
+
+PRESETS & SETLISTS
+• Save tempos, meters, subdivisions, and rehearsal notes as reusable presets
+• Search, favorite, duplicate, and organize presets in one tap
+• Build ordered setlists for gigs and rehearsals with drag-to-reorder and bar-synced transitions ("Next Bar")
+
+BUILT FOR REAL PRACTICE & STAGE USE
+• Background playback with media notification and lock screen controls
+• Always-accessible Play/Stop action from any screen
+• Light, Dark, and System themes for phones and tablets
+• Available in English and Portuguese
+
+NO ADS. NO DISTRACTIONS.
+Metronome is 100% free, ad-free, and open source — built only with what you need to master your rhythm.

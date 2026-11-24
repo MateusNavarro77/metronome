@@ -1,1 +1,33 @@
-O Metrônomo foi criado para oferecer uma experiência "clean", sem interrupções. Basta abrir, definir o tempo e começar a praticar. Sem compras no aplicativo, sem pop-ups e sem funções complicadas. Apenas o que você precisa para dominar o seu ritmo
+Simples. Limpo. Preciso.
+
+O Metrônomo foi criado para oferecer aos músicos uma experiência direta e sem interrupções no estudo ou no palco. Basta abrir o aplicativo, definir o andamento e tocar — totalmente sem anúncios, sem compras no app e sem pop-ups.
+
+ANDAMENTO E PRECISÃO
+• Ampla faixa de 30 a 300 BPM com controle deslizante rápido e ajuste fino de +/- 1 BPM
+• Marcações italianas de andamento em tempo real (de Largo a Prestissimo)
+• Tap Tempo preciso para encontrar o pulso de qualquer música na hora
+• Indicador visual de tempos claro e sincronizado a cada batida
+
+COMPASSOS E SUBDIVISÕES
+• Compassos padrão (2/4, 3/4, 4/4, 6/8) e compasso personalizado (1 a 16 tempos por compasso, denominadores 2, 4, 8 e 16)
+• Acento no Tempo 1 ativável e acentuação natural em compassos compostos
+• Quatro subdivisões: Semínima, Colcheias, Tercinas e Semicolcheias
+
+SONS E MIXER
+• Quatro timbres distintos: Click, Madeira, Bipe e Bateria
+• Controles independentes de volume para Tempo Forte, Tempos Fracos e Subdivisões
+• Modo silenciar áudio mantendo o indicador visual de pulso ativo
+
+PRESETS E SETLISTS
+• Salve andamento, compasso, subdivisão e notas de ensaio em presets reutilizáveis
+• Busque, favorite, duplique e organize seus presets com um toque
+• Monte setlists ordenadas para shows e ensaios com reordenação por arraste e transição sincronizada ao fim do compasso ("Próx. Compasso")
+
+FEITO PARA ENSAIO E PALCO
+• Reprodução em segundo plano com notificação de mídia e controles na tela bloqueada
+• Botão Play/Stop sempre acessível em qualquer aba do aplicativo
+• Temas Claro, Escuro e Sistema adaptados para celular e tablet
+• Disponível em Português e Inglês
+
+SEM ANÚNCIOS. SEM DISTRAÇÕES.
+O Metrônomo é 100% gratuito, livre de anúncios e de código aberto — apenas o que você precisa para dominar o seu ritmo.
