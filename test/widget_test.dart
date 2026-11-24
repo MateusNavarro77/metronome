@@ -21,7 +21,13 @@ void main() {
       expect(find.byKey(const Key('bpm_value_text')), findsOneWidget);
       expect(find.text('120'), findsOneWidget);
       expect(find.text('ALLEGRO'), findsOneWidget);
-      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('play_stop_button')),
+          matching: find.byIcon(Icons.play_arrow_rounded),
+        ),
+        findsOneWidget,
+      );
 
       // Tap '+' button to increment BPM to 121 (FR-BPM-02)
       await tester.tap(find.byKey(const Key('bpm_increment_button')));
