@@ -52,7 +52,27 @@ void main() {
       check(repo.getAccentEnabled()).isTrue();
       await repo.setAccentEnabled(false);
       check(repo.getAccentEnabled()).isFalse();
+
+      check(repo.getBackgroundPlaybackEnabled()).isTrue();
+      await repo.setBackgroundPlaybackEnabled(false);
+      check(repo.getBackgroundPlaybackEnabled()).isFalse();
     });
+
+    test(
+      'defaults to background playback enabled and persists across instances',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final repo = PreferencesRepository(preferences: prefs);
+
+        check(repo.getBackgroundPlaybackEnabled()).isTrue();
+        await repo.setBackgroundPlaybackEnabled(false);
+        check(repo.getBackgroundPlaybackEnabled()).isFalse();
+
+        final repo2 = PreferencesRepository(preferences: prefs);
+        check(repo2.getBackgroundPlaybackEnabled()).isFalse();
+      },
+    );
 
     test('defaults to accent enabled and persists accent preference', () async {
       SharedPreferences.setMockInitialValues({});

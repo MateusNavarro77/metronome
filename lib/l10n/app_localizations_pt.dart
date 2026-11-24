@@ -326,6 +326,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get backgroundPlaybackSectionHeader => 'SEGUNDO PLANO';
+
+  @override
+  String get backgroundPlaybackTitle => 'Tocar em segundo plano';
+
+  @override
+  String get backgroundPlaybackSubtitle =>
+      'Mantém o metrônomo tocando com notificação de mídia e controles na tela bloqueada ao sair do app.';
+
+  @override
   String get presetsHeader => 'PRESETS';
 
   @override

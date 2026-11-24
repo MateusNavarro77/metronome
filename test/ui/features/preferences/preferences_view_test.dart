@@ -256,5 +256,47 @@ void main() {
       expect(find.text('PREFERENCES'), findsNothing);
       expect(find.text('Open Settings'), findsOneWidget);
     });
+
+    testWidgets('renders and toggles background playback switch', (
+      WidgetTester tester,
+    ) async {
+      final repo = PreferencesRepository(preferences: null);
+      final engine = SimulatedMetronomeEngine();
+      final metronomeRepo = MetronomeRepository(engine: engine);
+      final viewModel = PreferencesViewModel(
+        repository: repo,
+        metronomeRepository: metronomeRepo,
+      );
+
+      await tester.pumpWidget(
+        ChangeNotifierProvider<PreferencesViewModel>.value(
+          value: viewModel,
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            localizationsDelegates: appLocalizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const PreferencesView(),
+          ),
+        ),
+      );
+
+      final switchFinder = find.byKey(const Key('background_playback_switch'));
+      await tester.ensureVisible(switchFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.text('BACKGROUND PLAYBACK'), findsOneWidget);
+      expect(find.text('Play in background'), findsOneWidget);
+      check(viewModel.isBackgroundPlaybackEnabled).isTrue();
+
+      await tester.tap(switchFinder);
+      await tester.pumpAndSettle();
+
+      check(viewModel.isBackgroundPlaybackEnabled).isFalse();
+      check(repo.getBackgroundPlaybackEnabled()).isFalse();
+
+      await tester.runAsync(() => GoogleFonts.pendingFonts());
+      await tester.pump();
+    });
   });
 }

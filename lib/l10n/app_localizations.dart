@@ -638,6 +638,24 @@ abstract class AppLocalizations {
   /// **'{label} volume'**
   String volumeSliderSemantics(String label);
 
+  /// Section header for background playback and notification settings
+  ///
+  /// In en, this message translates to:
+  /// **'BACKGROUND PLAYBACK'**
+  String get backgroundPlaybackSectionHeader;
+
+  /// Title for the background playback switch
+  ///
+  /// In en, this message translates to:
+  /// **'Play in background'**
+  String get backgroundPlaybackTitle;
+
+  /// Subtitle explaining background playback and media controls
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the metronome running with media notification and lock screen controls when you leave the app.'**
+  String get backgroundPlaybackSubtitle;
+
   /// Header title on the Presets screen
   ///
   /// In en, this message translates to:

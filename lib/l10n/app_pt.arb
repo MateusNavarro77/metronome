@@ -105,6 +105,9 @@
   "weakBeatsVolumeLabel": "Tempos Fracos",
   "subdivisionsVolumeLabel": "Subdivisões",
   "volumeSliderSemantics": "Volume de {label}",
+  "backgroundPlaybackSectionHeader": "SEGUNDO PLANO",
+  "backgroundPlaybackTitle": "Tocar em segundo plano",
+  "backgroundPlaybackSubtitle": "Mantém o metrônomo tocando com notificação de mídia e controles na tela bloqueada ao sair do app.",
 
   "presetsHeader": "PRESETS",
   "newPresetButton": "Novo Preset",

@@ -324,6 +324,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get backgroundPlaybackSectionHeader => 'BACKGROUND PLAYBACK';
+
+  @override
+  String get backgroundPlaybackTitle => 'Play in background';
+
+  @override
+  String get backgroundPlaybackSubtitle =>
+      'Keep the metronome running with media notification and lock screen controls when you leave the app.';
+
+  @override
   String get presetsHeader => 'PRESETS';
 
   @override
