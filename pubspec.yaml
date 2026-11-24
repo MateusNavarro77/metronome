@@ -24,6 +24,8 @@ dependencies:
   shared_preferences: ^2.3.2
   material_ui: ^1.11.0
   material_3_expressive: ^1.2.1
+  audio_service: ^0.18.19
+  audio_session: ^0.2.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

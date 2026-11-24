@@ -110,6 +110,16 @@ class PreferencesView extends StatelessWidget {
                           ),
                           SizedBox(height: context.dimens.spaceSm),
                           _SoundsSectionCard(viewModel: viewModel),
+                          SizedBox(height: context.dimens.spaceLg),
+                          _SectionHeader(
+                            key: const Key(
+                              'background_playback_section_header',
+                            ),
+                            icon: Icons.notifications_active_outlined,
+                            title: l10n.backgroundPlaybackSectionHeader,
+                          ),
+                          SizedBox(height: context.dimens.spaceSm),
+                          _BackgroundPlaybackSectionCard(viewModel: viewModel),
                           SizedBox(height: context.dimens.spaceMd),
                         ],
                       ),
@@ -661,6 +671,65 @@ class _VolumeSliderRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _BackgroundPlaybackSectionCard extends StatelessWidget {
+  const _BackgroundPlaybackSectionCard({required this.viewModel});
+
+  final PreferencesViewModel viewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final enabled = viewModel.isBackgroundPlaybackEnabled;
+
+    return M3ECard(
+      key: const Key('background_playback_section_card'),
+      variant: M3ECardVariant.outlined,
+      padding: EdgeInsets.all(context.dimens.spaceMd),
+      child: Row(
+        children: [
+          Icon(
+            enabled
+                ? Icons.notifications_active_rounded
+                : Icons.notifications_off_outlined,
+            size: 20,
+            color: enabled
+                ? context.colorScheme.primary
+                : context.colorScheme.onSurfaceVariant,
+          ),
+          SizedBox(width: context.dimens.spaceSmPlus4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.backgroundPlaybackTitle,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: context.colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  l10n.backgroundPlaybackSubtitle,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: context.dimens.spaceSm),
+          M3ESwitch(
+            key: const Key('background_playback_switch'),
+            value: enabled,
+            onChanged: viewModel.setBackgroundPlaybackEnabled,
+            semanticLabel: l10n.backgroundPlaybackTitle,
+          ),
+        ],
+      ),
     );
   }
 }

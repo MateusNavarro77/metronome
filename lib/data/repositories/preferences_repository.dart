@@ -19,11 +19,14 @@ class PreferencesRepository {
   AppThemeMode _inMemoryThemeMode = AppThemeMode.system;
   AppLanguage _inMemoryLanguage = AppLanguage.system;
   bool _inMemoryAccentEnabled = true;
+  bool _inMemoryBackgroundPlaybackEnabled = true;
   SoundSettings _inMemorySoundSettings = const SoundSettings();
 
   static const String _keyThemeMode = 'app_theme_mode';
   static const String _keyLanguage = 'app_language';
   static const String _keyAccentEnabled = 'accent_enabled';
+  static const String _keyBackgroundPlaybackEnabled =
+      'background_playback_enabled';
   static const String _keySound = 'metronome_sound';
   static const String _keyStrongVolume = 'sound_strong_volume';
   static const String _keyWeakVolume = 'sound_weak_volume';
@@ -98,6 +101,23 @@ class PreferencesRepository {
     final prefs = _preferences;
     if (prefs == null) return;
     await prefs.setBool(_keyAccentEnabled, enabled);
+  }
+
+  /// Loads whether background playback and media notification controls are
+  /// enabled, defaulting to `true`.
+  bool getBackgroundPlaybackEnabled() {
+    final prefs = _preferences;
+    if (prefs == null) return _inMemoryBackgroundPlaybackEnabled;
+    return prefs.getBool(_keyBackgroundPlaybackEnabled) ?? true;
+  }
+
+  /// Persists whether background playback and media notification controls are
+  /// enabled.
+  Future<void> setBackgroundPlaybackEnabled(bool enabled) async {
+    _inMemoryBackgroundPlaybackEnabled = enabled;
+    final prefs = _preferences;
+    if (prefs == null) return;
+    await prefs.setBool(_keyBackgroundPlaybackEnabled, enabled);
   }
 
   /// Loads persisted [SoundSettings], falling back to defaults (FR-SND-01..08, FR-CFG-03).

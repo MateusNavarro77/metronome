@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="metronome_notif_text_primary">#181D17</color>
+    <color name="metronome_notif_text_secondary">#526050</color>
+    <color name="metronome_notif_button_bg">#E4EDE1</color>
+    <color name="metronome_notif_button_icon">#1C251B</color>
+    <color name="metronome_notif_primary_bg">#1B6D2B</color>
+    <color name="metronome_notif_primary_icon">#FFFFFF</color>
+    <color name="metronome_notif_close_icon">#526050</color>
+</resources>

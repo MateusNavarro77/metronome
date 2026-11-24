@@ -457,6 +457,18 @@
       }
     }
   },
+  "backgroundPlaybackSectionHeader": "BACKGROUND PLAYBACK",
+  "@backgroundPlaybackSectionHeader": {
+    "description": "Section header for background playback and notification settings"
+  },
+  "backgroundPlaybackTitle": "Play in background",
+  "@backgroundPlaybackTitle": {
+    "description": "Title for the background playback switch"
+  },
+  "backgroundPlaybackSubtitle": "Keep the metronome running with media notification and lock screen controls when you leave the app.",
+  "@backgroundPlaybackSubtitle": {
+    "description": "Subtitle explaining background playback and media controls"
+  },
 
   "presetsHeader": "PRESETS",
   "@presetsHeader": {

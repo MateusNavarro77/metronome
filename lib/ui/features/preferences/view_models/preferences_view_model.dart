@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../data/repositories/metronome_repository.dart';
 import '../../../../data/repositories/preferences_repository.dart';
+import '../../../../data/services/background_playback_coordinator.dart';
 import '../../../../domain/models/app_language.dart';
 import '../../../../domain/models/app_theme_mode.dart';
 import '../../../../domain/models/metronome_sound.dart';
@@ -39,19 +40,25 @@ class PreferencesViewModel extends ChangeNotifier {
   PreferencesViewModel({
     required PreferencesRepository repository,
     MetronomeRepository? metronomeRepository,
+    BackgroundPlaybackCoordinator? backgroundPlaybackCoordinator,
   }) : _repository = repository,
        _metronomeRepository = metronomeRepository,
+       _backgroundPlaybackCoordinator = backgroundPlaybackCoordinator,
        _themeMode = repository.getThemeMode(),
        _language = repository.getLanguage(),
-       _soundSettings = repository.getSoundSettings() {
+       _soundSettings = repository.getSoundSettings(),
+       _isBackgroundPlaybackEnabled = repository
+           .getBackgroundPlaybackEnabled() {
     _metronomeRepository?.setSoundSettings(_soundSettings);
   }
 
   final PreferencesRepository _repository;
   final MetronomeRepository? _metronomeRepository;
+  final BackgroundPlaybackCoordinator? _backgroundPlaybackCoordinator;
   AppThemeMode _themeMode;
   AppLanguage _language;
   SoundSettings _soundSettings;
+  bool _isBackgroundPlaybackEnabled;
 
   /// Current active domain [AppThemeMode].
   AppThemeMode get themeMode => _themeMode;
@@ -82,6 +89,18 @@ class PreferencesViewModel extends ChangeNotifier {
 
   /// Whether audio playback is muted while visual feedback remains active.
   bool get isMuted => _soundSettings.isMuted;
+
+  /// Whether playback continues in the background with media notification controls.
+  bool get isBackgroundPlaybackEnabled => _isBackgroundPlaybackEnabled;
+
+  /// Enables or disables background playback and media notification controls.
+  Future<void> setBackgroundPlaybackEnabled(bool enabled) async {
+    if (_isBackgroundPlaybackEnabled == enabled) return;
+    _isBackgroundPlaybackEnabled = enabled;
+    notifyListeners();
+    await _repository.setBackgroundPlaybackEnabled(enabled);
+    await _backgroundPlaybackCoordinator?.setBackgroundPlaybackEnabled(enabled);
+  }
 
   /// Updates the theme mode, notifies listeners, and persists the choice.
   Future<void> setThemeMode(AppThemeMode mode) async {
