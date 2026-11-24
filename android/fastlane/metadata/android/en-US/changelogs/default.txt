@@ -1,1 +1,5 @@
-- Bug fixes and performance improvements.
+• Background playback with media notification and lock screen controls
+• New floating navigation toolbar with always-accessible Play/Stop button
+• Presets with search, favorites, and rehearsal notes
+• Setlists with drag-to-reorder and bar-synced song transitions
+• English and Portuguese language support plus theme switcher
