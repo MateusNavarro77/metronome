@@ -37,7 +37,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get delete => 'Excluir';
 
   @override
-  String get activeBadge => 'ATIVO';
+  String get activeBadge => 'Ativo';
 
   @override
   String get bpmUnit => 'BPM';
@@ -137,7 +137,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get beatAccentSubdivision => 'Subdivisão';
 
   @override
-  String get metronomeHeader => 'METRÔNOMO';
+  String get metronomeHeader => 'Metrônomo';
 
   @override
   String get savePresetAction => 'Salvar Preset';
@@ -187,7 +187,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tapTempoSemantics => 'Tap tempo';
 
   @override
-  String get tapTempoLabel => 'TAP TEMPO';
+  String get tapTempoLabel => 'Tap tempo';
 
   @override
   String get stopMetronomeSemantics => 'Parar metrônomo';
@@ -196,7 +196,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get startMetronomeSemantics => 'Iniciar metrônomo';
 
   @override
-  String get timeSignatureCaption => 'COMPASSO';
+  String get timeSignatureCaption => 'Compasso';
 
   @override
   String timeSignatureSelectorSemantics(String label) {
@@ -204,7 +204,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get subdivisionCaption => 'SUBDIVISÃO';
+  String get subdivisionCaption => 'Subdivisão';
 
   @override
   String subdivisionSelectorSemantics(String label) {
@@ -212,10 +212,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get downbeatAccentOnTooltip => 'Acento no tempo 1 LIGADO';
+  String get downbeatAccentOnTooltip => 'Acento no tempo 1 ligado';
 
   @override
-  String get downbeatAccentOffTooltip => 'Acento no tempo 1 DESLIGADO';
+  String get downbeatAccentOffTooltip => 'Acento no tempo 1 desligado';
 
   @override
   String get downbeatAccentOnSemantics => 'Acento no tempo 1 ativado';
@@ -224,10 +224,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get downbeatAccentOffSemantics => 'Acento no tempo 1 desativado';
 
   @override
-  String get timeSignatureSheetTitle => 'COMPASSO';
+  String get timeSignatureSheetTitle => 'Compasso';
 
   @override
-  String get timeSignaturePresetsSection => 'PREDEFINIÇÕES';
+  String get timeSignaturePresetsSection => 'Predefinições';
 
   @override
   String timeSignatureOptionSemantics(String label) {
@@ -235,10 +235,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get customMeterSection => 'COMPASSO PERSONALIZADO';
+  String get customMeterSection => 'Compasso personalizado';
 
   @override
-  String get beatsPerBarLabel => 'TEMPOS POR COMPASSO';
+  String get beatsPerBarLabel => 'Tempos por compasso';
 
   @override
   String get numeratorRangeLabel => 'Numerador (1–16)';
@@ -250,7 +250,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get increaseBeatsPerBarSemantics => 'Aumentar tempos por compasso';
 
   @override
-  String get noteValueDenominatorLabel => 'FIGURA (DENOMINADOR)';
+  String get noteValueDenominatorLabel => 'Figura (denominador)';
 
   @override
   String denominatorSemantics(int denom) {
@@ -258,10 +258,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get subdivisionsSheetTitle => 'SUBDIVISÕES';
+  String get subdivisionsSheetTitle => 'Subdivisões';
 
   @override
-  String get nextBarBadge => 'PRÓX. COMPASSO';
+  String get nextBarBadge => 'Próx. compasso';
 
   @override
   String get exitSetlistTooltip => 'Sair da setlist';
@@ -278,27 +278,27 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get preferencesHeader => 'PREFERÊNCIAS';
+  String get preferencesHeader => 'Preferências';
 
   @override
   String get backToMetronomeTooltip => 'Voltar ao metrônomo';
 
   @override
-  String get appearanceSectionHeader => 'APARÊNCIA';
+  String get appearanceSectionHeader => 'Aparência';
 
   @override
   String get appearanceDescription =>
       'Escolha entre modo escuro, modo claro ou siga a aparência do sistema.';
 
   @override
-  String get languageSectionHeader => 'IDIOMA';
+  String get languageSectionHeader => 'Idioma';
 
   @override
   String get languageDescription =>
       'Escolha o idioma do aplicativo ou siga o idioma do dispositivo.';
 
   @override
-  String get soundsSectionHeader => 'SONS E VOLUMES';
+  String get soundsSectionHeader => 'Sons e volumes';
 
   @override
   String get soundsDescription =>
@@ -326,7 +326,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get backgroundPlaybackSectionHeader => 'SEGUNDO PLANO';
+  String get backgroundPlaybackSectionHeader => 'Segundo plano';
 
   @override
   String get backgroundPlaybackTitle => 'Tocar em segundo plano';
@@ -336,7 +336,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mantém o metrônomo tocando com notificação de mídia e controles na tela bloqueada ao sair do app.';
 
   @override
-  String get presetsHeader => 'PRESETS';
+  String get presetsHeader => 'Presets';
 
   @override
   String get newPresetButton => 'Novo Preset';
@@ -368,10 +368,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get accentOnBadge => 'Acento LIGADO';
+  String get accentOnBadge => 'Acento ligado';
 
   @override
-  String get accentOffBadge => 'Acento DESLIGADO';
+  String get accentOffBadge => 'Acento desligado';
 
   @override
   String editPresetTooltip(String name) {
@@ -435,10 +435,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get presetNameRequiredError => 'Digite um nome para salvar o preset.';
 
   @override
-  String get editPresetSheetTitle => 'EDITAR PRESET';
+  String get editPresetSheetTitle => 'Editar preset';
 
   @override
-  String get newPresetSheetTitle => 'NOVO PRESET';
+  String get newPresetSheetTitle => 'Novo preset';
 
   @override
   String get removeFromFavoritesTooltip => 'Remover dos favoritos';
@@ -459,7 +459,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get presetNotePlaceholder => 'ex: Contagem no início';
 
   @override
-  String get tempoSectionLabel => 'ANDAMENTO';
+  String get tempoSectionLabel => 'Andamento';
 
   @override
   String get decreasePresetBpmSemantics => 'Diminuir BPM do preset';
@@ -473,7 +473,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get accentOnBeat1Label => 'ACENTO NO TEMPO 1';
+  String get accentOnBeat1Label => 'Acento no tempo 1';
 
   @override
   String get saveChangesButton => 'Salvar Alterações';
@@ -482,7 +482,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get savePresetButton => 'Salvar Preset';
 
   @override
-  String get setlistsHeader => 'SETLISTS';
+  String get setlistsHeader => 'Setlists';
 
   @override
   String get newSetlistButton => 'Nova Setlist';
@@ -583,7 +583,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get addPresetPickerTitle => 'ADICIONAR PRESET À SETLIST';
+  String get addPresetPickerTitle => 'Adicionar preset à setlist';
 
   @override
   String get addPresetPickerEmpty =>

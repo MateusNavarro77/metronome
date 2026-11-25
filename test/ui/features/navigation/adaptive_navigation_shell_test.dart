@@ -135,31 +135,31 @@ void main() {
         expect(find.byKey(const Key('adaptive_navigation_rail')), findsNothing);
 
         // Verify initial screen is Metronome
-        expect(find.text('METRONOME'), findsOneWidget);
+        expect(find.text('Metronome'), findsWidgets);
         expect(find.text('120'), findsOneWidget);
 
         // Switch to Presets
         await tester.tap(find.bySemanticsLabel('Presets'));
         await tester.pumpAndSettle();
-        expect(find.text('PRESETS'), findsOneWidget);
+        expect(find.text('Presets'), findsWidgets);
         expect(find.text('No presets saved yet'), findsOneWidget);
 
         // Switch to Setlists
         await tester.tap(find.bySemanticsLabel('Setlists'));
         await tester.pumpAndSettle();
-        expect(find.text('SETLISTS'), findsOneWidget);
+        expect(find.text('Setlists'), findsWidgets);
         expect(find.text('No setlists yet'), findsOneWidget);
 
         // Switch to Settings
         await tester.tap(find.bySemanticsLabel('Settings'));
         await tester.pumpAndSettle();
-        expect(find.text('PREFERENCES'), findsOneWidget);
-        expect(find.text('APPEARANCE'), findsOneWidget);
+        expect(find.text('Preferences'), findsOneWidget);
+        expect(find.text('Appearance'), findsOneWidget);
 
         // Switch back to Metronome
         await tester.tap(find.bySemanticsLabel('Metronome'));
         await tester.pumpAndSettle();
-        expect(find.text('METRONOME'), findsOneWidget);
+        expect(find.text('Metronome'), findsWidgets);
 
         await tester.runAsync(() => GoogleFonts.pendingFonts());
         await tester.pump();
@@ -185,7 +185,7 @@ void main() {
         );
         await tester.tap(find.bySemanticsLabel('Setlists'));
         await tester.pumpAndSettle();
-        expect(find.text('SETLISTS'), findsOneWidget);
+        expect(find.text('Setlists'), findsWidgets);
       },
     );
 
@@ -288,7 +288,7 @@ void main() {
         // Navigate to Presets via rail
         await tester.tap(find.byKey(const Key('rail_destination_presets')));
         await tester.pumpAndSettle();
-        expect(find.text('PRESETS'), findsOneWidget);
+        expect(find.text('Presets'), findsWidgets);
 
         // Toggle play via rail FAB while on Presets
         await tester.tap(find.byKey(const Key('rail_play_stop_fab_icon')));
@@ -304,7 +304,7 @@ void main() {
         // Navigate to Setlists via rail and stop via rail FAB
         await tester.tap(find.byKey(const Key('rail_destination_setlists')));
         await tester.pumpAndSettle();
-        expect(find.text('SETLISTS'), findsOneWidget);
+        expect(find.text('Setlists'), findsWidgets);
 
         await tester.tap(find.byKey(const Key('rail_play_stop_fab_icon')));
         await tester.pumpAndSettle();

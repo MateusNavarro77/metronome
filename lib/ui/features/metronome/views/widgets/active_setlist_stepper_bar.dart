@@ -49,7 +49,7 @@ class ActiveSetlistStepperBar extends StatelessWidget {
 
     return M3ECard(
       key: const Key('active_setlist_stepper_bar'),
-      variant: M3ECardVariant.outlined,
+      variant: M3ECardVariant.elevated,
       padding: EdgeInsets.symmetric(
         horizontal: context.dimens.spaceSmPlus4,
         vertical: verticalPad,
@@ -68,12 +68,11 @@ class ActiveSetlistStepperBar extends StatelessWidget {
               SizedBox(width: context.dimens.spaceXs),
               Expanded(
                 child: Text(
-                  setlist.displayName(l10n).toUpperCase(),
+                  setlist.displayName(l10n),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: context.textTheme.labelMedium?.copyWith(
-                    fontSize: 10,
-                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w600,
                     color: context.colorScheme.primary,
                   ),
                 ),
@@ -93,9 +92,8 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   ),
                   child: Text(
                     l10n.nextBarBadge,
-                    style: context.textTheme.labelMedium?.copyWith(
-                      fontSize: 9,
-                      letterSpacing: 0.8,
+                    style: context.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
                       color: context.colorScheme.onPrimaryContainer,
                     ),
                   ),
@@ -118,7 +116,6 @@ class ActiveSetlistStepperBar extends StatelessWidget {
                   key: const Key('active_setlist_position_label'),
                   style: context.textTheme.labelMedium?.copyWith(
                     fontSize: 11,
-                    letterSpacing: 0.4,
                     color: context.colorScheme.onSurface,
                   ),
                 ),

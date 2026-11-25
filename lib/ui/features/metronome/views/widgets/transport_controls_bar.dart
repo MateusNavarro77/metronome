@@ -105,7 +105,6 @@ class _TransportControlsBarState extends State<TransportControlsBar> {
                             style: context.textTheme.labelMedium?.copyWith(
                               fontSize: widget.isCompact ? 13 : 15,
                               fontWeight: FontWeight.w700,
-                              letterSpacing: 1.8,
                               color: _tapPressed
                                   ? context.colorScheme.onPrimaryContainer
                                   : context.colorScheme.onSurface,

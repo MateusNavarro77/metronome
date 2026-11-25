@@ -150,7 +150,7 @@ class _SummaryTriggerCard extends StatelessWidget {
       label: semanticLabel,
       child: M3ECard(
         key: cardKey,
-        variant: M3ECardVariant.outlined,
+        variant: M3ECardVariant.elevated,
         onPressed: onTap,
         padding: EdgeInsets.symmetric(
           horizontal: context.dimens.spaceSmPlus4,
@@ -170,8 +170,7 @@ class _SummaryTriggerCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.textTheme.labelMedium?.copyWith(
-                      fontSize: 10,
-                      letterSpacing: 1.1,
+                      fontSize: 11,
                       color: context.colorScheme.onSurfaceVariant,
                     ),
                   ),
@@ -309,7 +308,8 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
         children: [
           Text(
             l10n.timeSignaturePresetsSection,
-            style: context.textTheme.labelMedium?.copyWith(
+            style: context.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
               color: context.colorScheme.onSurfaceVariant,
             ),
           ),
@@ -338,14 +338,15 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           SizedBox(height: context.dimens.spaceLg),
           Text(
             l10n.customMeterSection,
-            style: context.textTheme.labelMedium?.copyWith(
+            style: context.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
               color: context.colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: context.dimens.spaceSm),
           // Beats per bar (Numerator 1..16) stepper
           M3ECard(
-            variant: M3ECardVariant.outlined,
+            variant: M3ECardVariant.elevated,
             padding: EdgeInsets.symmetric(
               horizontal: context.dimens.spaceMd,
               vertical: context.dimens.spaceSmPlus2,
@@ -358,9 +359,9 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
                   children: [
                     Text(
                       l10n.beatsPerBarLabel,
-                      style: context.textTheme.labelMedium?.copyWith(
-                        fontSize: 11,
-                        color: context.colorScheme.onSurfaceVariant,
+                      style: context.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: context.colorScheme.onSurface,
                       ),
                     ),
                     SizedBox(height: context.dimens.spaceXs),
@@ -413,16 +414,16 @@ class _TimeSignatureBottomSheetState extends State<TimeSignatureBottomSheet> {
           SizedBox(height: context.dimens.spaceSmPlus4),
           // Note value (Denominator 2, 4, 8, 16) pill selector
           M3ECard(
-            variant: M3ECardVariant.outlined,
+            variant: M3ECardVariant.elevated,
             padding: EdgeInsets.all(context.dimens.spaceMd),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   l10n.noteValueDenominatorLabel,
-                  style: context.textTheme.labelMedium?.copyWith(
-                    fontSize: 11,
-                    color: context.colorScheme.onSurfaceVariant,
+                  style: context.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
                 SizedBox(height: context.dimens.spaceSm),
@@ -490,7 +491,7 @@ class SubdivisionBottomSheet extends StatelessWidget {
                 key: Key('subdivision_${subdivision.name}'),
                 variant: isSelected
                     ? M3ECardVariant.filled
-                    : M3ECardVariant.outlined,
+                    : M3ECardVariant.elevated,
                 color: isSelected ? context.colorScheme.primaryContainer : null,
                 padding: EdgeInsets.symmetric(
                   horizontal: context.dimens.spaceMd,
@@ -571,7 +572,6 @@ class SubdivisionBottomSheet extends StatelessWidget {
                       child: Text(
                         subdivision.shortLabel,
                         style: context.textTheme.labelMedium?.copyWith(
-                          letterSpacing: 0.5,
                           color: isSelected
                               ? context.colorScheme.onPrimary
                               : context.colorScheme.onSurfaceVariant,
@@ -621,8 +621,7 @@ class _SonicModalSheetContainer extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    letterSpacing: 1.6,
+                  style: context.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: context.colorScheme.onSurface,
                   ),

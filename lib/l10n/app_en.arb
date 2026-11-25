@@ -38,7 +38,7 @@
   "@delete": {
     "description": "Generic delete button label"
   },
-  "activeBadge": "ACTIVE",
+  "activeBadge": "Active",
   "@activeBadge": {
     "description": "Badge indicating the currently active preset or setlist"
   },
@@ -178,7 +178,7 @@
     "description": "Display label for subdivision click accent"
   },
 
-  "metronomeHeader": "METRONOME",
+  "metronomeHeader": "Metronome",
   "@metronomeHeader": {
     "description": "Header title on the main metronome screen"
   },
@@ -256,7 +256,7 @@
   "@tapTempoSemantics": {
     "description": "Accessibility label for Tap Tempo button"
   },
-  "tapTempoLabel": "TAP TEMPO",
+  "tapTempoLabel": "Tap tempo",
   "@tapTempoLabel": {
     "description": "Visible label on Tap Tempo button"
   },
@@ -269,7 +269,7 @@
     "description": "Accessibility label for Play/Stop button while stopped"
   },
 
-  "timeSignatureCaption": "TIME SIG",
+  "timeSignatureCaption": "Time sig",
   "@timeSignatureCaption": {
     "description": "Compact caption for time signature selector card"
   },
@@ -282,7 +282,7 @@
       }
     }
   },
-  "subdivisionCaption": "SUBDIVISION",
+  "subdivisionCaption": "Subdivision",
   "@subdivisionCaption": {
     "description": "Compact caption for subdivision selector card"
   },
@@ -295,11 +295,11 @@
       }
     }
   },
-  "downbeatAccentOnTooltip": "Downbeat accent ON",
+  "downbeatAccentOnTooltip": "Downbeat accent on",
   "@downbeatAccentOnTooltip": {
     "description": "Tooltip for accent toggle when enabled"
   },
-  "downbeatAccentOffTooltip": "Downbeat accent OFF",
+  "downbeatAccentOffTooltip": "Downbeat accent off",
   "@downbeatAccentOffTooltip": {
     "description": "Tooltip for accent toggle when disabled"
   },
@@ -312,11 +312,11 @@
     "description": "Accessibility label for accent toggle when disabled"
   },
 
-  "timeSignatureSheetTitle": "TIME SIGNATURE",
+  "timeSignatureSheetTitle": "Time signature",
   "@timeSignatureSheetTitle": {
     "description": "Title of the time signature bottom sheet"
   },
-  "timeSignaturePresetsSection": "PRESETS",
+  "timeSignaturePresetsSection": "Presets",
   "@timeSignaturePresetsSection": {
     "description": "Section header for standard preset time signatures"
   },
@@ -329,11 +329,11 @@
       }
     }
   },
-  "customMeterSection": "CUSTOM METER",
+  "customMeterSection": "Custom meter",
   "@customMeterSection": {
     "description": "Section header for custom numerator/denominator controls"
   },
-  "beatsPerBarLabel": "BEATS PER BAR",
+  "beatsPerBarLabel": "Beats per bar",
   "@beatsPerBarLabel": {
     "description": "Label for custom time signature numerator"
   },
@@ -349,7 +349,7 @@
   "@increaseBeatsPerBarSemantics": {
     "description": "Tooltip and accessibility label for incrementing beats per bar"
   },
-  "noteValueDenominatorLabel": "NOTE VALUE (DENOMINATOR)",
+  "noteValueDenominatorLabel": "Note value (denominator)",
   "@noteValueDenominatorLabel": {
     "description": "Label for custom time signature denominator"
   },
@@ -362,12 +362,12 @@
       }
     }
   },
-  "subdivisionsSheetTitle": "SUBDIVISIONS",
+  "subdivisionsSheetTitle": "Subdivisions",
   "@subdivisionsSheetTitle": {
     "description": "Title of the subdivisions bottom sheet"
   },
 
-  "nextBarBadge": "NEXT BAR",
+  "nextBarBadge": "Next bar",
   "@nextBarBadge": {
     "description": "Badge indicating a pending bar-synced setlist transition"
   },
@@ -396,7 +396,7 @@
     }
   },
 
-  "preferencesHeader": "PREFERENCES",
+  "preferencesHeader": "Preferences",
   "@preferencesHeader": {
     "description": "Header title on the Preferences screen"
   },
@@ -404,7 +404,7 @@
   "@backToMetronomeTooltip": {
     "description": "Tooltip for back button on Preferences screen"
   },
-  "appearanceSectionHeader": "APPEARANCE",
+  "appearanceSectionHeader": "Appearance",
   "@appearanceSectionHeader": {
     "description": "Section header for theme settings"
   },
@@ -412,7 +412,7 @@
   "@appearanceDescription": {
     "description": "Description text in the Appearance card"
   },
-  "languageSectionHeader": "LANGUAGE",
+  "languageSectionHeader": "Language",
   "@languageSectionHeader": {
     "description": "Section header for language settings"
   },
@@ -420,7 +420,7 @@
   "@languageDescription": {
     "description": "Description text in the Language card"
   },
-  "soundsSectionHeader": "SOUNDS & VOLUMES",
+  "soundsSectionHeader": "Sounds & volumes",
   "@soundsSectionHeader": {
     "description": "Section header for audio timbre and volume settings"
   },
@@ -457,7 +457,7 @@
       }
     }
   },
-  "backgroundPlaybackSectionHeader": "BACKGROUND PLAYBACK",
+  "backgroundPlaybackSectionHeader": "Background playback",
   "@backgroundPlaybackSectionHeader": {
     "description": "Section header for background playback and notification settings"
   },
@@ -470,7 +470,7 @@
     "description": "Subtitle explaining background playback and media controls"
   },
 
-  "presetsHeader": "PRESETS",
+  "presetsHeader": "Presets",
   "@presetsHeader": {
     "description": "Header title on the Presets screen"
   },
@@ -531,11 +531,11 @@
       }
     }
   },
-  "accentOnBadge": "Accent ON",
+  "accentOnBadge": "Accent on",
   "@accentOnBadge": {
     "description": "Preset parameter badge when downbeat accent is enabled"
   },
-  "accentOffBadge": "Accent OFF",
+  "accentOffBadge": "Accent off",
   "@accentOffBadge": {
     "description": "Preset parameter badge when downbeat accent is disabled"
   },
@@ -625,11 +625,11 @@
   "@presetNameRequiredError": {
     "description": "Validation error when saving a preset without a name"
   },
-  "editPresetSheetTitle": "EDIT PRESET",
+  "editPresetSheetTitle": "Edit preset",
   "@editPresetSheetTitle": {
     "description": "Title of the preset editor sheet when editing"
   },
-  "newPresetSheetTitle": "NEW PRESET",
+  "newPresetSheetTitle": "New preset",
   "@newPresetSheetTitle": {
     "description": "Title of the preset editor sheet when creating"
   },
@@ -657,7 +657,7 @@
   "@presetNotePlaceholder": {
     "description": "Input placeholder for preset rehearsal note"
   },
-  "tempoSectionLabel": "TEMPO",
+  "tempoSectionLabel": "Tempo",
   "@tempoSectionLabel": {
     "description": "Section label for BPM editor in preset sheet"
   },
@@ -678,7 +678,7 @@
       }
     }
   },
-  "accentOnBeat1Label": "ACCENT ON BEAT 1",
+  "accentOnBeat1Label": "Accent on beat 1",
   "@accentOnBeat1Label": {
     "description": "Switch label for Beat 1 accent in preset editor"
   },
@@ -691,7 +691,7 @@
     "description": "Save button label when creating a new preset"
   },
 
-  "setlistsHeader": "SETLISTS",
+  "setlistsHeader": "Setlists",
   "@setlistsHeader": {
     "description": "Header title on the Setlists screen"
   },
@@ -839,7 +839,7 @@
       }
     }
   },
-  "addPresetPickerTitle": "ADD PRESET TO SETLIST",
+  "addPresetPickerTitle": "Add preset to setlist",
   "@addPresetPickerTitle": {
     "description": "Title of the bottom sheet for picking a preset to add to a setlist"
   },

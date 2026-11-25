@@ -1,7 +1,9 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preset_library_repository.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
@@ -159,6 +161,18 @@ void main() {
         await tester.pumpWidget(buildTestApp());
         await tester.pumpAndSettle();
 
+        // Inactive preset cards use elevated variant
+        check(
+          tester
+              .widget<M3ECard>(find.byKey(Key('preset_card_${alpha.id}')))
+              .variant,
+        ).equals(M3ECardVariant.elevated);
+        check(
+          tester
+              .widget<M3ECard>(find.byKey(Key('preset_card_${beta.id}')))
+              .variant,
+        ).equals(M3ECardVariant.elevated);
+
         // One-tap load Beta Jazz (FR-PRE-02)
         await tester.tap(find.byKey(Key('preset_card_${beta.id}')));
         await tester.pumpAndSettle();
@@ -170,6 +184,17 @@ void main() {
           find.byKey(Key('preset_active_badge_${beta.id}')),
           findsOneWidget,
         );
+        expect(find.text('Active'), findsOneWidget);
+        check(
+          tester
+              .widget<M3ECard>(find.byKey(Key('preset_card_${beta.id}')))
+              .variant,
+        ).equals(M3ECardVariant.filled);
+        check(
+          tester
+              .widget<M3ECard>(find.byKey(Key('preset_card_${alpha.id}')))
+              .variant,
+        ).equals(M3ECardVariant.elevated);
 
         // Favorite Beta Jazz -> moves before Alpha Rock (FR-PRE-04)
         await tester.tap(find.byKey(Key('preset_favorite_button_${beta.id}')));

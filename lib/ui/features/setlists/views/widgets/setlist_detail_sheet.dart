@@ -149,7 +149,7 @@ class SetlistDetailSheet extends StatelessWidget {
                     child: presets.isEmpty
                         ? Center(
                             child: M3ECard(
-                              variant: M3ECardVariant.outlined,
+                              variant: M3ECardVariant.elevated,
                               padding: EdgeInsets.all(context.dimens.spaceLg),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -219,7 +219,7 @@ class SetlistDetailSheet extends StatelessWidget {
                                   key: Key('setlist_item_tap_$index'),
                                   variant: isCurrentSong
                                       ? M3ECardVariant.filled
-                                      : M3ECardVariant.outlined,
+                                      : M3ECardVariant.elevated,
                                   borderRadius: BorderRadius.circular(
                                     context.dimens.radiusDefault,
                                   ),
@@ -387,8 +387,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
             children: [
               Text(
                 l10n.addPresetPickerTitle,
-                style: context.textTheme.titleSmall?.copyWith(
-                  letterSpacing: 1.4,
+                style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: context.colorScheme.onSurface,
                 ),
@@ -417,7 +416,7 @@ class _AddPresetPickerSheet extends StatelessWidget {
                       final preset = presets[index];
                       return M3ECard(
                         key: Key('add_preset_picker_item_${preset.id}'),
-                        variant: M3ECardVariant.outlined,
+                        variant: M3ECardVariant.elevated,
                         borderRadius: BorderRadius.circular(
                           context.dimens.radiusDefault,
                         ),

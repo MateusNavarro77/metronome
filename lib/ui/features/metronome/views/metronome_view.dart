@@ -223,9 +223,9 @@ class _HeaderBar extends StatelessWidget {
       children: [
         Text(
           l10n.metronomeHeader,
-          style: context.textTheme.labelMedium?.copyWith(
+          style: context.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
             color: context.colorScheme.onSurface,
-            letterSpacing: 2.2,
           ),
         ),
         if (canSavePresets)

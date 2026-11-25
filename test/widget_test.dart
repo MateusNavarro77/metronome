@@ -17,10 +17,10 @@ void main() {
 
       await tester.pumpWidget(MetronomeApp(engineOverride: simulatedEngine));
 
-      // Verify initial state (UI-01, UI-08): 120 BPM, ALLEGRO, 4/4, STOPPED
+      // Verify initial state (UI-01, UI-08): 120 BPM, Allegro, 4/4, STOPPED
       expect(find.byKey(const Key('bpm_value_text')), findsOneWidget);
       expect(find.text('120'), findsOneWidget);
-      expect(find.text('ALLEGRO'), findsOneWidget);
+      expect(find.text('Allegro'), findsOneWidget);
       expect(
         find.descendant(
           of: find.byKey(const Key('play_stop_button')),
@@ -44,12 +44,12 @@ void main() {
       await tester.pump();
       expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
 
-      // Tap '-' button twice to decrement BPM to 119 -> MODERATO (FR-AND-02)
+      // Tap '-' button twice to decrement BPM to 119 -> Moderato (FR-AND-02)
       await tester.tap(find.byKey(const Key('bpm_decrement_button')));
       await tester.tap(find.byKey(const Key('bpm_decrement_button')));
       await tester.pump();
       expect(find.text('119'), findsOneWidget);
-      expect(find.text('MODERATO'), findsOneWidget);
+      expect(find.text('Moderato'), findsOneWidget);
 
       // Select 6/8 time signature via the Time Signature bottom sheet (FR-CMP-01)
       expect(find.text('4/4'), findsOneWidget);
@@ -117,8 +117,8 @@ void main() {
       await tester.tap(find.byKey(const Key('rail_destination_settings')));
       await tester.pumpAndSettle();
 
-      expect(find.text('PREFERENCES'), findsOneWidget);
-      expect(find.text('APPEARANCE'), findsOneWidget);
+      expect(find.text('Preferences'), findsOneWidget);
+      expect(find.text('Appearance'), findsOneWidget);
 
       // Switch to Light theme
       await tester.tap(find.byKey(const Key('theme_mode_dropdown')));
@@ -130,7 +130,7 @@ void main() {
       await tester.tap(find.byKey(const Key('rail_destination_metronome')));
       await tester.pumpAndSettle();
 
-      expect(find.text('METRONOME'), findsOneWidget);
+      expect(find.text('Metronome'), findsWidgets);
 
       // Save current configuration (119 BPM, 7/4, Triplets) as a preset (UC-06)
       await tester.tap(find.byKey(const Key('save_preset_header_button')));
@@ -153,7 +153,7 @@ void main() {
       // Switch language to Portuguese in Settings and verify localized UI
       await tester.tap(find.byKey(const Key('rail_destination_settings')));
       await tester.pumpAndSettle();
-      expect(find.text('LANGUAGE'), findsOneWidget);
+      expect(find.text('Language'), findsOneWidget);
       final languageDropdown = find.byKey(const Key('language_dropdown'));
       await tester.ensureVisible(languageDropdown);
       await tester.tap(languageDropdown);
@@ -161,17 +161,17 @@ void main() {
       await tester.tap(find.text('Português').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('PREFERÊNCIAS'), findsOneWidget);
-      expect(find.text('APARÊNCIA'), findsOneWidget);
-      expect(find.text('IDIOMA'), findsOneWidget);
-      expect(find.text('SONS E VOLUMES'), findsOneWidget);
+      expect(find.text('Preferências'), findsOneWidget);
+      expect(find.text('Aparência'), findsOneWidget);
+      expect(find.text('Idioma'), findsOneWidget);
+      expect(find.text('Sons e volumes'), findsOneWidget);
 
       // Navigate back to Metronome and verify Portuguese labels
       await tester.tap(find.byKey(const Key('rail_destination_metronome')));
       await tester.pumpAndSettle();
-      expect(find.text('METRÔNOMO'), findsOneWidget);
-      expect(find.text('COMPASSO'), findsOneWidget);
-      expect(find.text('SUBDIVISÃO'), findsOneWidget);
+      expect(find.text('Metrônomo'), findsWidgets);
+      expect(find.text('Compasso'), findsOneWidget);
+      expect(find.text('Subdivisão'), findsOneWidget);
 
       await tester.runAsync(() => GoogleFonts.pendingFonts());
       await tester.pump();

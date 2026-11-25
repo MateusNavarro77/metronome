@@ -156,18 +156,18 @@ class _PreferencesHeader extends StatelessWidget {
           ),
           Text(
             l10n.preferencesHeader,
-            style: context.textTheme.labelMedium?.copyWith(
+            style: context.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
               color: context.colorScheme.onSurface,
-              letterSpacing: 2.2,
             ),
           ),
           const SizedBox(width: 48.0),
         ] else ...[
           Text(
             l10n.preferencesHeader,
-            style: context.textTheme.labelMedium?.copyWith(
+            style: context.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
               color: context.colorScheme.onSurface,
-              letterSpacing: 2.2,
             ),
           ),
           const SizedBox.shrink(),
@@ -193,10 +193,9 @@ class _SectionHeader extends StatelessWidget {
           SizedBox(width: context.dimens.spaceSm),
           Text(
             title,
-            style: context.textTheme.labelMedium?.copyWith(
+            style: context.textTheme.titleSmall?.copyWith(
               color: context.colorScheme.onSurface,
               fontWeight: FontWeight.w700,
-              letterSpacing: 1.4,
             ),
           ),
         ],
@@ -228,7 +227,7 @@ class _DropdownSectionCard<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return M3ECard(
       key: cardKey,
-      variant: M3ECardVariant.outlined,
+      variant: M3ECardVariant.elevated,
       padding: EdgeInsets.all(context.dimens.spaceMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,7 +347,7 @@ class _SoundsSectionCard extends StatelessWidget {
 
     return M3ECard(
       key: const Key('sounds_section_card'),
-      variant: M3ECardVariant.outlined,
+      variant: M3ECardVariant.elevated,
       padding: EdgeInsets.all(context.dimens.spaceMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -687,7 +686,7 @@ class _BackgroundPlaybackSectionCard extends StatelessWidget {
 
     return M3ECard(
       key: const Key('background_playback_section_card'),
-      variant: M3ECardVariant.outlined,
+      variant: M3ECardVariant.elevated,
       padding: EdgeInsets.all(context.dimens.spaceMd),
       child: Row(
         children: [

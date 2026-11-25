@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// Badge indicating the currently active preset or setlist
   ///
   /// In en, this message translates to:
-  /// **'ACTIVE'**
+  /// **'Active'**
   String get activeBadge;
 
   /// Beats per minute unit label
@@ -329,7 +329,7 @@ abstract class AppLocalizations {
   /// Header title on the main metronome screen
   ///
   /// In en, this message translates to:
-  /// **'METRONOME'**
+  /// **'Metronome'**
   String get metronomeHeader;
 
   /// Header button label to save current metronome settings as a preset
@@ -395,7 +395,7 @@ abstract class AppLocalizations {
   /// Visible label on Tap Tempo button
   ///
   /// In en, this message translates to:
-  /// **'TAP TEMPO'**
+  /// **'Tap tempo'**
   String get tapTempoLabel;
 
   /// Accessibility label for Play/Stop button while playing
@@ -413,7 +413,7 @@ abstract class AppLocalizations {
   /// Compact caption for time signature selector card
   ///
   /// In en, this message translates to:
-  /// **'TIME SIG'**
+  /// **'Time sig'**
   String get timeSignatureCaption;
 
   /// Accessibility label for time signature selector card
@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// Compact caption for subdivision selector card
   ///
   /// In en, this message translates to:
-  /// **'SUBDIVISION'**
+  /// **'Subdivision'**
   String get subdivisionCaption;
 
   /// Accessibility label for subdivision selector card
@@ -437,13 +437,13 @@ abstract class AppLocalizations {
   /// Tooltip for accent toggle when enabled
   ///
   /// In en, this message translates to:
-  /// **'Downbeat accent ON'**
+  /// **'Downbeat accent on'**
   String get downbeatAccentOnTooltip;
 
   /// Tooltip for accent toggle when disabled
   ///
   /// In en, this message translates to:
-  /// **'Downbeat accent OFF'**
+  /// **'Downbeat accent off'**
   String get downbeatAccentOffTooltip;
 
   /// Accessibility label for accent toggle when enabled
@@ -461,13 +461,13 @@ abstract class AppLocalizations {
   /// Title of the time signature bottom sheet
   ///
   /// In en, this message translates to:
-  /// **'TIME SIGNATURE'**
+  /// **'Time signature'**
   String get timeSignatureSheetTitle;
 
   /// Section header for standard preset time signatures
   ///
   /// In en, this message translates to:
-  /// **'PRESETS'**
+  /// **'Presets'**
   String get timeSignaturePresetsSection;
 
   /// Accessibility label for a time signature preset pill
@@ -479,13 +479,13 @@ abstract class AppLocalizations {
   /// Section header for custom numerator/denominator controls
   ///
   /// In en, this message translates to:
-  /// **'CUSTOM METER'**
+  /// **'Custom meter'**
   String get customMeterSection;
 
   /// Label for custom time signature numerator
   ///
   /// In en, this message translates to:
-  /// **'BEATS PER BAR'**
+  /// **'Beats per bar'**
   String get beatsPerBarLabel;
 
   /// Helper label showing valid numerator range
@@ -509,7 +509,7 @@ abstract class AppLocalizations {
   /// Label for custom time signature denominator
   ///
   /// In en, this message translates to:
-  /// **'NOTE VALUE (DENOMINATOR)'**
+  /// **'Note value (denominator)'**
   String get noteValueDenominatorLabel;
 
   /// Accessibility label for denominator pill
@@ -521,13 +521,13 @@ abstract class AppLocalizations {
   /// Title of the subdivisions bottom sheet
   ///
   /// In en, this message translates to:
-  /// **'SUBDIVISIONS'**
+  /// **'Subdivisions'**
   String get subdivisionsSheetTitle;
 
   /// Badge indicating a pending bar-synced setlist transition
   ///
   /// In en, this message translates to:
-  /// **'NEXT BAR'**
+  /// **'Next bar'**
   String get nextBarBadge;
 
   /// Tooltip for closing the active setlist stepper bar
@@ -557,7 +557,7 @@ abstract class AppLocalizations {
   /// Header title on the Preferences screen
   ///
   /// In en, this message translates to:
-  /// **'PREFERENCES'**
+  /// **'Preferences'**
   String get preferencesHeader;
 
   /// Tooltip for back button on Preferences screen
@@ -569,7 +569,7 @@ abstract class AppLocalizations {
   /// Section header for theme settings
   ///
   /// In en, this message translates to:
-  /// **'APPEARANCE'**
+  /// **'Appearance'**
   String get appearanceSectionHeader;
 
   /// Description text in the Appearance card
@@ -581,7 +581,7 @@ abstract class AppLocalizations {
   /// Section header for language settings
   ///
   /// In en, this message translates to:
-  /// **'LANGUAGE'**
+  /// **'Language'**
   String get languageSectionHeader;
 
   /// Description text in the Language card
@@ -593,7 +593,7 @@ abstract class AppLocalizations {
   /// Section header for audio timbre and volume settings
   ///
   /// In en, this message translates to:
-  /// **'SOUNDS & VOLUMES'**
+  /// **'Sounds & volumes'**
   String get soundsSectionHeader;
 
   /// Description text in the Sounds & Volumes card
@@ -641,7 +641,7 @@ abstract class AppLocalizations {
   /// Section header for background playback and notification settings
   ///
   /// In en, this message translates to:
-  /// **'BACKGROUND PLAYBACK'**
+  /// **'Background playback'**
   String get backgroundPlaybackSectionHeader;
 
   /// Title for the background playback switch
@@ -659,7 +659,7 @@ abstract class AppLocalizations {
   /// Header title on the Presets screen
   ///
   /// In en, this message translates to:
-  /// **'PRESETS'**
+  /// **'Presets'**
   String get presetsHeader;
 
   /// Primary button label to create a new preset
@@ -707,13 +707,13 @@ abstract class AppLocalizations {
   /// Preset parameter badge when downbeat accent is enabled
   ///
   /// In en, this message translates to:
-  /// **'Accent ON'**
+  /// **'Accent on'**
   String get accentOnBadge;
 
   /// Preset parameter badge when downbeat accent is disabled
   ///
   /// In en, this message translates to:
-  /// **'Accent OFF'**
+  /// **'Accent off'**
   String get accentOffBadge;
 
   /// Tooltip for editing a preset
@@ -797,13 +797,13 @@ abstract class AppLocalizations {
   /// Title of the preset editor sheet when editing
   ///
   /// In en, this message translates to:
-  /// **'EDIT PRESET'**
+  /// **'Edit preset'**
   String get editPresetSheetTitle;
 
   /// Title of the preset editor sheet when creating
   ///
   /// In en, this message translates to:
-  /// **'NEW PRESET'**
+  /// **'New preset'**
   String get newPresetSheetTitle;
 
   /// Tooltip to unstar a preset in editor sheet
@@ -845,7 +845,7 @@ abstract class AppLocalizations {
   /// Section label for BPM editor in preset sheet
   ///
   /// In en, this message translates to:
-  /// **'TEMPO'**
+  /// **'Tempo'**
   String get tempoSectionLabel;
 
   /// Tooltip for decrementing BPM in preset editor
@@ -869,7 +869,7 @@ abstract class AppLocalizations {
   /// Switch label for Beat 1 accent in preset editor
   ///
   /// In en, this message translates to:
-  /// **'ACCENT ON BEAT 1'**
+  /// **'Accent on beat 1'**
   String get accentOnBeat1Label;
 
   /// Save button label when editing an existing preset
@@ -887,7 +887,7 @@ abstract class AppLocalizations {
   /// Header title on the Setlists screen
   ///
   /// In en, this message translates to:
-  /// **'SETLISTS'**
+  /// **'Setlists'**
   String get setlistsHeader;
 
   /// Button label to create a new setlist
@@ -1037,7 +1037,7 @@ abstract class AppLocalizations {
   /// Title of the bottom sheet for picking a preset to add to a setlist
   ///
   /// In en, this message translates to:
-  /// **'ADD PRESET TO SETLIST'**
+  /// **'Add preset to setlist'**
   String get addPresetPickerTitle;
 
   /// Message shown in add-preset picker when no presets exist
