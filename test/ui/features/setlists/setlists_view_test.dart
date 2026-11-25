@@ -1,7 +1,9 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart'
+    hide CornerRounding, RoundedPolygon;
 import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preset_library_repository.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
@@ -284,6 +286,14 @@ void main() {
             find.byKey(const Key('active_setlist_stepper_bar')),
             findsOneWidget,
           );
+          check(
+            tester
+                .widget<M3ECard>(
+                  find.byKey(const Key('active_setlist_stepper_bar')),
+                )
+                .variant,
+          ).equals(M3ECardVariant.elevated);
+          expect(find.text('Live Set'), findsOneWidget);
           expect(
             find.byKey(const Key('active_setlist_preset_name')),
             findsOneWidget,
@@ -293,7 +303,7 @@ void main() {
           expect(find.text('1 of 2'), findsOneWidget);
           expect(find.text('112'), findsOneWidget);
 
-          // Start playing, then step Next -> shows NEXT BAR pending badge until downbeat
+          // Start playing, then step Next -> shows Next bar pending badge until downbeat
           await tester.ensureVisible(find.byKey(const Key('play_stop_button')));
           await tester.tap(find.byKey(const Key('play_stop_button')));
           await tester.pumpAndSettle();
@@ -313,6 +323,7 @@ void main() {
             find.byKey(const Key('setlist_pending_transition_badge')),
             findsOneWidget,
           );
+          expect(find.text('Next bar'), findsOneWidget);
           check(engine.bpm).equals(const Bpm(112));
 
           // Finish remaining 3 beats of the 4/4 bar -> transitions at Beat 1

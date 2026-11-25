@@ -59,7 +59,7 @@ class BpmControlSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(context.dimens.radiusFull),
             ),
             child: Text(
-              tempoMarking.label.toUpperCase(),
+              tempoMarking.label,
               key: const Key('tempo_marking_text'),
               style: context.textTheme.labelMedium?.copyWith(
                 color: context.colorScheme.secondary,

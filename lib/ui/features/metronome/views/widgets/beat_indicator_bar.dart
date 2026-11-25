@@ -42,7 +42,7 @@ class BeatIndicatorBar extends StatelessWidget {
           ? l10n.beatIndicatorPlayingSemantics(currentBeat + 1, beatCount)
           : l10n.beatIndicatorStoppedSemantics(beatCount),
       child: M3ECard(
-        variant: M3ECardVariant.outlined,
+        variant: M3ECardVariant.elevated,
         padding: EdgeInsets.symmetric(
           horizontal: context.dimens.spaceMd,
           vertical: isCompact ? context.dimens.spaceSm : context.dimens.spaceMd,

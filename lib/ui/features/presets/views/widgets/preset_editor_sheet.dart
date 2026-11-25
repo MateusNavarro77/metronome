@@ -198,8 +198,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                             _isEditing
                                 ? l10n.editPresetSheetTitle
                                 : l10n.newPresetSheetTitle,
-                            style: context.textTheme.titleSmall?.copyWith(
-                              letterSpacing: 1.6,
+                            style: context.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: context.colorScheme.onSurface,
                             ),
@@ -258,7 +257,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
 
                       // BPM editor section
                       M3ECard(
-                        variant: M3ECardVariant.outlined,
+                        variant: M3ECardVariant.elevated,
                         padding: EdgeInsets.all(context.dimens.spaceMd),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -268,15 +267,13 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               children: [
                                 Text(
                                   l10n.tempoSectionLabel,
-                                  style: context.textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: context
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
+                                  style: context.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                                 Text(
-                                  _bpm.tempoMarking.label.toUpperCase(),
+                                  _bpm.tempoMarking.label,
                                   style: context.textTheme.labelMedium
                                       ?.copyWith(
                                         color: context.colorScheme.secondary,
@@ -345,7 +342,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
 
                       // Time signature section
                       M3ECard(
-                        variant: M3ECardVariant.outlined,
+                        variant: M3ECardVariant.elevated,
                         padding: EdgeInsets.all(context.dimens.spaceMd),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -355,12 +352,10 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                               children: [
                                 Text(
                                   l10n.timeSignatureSheetTitle,
-                                  style: context.textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: context
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
+                                  style: context.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                                 Text(
                                   _timeSignature.label,
@@ -481,14 +476,15 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
 
                       // Subdivision selector
                       M3ECard(
-                        variant: M3ECardVariant.outlined,
+                        variant: M3ECardVariant.elevated,
                         padding: EdgeInsets.all(context.dimens.spaceMd),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
                               l10n.subdivisionCaption,
-                              style: context.textTheme.labelMedium?.copyWith(
+                              style: context.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
                                 color: context.colorScheme.onSurfaceVariant,
                               ),
                             ),
@@ -518,7 +514,7 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
 
                       // Downbeat accent toggle
                       M3ECard(
-                        variant: M3ECardVariant.outlined,
+                        variant: M3ECardVariant.elevated,
                         padding: EdgeInsets.symmetric(
                           horizontal: context.dimens.spaceMd,
                           vertical: context.dimens.spaceSm,
@@ -528,7 +524,8 @@ class _PresetEditorSheetState extends State<PresetEditorSheet> {
                           children: [
                             Text(
                               l10n.accentOnBeat1Label,
-                              style: context.textTheme.labelMedium?.copyWith(
+                              style: context.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
                                 color: context.colorScheme.onSurface,
                               ),
                             ),

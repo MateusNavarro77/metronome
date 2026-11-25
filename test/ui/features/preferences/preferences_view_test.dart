@@ -46,14 +46,14 @@ void main() {
         );
 
         // Screen header & section headers outside their respective cards
-        expect(find.text('PREFERENCES'), findsOneWidget);
-        expect(find.text('APPEARANCE'), findsOneWidget);
-        expect(find.text('SOUNDS & VOLUMES'), findsOneWidget);
+        expect(find.text('Preferences'), findsOneWidget);
+        expect(find.text('Appearance'), findsOneWidget);
+        expect(find.text('Sounds & volumes'), findsOneWidget);
 
         expect(
           find.descendant(
             of: find.byKey(const Key('appearance_section_card')),
-            matching: find.text('APPEARANCE'),
+            matching: find.text('Appearance'),
           ),
           findsNothing,
         );
@@ -67,7 +67,7 @@ void main() {
         expect(
           find.descendant(
             of: find.byKey(const Key('sounds_section_card')),
-            matching: find.text('SOUNDS & VOLUMES'),
+            matching: find.text('Sounds & volumes'),
           ),
           findsNothing,
         );
@@ -247,13 +247,13 @@ void main() {
       await tester.tap(find.text('Open Settings'));
       await tester.pumpAndSettle();
 
-      expect(find.text('PREFERENCES'), findsOneWidget);
+      expect(find.text('Preferences'), findsOneWidget);
 
       // Tap back button
       await tester.tap(find.byKey(const Key('preferences_back_button')));
       await tester.pumpAndSettle();
 
-      expect(find.text('PREFERENCES'), findsNothing);
+      expect(find.text('Preferences'), findsNothing);
       expect(find.text('Open Settings'), findsOneWidget);
     });
 
@@ -285,7 +285,7 @@ void main() {
       await tester.ensureVisible(switchFinder);
       await tester.pumpAndSettle();
 
-      expect(find.text('BACKGROUND PLAYBACK'), findsOneWidget);
+      expect(find.text('Background playback'), findsOneWidget);
       expect(find.text('Play in background'), findsOneWidget);
       check(viewModel.isBackgroundPlaybackEnabled).isTrue();
 

@@ -132,9 +132,9 @@ class _SetlistsViewBody extends StatelessWidget {
                     children: [
                       Text(
                         l10n.setlistsHeader,
-                        style: context.textTheme.labelMedium?.copyWith(
+                        style: context.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
                           color: context.colorScheme.onSurface,
-                          letterSpacing: 2.2,
                         ),
                       ),
                       M3EButton.filled(
@@ -237,7 +237,7 @@ class _SetlistCard extends StatelessWidget {
       label: l10n.setlistCardSemantics(setlistName, songCountLabel),
       child: M3ECard(
         key: Key('setlist_card_${setlist.id}'),
-        variant: isActive ? M3ECardVariant.filled : M3ECardVariant.outlined,
+        variant: isActive ? M3ECardVariant.filled : M3ECardVariant.elevated,
         borderRadius: BorderRadius.circular(context.dimens.radiusMd),
         padding: EdgeInsets.all(context.dimens.spaceMd),
         onPressed: onTap,
@@ -279,9 +279,8 @@ class _SetlistCard extends StatelessWidget {
                               ),
                               child: Text(
                                 l10n.activeBadge,
-                                style: context.textTheme.labelMedium?.copyWith(
-                                  fontSize: 9,
-                                  letterSpacing: 0.8,
+                                style: context.textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
                                   color: context.colorScheme.onPrimary,
                                 ),
                               ),
@@ -355,7 +354,7 @@ class _EmptySetlistsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return M3ECard(
-      variant: M3ECardVariant.outlined,
+      variant: M3ECardVariant.elevated,
       borderRadius: BorderRadius.circular(context.dimens.radiusLg),
       padding: EdgeInsets.all(context.dimens.spaceLg),
       child: Column(
