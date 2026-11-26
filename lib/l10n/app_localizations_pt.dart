@@ -326,6 +326,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get playbackSectionHeader => 'Reprodução';
+
+  @override
+  String get keepScreenAwakeTitle => 'Manter tela ligada';
+
+  @override
+  String get keepScreenAwakeSubtitle =>
+      'Evita que a tela desligue automaticamente enquanto o metrônomo estiver tocando.';
+
+  @override
   String get backgroundPlaybackSectionHeader => 'Segundo plano';
 
   @override
@@ -745,4 +755,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get setlistEmptyActionHint => 'Adicione músicas para ativar';
+
+  @override
+  String get aboutSectionHeader => 'Sobre';
+
+  @override
+  String get aboutAppVersionTitle => 'Versão do app';
+
+  @override
+  String get aboutSourceCodeTitle => 'Código fonte';
+
+  @override
+  String get aboutSourceCodeSubtitle => 'Ver no GitHub';
+
+  @override
+  String get aboutDeveloperTitle => 'Desenvolvido por Mateus Navarro';
+
+  @override
+  String get aboutDeveloperSubtitle => 'Perfil no GitHub';
+
+  @override
+  String get aboutPrivacyPolicyTitle => 'Política de privacidade';
+
+  @override
+  String get aboutOpenLinkError => 'Não foi possível abrir o link';
 }

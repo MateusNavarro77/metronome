@@ -9,11 +9,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'data/repositories/metronome_repository.dart';
 import 'data/repositories/preferences_repository.dart';
 import 'data/repositories/preset_library_repository.dart';
+import 'data/services/app_info_service.dart';
 import 'data/services/audio_service_background_playback_service.dart';
 import 'data/services/background_playback_coordinator.dart';
 import 'data/services/background_playback_service.dart';
 import 'data/services/metronome_engine.dart';
 import 'data/services/soloud_metronome_engine.dart';
+import 'data/services/url_launcher_service.dart';
+import 'data/services/wakelock_coordinator.dart';
+import 'data/services/wakelock_plus_service.dart';
+import 'data/services/wakelock_service.dart';
 import 'domain/models/app_theme_mode.dart';
 import 'l10n/app_localizations.dart';
 import 'ui/core/l10n/l10n_extensions.dart';
@@ -39,6 +44,9 @@ class MetronomeApp extends StatelessWidget {
     this.preferencesRepositoryOverride,
     this.presetLibraryRepositoryOverride,
     this.backgroundPlaybackServiceOverride,
+    this.wakelockServiceOverride,
+    this.appInfoServiceOverride,
+    this.urlLauncherServiceOverride,
     this.preferences,
   });
 
@@ -53,6 +61,15 @@ class MetronomeApp extends StatelessWidget {
 
   /// Optional [BackgroundPlaybackService] override for testing.
   final BackgroundPlaybackService? backgroundPlaybackServiceOverride;
+
+  /// Optional [WakelockService] override for testing.
+  final WakelockService? wakelockServiceOverride;
+
+  /// Optional [AppInfoService] override for testing.
+  final AppInfoService? appInfoServiceOverride;
+
+  /// Optional [UrlLauncherService] override for testing.
+  final UrlLauncherService? urlLauncherServiceOverride;
 
   /// Optional [SharedPreferences] instance from entrypoint.
   final SharedPreferences? preferences;
@@ -88,6 +105,38 @@ class MetronomeApp extends StatelessWidget {
                   ? NoopBackgroundPlaybackService()
                   : AudioServiceBackgroundPlaybackService()),
           dispose: (_, service) => service.dispose(),
+        ),
+        Provider<WakelockService>(
+          create: (_) =>
+              wakelockServiceOverride ??
+              (engineOverride != null
+                  ? NoopWakelockService()
+                  : WakelockPlusService()),
+          dispose: (_, service) => service.dispose(),
+        ),
+        ProxyProvider3<
+          MetronomeRepository,
+          PreferencesRepository,
+          WakelockService,
+          WakelockCoordinator
+        >(
+          lazy: false,
+          update:
+              (
+                _,
+                metronomeRepository,
+                preferencesRepository,
+                wakelockService,
+                previous,
+              ) {
+                return previous ??
+                    WakelockCoordinator(
+                      metronomeRepository: metronomeRepository,
+                      preferencesRepository: preferencesRepository,
+                      wakelockService: wakelockService,
+                    );
+              },
+          dispose: (_, coordinator) => coordinator.dispose(),
         ),
         ProxyProvider4<
           MetronomeRepository,
@@ -138,10 +187,11 @@ class MetronomeApp extends StatelessWidget {
                     presetLibraryRepository: presetLibrary,
                   ),
         ),
-        ChangeNotifierProxyProvider3<
+        ChangeNotifierProxyProvider4<
           PreferencesRepository,
           MetronomeRepository,
           BackgroundPlaybackCoordinator,
+          WakelockCoordinator,
           PreferencesViewModel
         >(
           create: (context) => PreferencesViewModel(
@@ -149,6 +199,9 @@ class MetronomeApp extends StatelessWidget {
             metronomeRepository: context.read<MetronomeRepository>(),
             backgroundPlaybackCoordinator: context
                 .read<BackgroundPlaybackCoordinator>(),
+            wakelockCoordinator: context.read<WakelockCoordinator>(),
+            appInfoService: appInfoServiceOverride,
+            urlLauncherService: urlLauncherServiceOverride,
           ),
           update:
               (
@@ -156,6 +209,7 @@ class MetronomeApp extends StatelessWidget {
                 repository,
                 metronomeRepository,
                 backgroundPlaybackCoordinator,
+                wakelockCoordinator,
                 previous,
               ) =>
                   previous ??
@@ -164,6 +218,9 @@ class MetronomeApp extends StatelessWidget {
                     metronomeRepository: metronomeRepository,
                     backgroundPlaybackCoordinator:
                         backgroundPlaybackCoordinator,
+                    wakelockCoordinator: wakelockCoordinator,
+                    appInfoService: appInfoServiceOverride,
+                    urlLauncherService: urlLauncherServiceOverride,
                   ),
         ),
         ChangeNotifierProxyProvider2<
@@ -203,11 +260,15 @@ class MetronomeApp extends StatelessWidget {
         builder: (context, preferencesViewModel, _) {
           final backgroundCoordinator = context
               .read<BackgroundPlaybackCoordinator>();
+          final wakelockCoordinator = context.read<WakelockCoordinator>();
           return _M3EAppHost(
             themeMode: preferencesViewModel.themeMode,
             locale: preferencesViewModel.materialLocale,
-            onAppBackgrounded: () =>
-                unawaited(backgroundCoordinator.onAppBackgrounded()),
+            onAppBackgrounded: () {
+              unawaited(backgroundCoordinator.onAppBackgrounded());
+              unawaited(wakelockCoordinator.onAppBackgrounded());
+            },
+            onAppResumed: () => unawaited(wakelockCoordinator.onAppResumed()),
             home: Builder(
               builder: (context) {
                 return AdaptiveNavigationShell(
@@ -228,12 +289,14 @@ class _M3EAppHost extends StatefulWidget {
     required this.locale,
     required this.home,
     this.onAppBackgrounded,
+    this.onAppResumed,
   });
 
   final AppThemeMode themeMode;
   final Locale? locale;
   final Widget home;
   final VoidCallback? onAppBackgrounded;
+  final VoidCallback? onAppResumed;
 
   @override
   State<_M3EAppHost> createState() => _M3EAppHostState();
@@ -252,6 +315,7 @@ class _M3EAppHostState extends State<_M3EAppHost> {
     _themeController = M3EThemeController();
     _lifecycleListener = AppLifecycleListener(
       onPause: () => widget.onAppBackgrounded?.call(),
+      onResume: () => widget.onAppResumed?.call(),
     );
     _lightThemeData = AppTheme.lightThemeData;
     _lightTheme = _lightThemeData.toThemeData();

@@ -457,6 +457,18 @@
       }
     }
   },
+  "playbackSectionHeader": "Playback",
+  "@playbackSectionHeader": {
+    "description": "Section header for playback behavior settings"
+  },
+  "keepScreenAwakeTitle": "Keep screen awake",
+  "@keepScreenAwakeTitle": {
+    "description": "Title for the keep screen awake switch"
+  },
+  "keepScreenAwakeSubtitle": "Prevent the screen from turning off automatically while the metronome is playing.",
+  "@keepScreenAwakeSubtitle": {
+    "description": "Subtitle explaining keep screen awake while playing"
+  },
   "backgroundPlaybackSectionHeader": "Background playback",
   "@backgroundPlaybackSectionHeader": {
     "description": "Section header for background playback and notification settings"
@@ -1076,5 +1088,38 @@
   "setlistEmptyActionHint": "Add songs to activate",
   "@setlistEmptyActionHint": {
     "description": "Disabled button label on an empty setlist card"
+  },
+
+  "aboutSectionHeader": "About",
+  "@aboutSectionHeader": {
+    "description": "Section header for app information in Preferences"
+  },
+  "aboutAppVersionTitle": "App version",
+  "@aboutAppVersionTitle": {
+    "description": "Title for the app version row in Preferences"
+  },
+  "aboutSourceCodeTitle": "Source code",
+  "@aboutSourceCodeTitle": {
+    "description": "Title for the GitHub source code link row in Preferences"
+  },
+  "aboutSourceCodeSubtitle": "View on GitHub",
+  "@aboutSourceCodeSubtitle": {
+    "description": "Subtitle for the GitHub source code link row in Preferences"
+  },
+  "aboutDeveloperTitle": "Developed by Mateus Navarro",
+  "@aboutDeveloperTitle": {
+    "description": "Title for the developer credit row in Preferences"
+  },
+  "aboutDeveloperSubtitle": "GitHub profile",
+  "@aboutDeveloperSubtitle": {
+    "description": "Subtitle for the developer credit row in Preferences"
+  },
+  "aboutPrivacyPolicyTitle": "Privacy policy",
+  "@aboutPrivacyPolicyTitle": {
+    "description": "Title for the privacy policy link row in Preferences"
+  },
+  "aboutOpenLinkError": "Could not open link",
+  "@aboutOpenLinkError": {
+    "description": "Snackbar error shown when an external link fails to launch"
   }
 }

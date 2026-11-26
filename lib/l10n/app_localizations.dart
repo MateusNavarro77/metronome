@@ -638,6 +638,24 @@ abstract class AppLocalizations {
   /// **'{label} volume'**
   String volumeSliderSemantics(String label);
 
+  /// Section header for playback behavior settings
+  ///
+  /// In en, this message translates to:
+  /// **'Playback'**
+  String get playbackSectionHeader;
+
+  /// Title for the keep screen awake switch
+  ///
+  /// In en, this message translates to:
+  /// **'Keep screen awake'**
+  String get keepScreenAwakeTitle;
+
+  /// Subtitle explaining keep screen awake while playing
+  ///
+  /// In en, this message translates to:
+  /// **'Prevent the screen from turning off automatically while the metronome is playing.'**
+  String get keepScreenAwakeSubtitle;
+
   /// Section header for background playback and notification settings
   ///
   /// In en, this message translates to:
@@ -1255,6 +1273,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add songs to activate'**
   String get setlistEmptyActionHint;
+
+  /// Section header for app information in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutSectionHeader;
+
+  /// Title for the app version row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'App version'**
+  String get aboutAppVersionTitle;
+
+  /// Title for the GitHub source code link row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'Source code'**
+  String get aboutSourceCodeTitle;
+
+  /// Subtitle for the GitHub source code link row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'View on GitHub'**
+  String get aboutSourceCodeSubtitle;
+
+  /// Title for the developer credit row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'Developed by Mateus Navarro'**
+  String get aboutDeveloperTitle;
+
+  /// Subtitle for the developer credit row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub profile'**
+  String get aboutDeveloperSubtitle;
+
+  /// Title for the privacy policy link row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get aboutPrivacyPolicyTitle;
+
+  /// Snackbar error shown when an external link fails to launch
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open link'**
+  String get aboutOpenLinkError;
 }
 
 class _AppLocalizationsDelegate

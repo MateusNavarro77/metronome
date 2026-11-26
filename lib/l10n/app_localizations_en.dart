@@ -324,6 +324,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get playbackSectionHeader => 'Playback';
+
+  @override
+  String get keepScreenAwakeTitle => 'Keep screen awake';
+
+  @override
+  String get keepScreenAwakeSubtitle =>
+      'Prevent the screen from turning off automatically while the metronome is playing.';
+
+  @override
   String get backgroundPlaybackSectionHeader => 'Background playback';
 
   @override
@@ -742,4 +752,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setlistEmptyActionHint => 'Add songs to activate';
+
+  @override
+  String get aboutSectionHeader => 'About';
+
+  @override
+  String get aboutAppVersionTitle => 'App version';
+
+  @override
+  String get aboutSourceCodeTitle => 'Source code';
+
+  @override
+  String get aboutSourceCodeSubtitle => 'View on GitHub';
+
+  @override
+  String get aboutDeveloperTitle => 'Developed by Mateus Navarro';
+
+  @override
+  String get aboutDeveloperSubtitle => 'GitHub profile';
+
+  @override
+  String get aboutPrivacyPolicyTitle => 'Privacy policy';
+
+  @override
+  String get aboutOpenLinkError => 'Could not open link';
 }

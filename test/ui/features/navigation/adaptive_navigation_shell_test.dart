@@ -436,7 +436,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final lastCardRect = tester.getRect(
-          find.byKey(const Key('background_playback_section_card')),
+          find.byKey(const Key('playback_section_card')),
         );
         check(lastCardRect.bottom <= toolbarRect.top).isTrue();
       },

@@ -105,6 +105,9 @@
   "weakBeatsVolumeLabel": "Tempos Fracos",
   "subdivisionsVolumeLabel": "Subdivisões",
   "volumeSliderSemantics": "Volume de {label}",
+  "playbackSectionHeader": "Reprodução",
+  "keepScreenAwakeTitle": "Manter tela ligada",
+  "keepScreenAwakeSubtitle": "Evita que a tela desligue automaticamente enquanto o metrônomo estiver tocando.",
   "backgroundPlaybackSectionHeader": "Segundo plano",
   "backgroundPlaybackTitle": "Tocar em segundo plano",
   "backgroundPlaybackSubtitle": "Mantém o metrônomo tocando com notificação de mídia e controles na tela bloqueada ao sair do app.",
@@ -216,5 +219,14 @@
   "addSelectedPresetsButton": "{count, plural, =0{Adicionar selecionados} =1{Adicionar 1 música} other{Adicionar {count} músicas}}",
   "searchPresetsInPickerPlaceholder": "Buscar presets...",
   "activateSetlistActiveButton": "Ativa · Reiniciar",
-  "setlistEmptyActionHint": "Adicione músicas para ativar"
+  "setlistEmptyActionHint": "Adicione músicas para ativar",
+
+  "aboutSectionHeader": "Sobre",
+  "aboutAppVersionTitle": "Versão do app",
+  "aboutSourceCodeTitle": "Código fonte",
+  "aboutSourceCodeSubtitle": "Ver no GitHub",
+  "aboutDeveloperTitle": "Desenvolvido por Mateus Navarro",
+  "aboutDeveloperSubtitle": "Perfil no GitHub",
+  "aboutPrivacyPolicyTitle": "Política de privacidade",
+  "aboutOpenLinkError": "Não foi possível abrir o link"
 }

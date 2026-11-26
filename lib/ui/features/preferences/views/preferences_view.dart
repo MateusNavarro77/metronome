@@ -9,6 +9,7 @@ import '../../../../domain/models/metronome_sound.dart';
 import '../../../../domain/models/sound_settings.dart';
 import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_snackbar.dart';
 import '../view_models/preferences_view_model.dart';
 
 /// Preferences and settings screen using Material 3 Expressive theming
@@ -119,14 +120,20 @@ class PreferencesView extends StatelessWidget {
                           _SoundsSectionCard(viewModel: viewModel),
                           SizedBox(height: context.dimens.spaceLg),
                           _SectionHeader(
-                            key: const Key(
-                              'background_playback_section_header',
-                            ),
-                            icon: Icons.notifications_active_outlined,
-                            title: l10n.backgroundPlaybackSectionHeader,
+                            key: const Key('playback_section_header'),
+                            icon: Icons.play_circle_outline_rounded,
+                            title: l10n.playbackSectionHeader,
                           ),
                           SizedBox(height: context.dimens.spaceSm),
-                          _BackgroundPlaybackSectionCard(viewModel: viewModel),
+                          _PlaybackSectionCard(viewModel: viewModel),
+                          SizedBox(height: context.dimens.spaceLg),
+                          _SectionHeader(
+                            key: const Key('about_section_header'),
+                            icon: Icons.info_outline_rounded,
+                            title: l10n.aboutSectionHeader,
+                          ),
+                          SizedBox(height: context.dimens.spaceSm),
+                          _AboutSectionCard(viewModel: viewModel),
                         ],
                       ),
                     ),
@@ -680,60 +687,267 @@ class _VolumeSliderRow extends StatelessWidget {
   }
 }
 
-class _BackgroundPlaybackSectionCard extends StatelessWidget {
-  const _BackgroundPlaybackSectionCard({required this.viewModel});
+class _PlaybackSectionCard extends StatelessWidget {
+  const _PlaybackSectionCard({required this.viewModel});
 
   final PreferencesViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final enabled = viewModel.isBackgroundPlaybackEnabled;
+    final keepScreenAwake = viewModel.isKeepScreenAwakeEnabled;
+    final backgroundEnabled = viewModel.isBackgroundPlaybackEnabled;
 
     return M3ECard(
-      key: const Key('background_playback_section_card'),
+      key: const Key('playback_section_card'),
       variant: M3ECardVariant.elevated,
       padding: EdgeInsets.all(context.dimens.spaceMd),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            enabled
+          _PlaybackToggleRow(
+            switchKey: const Key('keep_screen_awake_switch'),
+            icon: keepScreenAwake
+                ? Icons.stay_primary_portrait_rounded
+                : Icons.screen_lock_portrait_outlined,
+            title: l10n.keepScreenAwakeTitle,
+            subtitle: l10n.keepScreenAwakeSubtitle,
+            value: keepScreenAwake,
+            onChanged: viewModel.setKeepScreenAwake,
+          ),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          const Divider(height: 1),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          _PlaybackToggleRow(
+            switchKey: const Key('background_playback_switch'),
+            icon: backgroundEnabled
                 ? Icons.notifications_active_rounded
                 : Icons.notifications_off_outlined,
-            size: 20,
-            color: enabled
-                ? context.colorScheme.primary
-                : context.colorScheme.onSurfaceVariant,
+            title: l10n.backgroundPlaybackTitle,
+            subtitle: l10n.backgroundPlaybackSubtitle,
+            value: backgroundEnabled,
+            onChanged: viewModel.setBackgroundPlaybackEnabled,
           ),
-          SizedBox(width: context.dimens.spaceSmPlus4),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.backgroundPlaybackTitle,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    color: context.colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlaybackToggleRow extends StatelessWidget {
+  const _PlaybackToggleRow({
+    required this.switchKey,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final Key switchKey;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: value
+              ? context.colorScheme.primary
+              : context.colorScheme.onSurfaceVariant,
+        ),
+        SizedBox(width: context.dimens.spaceSmPlus4),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: context.colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
                 ),
+              ),
+              Text(
+                subtitle,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: context.dimens.spaceSm),
+        M3ESwitch(
+          key: switchKey,
+          value: value,
+          onChanged: onChanged,
+          semanticLabel: title,
+        ),
+      ],
+    );
+  }
+}
+
+class _AboutSectionCard extends StatelessWidget {
+  const _AboutSectionCard({required this.viewModel});
+
+  final PreferencesViewModel viewModel;
+
+  Future<void> _openUrl(BuildContext context, Uri uri) async {
+    final launched = await viewModel.openUrl(uri);
+    if (!launched && context.mounted) {
+      showAppSnackbar(context, message: context.l10n.aboutOpenLinkError);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final versionText = viewModel.appVersionInfo?.formatted ?? '—';
+
+    return M3ECard(
+      key: const Key('about_section_card'),
+      variant: M3ECardVariant.elevated,
+      padding: EdgeInsets.all(context.dimens.spaceMd),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _AboutInfoRow(
+            rowKey: const Key('about_version_row'),
+            icon: Icons.tag_rounded,
+            title: l10n.aboutAppVersionTitle,
+            trailing: Text(
+              versionText,
+              key: const Key('about_version_value'),
+              style: context.textTheme.labelLarge?.copyWith(
+                color: context.colorScheme.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          const Divider(height: 1),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          _AboutInfoRow(
+            rowKey: const Key('about_source_code_row'),
+            icon: Icons.code_rounded,
+            title: l10n.aboutSourceCodeTitle,
+            subtitle: l10n.aboutSourceCodeSubtitle,
+            trailing: Icon(
+              Icons.open_in_new_rounded,
+              size: 18,
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+            onTap: () => _openUrl(context, PreferencesViewModel.sourceCodeUri),
+          ),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          const Divider(height: 1),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          _AboutInfoRow(
+            rowKey: const Key('about_developer_row'),
+            icon: Icons.person_outline_rounded,
+            title: l10n.aboutDeveloperTitle,
+            subtitle: l10n.aboutDeveloperSubtitle,
+            trailing: Icon(
+              Icons.open_in_new_rounded,
+              size: 18,
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+            onTap: () =>
+                _openUrl(context, PreferencesViewModel.developerProfileUri),
+          ),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          const Divider(height: 1),
+          SizedBox(height: context.dimens.spaceSmPlus4),
+          _AboutInfoRow(
+            rowKey: const Key('about_privacy_policy_row'),
+            icon: Icons.privacy_tip_outlined,
+            title: l10n.aboutPrivacyPolicyTitle,
+            trailing: Icon(
+              Icons.open_in_new_rounded,
+              size: 18,
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+            onTap: () =>
+                _openUrl(context, PreferencesViewModel.privacyPolicyUri),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AboutInfoRow extends StatelessWidget {
+  const _AboutInfoRow({
+    required this.rowKey,
+    required this.icon,
+    required this.title,
+    required this.trailing,
+    this.subtitle,
+    this.onTap,
+  });
+
+  final Key rowKey;
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final Widget trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Row(
+      children: [
+        Icon(icon, size: 20, color: context.colorScheme.onSurfaceVariant),
+        SizedBox(width: context.dimens.spaceSmPlus4),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: context.colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (subtitle != null)
                 Text(
-                  l10n.backgroundPlaybackSubtitle,
+                  subtitle!,
                   style: context.textTheme.bodySmall?.copyWith(
                     color: context.colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
-          SizedBox(width: context.dimens.spaceSm),
-          M3ESwitch(
-            key: const Key('background_playback_switch'),
-            value: enabled,
-            onChanged: viewModel.setBackgroundPlaybackEnabled,
-            semanticLabel: l10n.backgroundPlaybackTitle,
-          ),
-        ],
+        ),
+        SizedBox(width: context.dimens.spaceSm),
+        trailing,
+      ],
+    );
+
+    if (onTap == null) {
+      return KeyedSubtree(key: rowKey, child: content);
+    }
+
+    return Semantics(
+      button: true,
+      label: subtitle == null ? title : '$title, $subtitle',
+      child: InkWell(
+        key: rowKey,
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(context.dimens.radiusSm),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: context.dimens.spaceXs),
+          child: content,
+        ),
       ),
     );
   }
