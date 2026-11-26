@@ -18,6 +18,15 @@ android {
     compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String?
+            keyPassword = keystoreProperties["keyPassword"] as String?
+            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storePassword = keystoreProperties["storePassword"] as String?
+        }
+    }
+
     flavorDimensions += "default"
     productFlavors {
         create("dev") {
@@ -44,28 +53,33 @@ android {
         versionName = flutter.versionName
     }
 
-    signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String?
-        }
-    }
-
     buildTypes {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
         }
         getByName("release") {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             signingConfig = signingConfigs.getByName("release")
         }
     }
 
     buildFeatures {
         resValues = true
+    }
+
+    androidComponents {
+        onVariants(
+            selector()
+                .withFlavor("default" to "dev")
+                .withBuildType("release"),
+        ) { variant ->
+            variant.signingConfig?.setConfig(signingConfigs.getByName("debug"))
+        }
     }
 
     applicationVariants.all {
