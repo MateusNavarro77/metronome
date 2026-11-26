@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
+import 'package:metronome/data/services/app_info_service.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
+import 'package:metronome/data/services/url_launcher_service.dart';
+import 'package:metronome/data/services/wakelock_coordinator.dart';
+import 'package:metronome/data/services/wakelock_service.dart';
 import 'package:metronome/domain/models/app_language.dart';
 import 'package:metronome/domain/models/app_theme_mode.dart';
 import 'package:metronome/domain/models/metronome_sound.dart';
@@ -27,7 +31,49 @@ void main() {
       check(vm.language).equals(AppLanguage.system);
       check(vm.materialLocale).isNull();
       check(vm.soundSettings).equals(const SoundSettings());
+      check(vm.isKeepScreenAwakeEnabled).isTrue();
       check(metronomeRepo.state.soundSettings).equals(const SoundSettings());
+    });
+
+    test('updates keep screen awake preference, notifies listeners, and syncs coordinator', () async {
+      final repo = PreferencesRepository(preferences: null);
+      final engine = SimulatedMetronomeEngine();
+      final metronomeRepo = MetronomeRepository(engine: engine);
+      final wakelockCoordinator = WakelockCoordinator(
+        metronomeRepository: metronomeRepo,
+        preferencesRepository: repo,
+        wakelockService: NoopWakelockService(),
+      );
+      final vm = PreferencesViewModel(
+        repository: repo,
+        metronomeRepository: metronomeRepo,
+        wakelockCoordinator: wakelockCoordinator,
+      );
+
+      var notified = 0;
+      vm.addListener(() => notified++);
+
+      await metronomeRepo.start();
+      await Future<void>.delayed(Duration.zero);
+      check(wakelockCoordinator.isWakelockActive).isTrue();
+
+      await vm.setKeepScreenAwake(false);
+      check(vm.isKeepScreenAwakeEnabled).isFalse();
+      check(repo.getKeepScreenAwake()).isFalse();
+      check(wakelockCoordinator.isWakelockActive).isFalse();
+      check(notified).equals(1);
+
+      // Setting same value again does not re-notify
+      await vm.setKeepScreenAwake(false);
+      check(notified).equals(1);
+
+      await vm.setKeepScreenAwake(true);
+      check(vm.isKeepScreenAwakeEnabled).isTrue();
+      check(wakelockCoordinator.isWakelockActive).isTrue();
+      check(notified).equals(2);
+
+      await wakelockCoordinator.dispose();
+      await metronomeRepo.dispose();
     });
 
     test('updates theme mode and notifies listeners', () async {
@@ -157,5 +203,42 @@ void main() {
             .equals(0.0);
       },
     );
+
+    test('loads app version info and delegates openUrl', () async {
+      final launchedUris = <Uri>[];
+      final fakeUrlLauncher = _FakeUrlLauncherService(
+        onOpen: (uri) {
+          launchedUris.add(uri);
+          return true;
+        },
+      );
+      final vm = PreferencesViewModel(
+        repository: PreferencesRepository(preferences: null),
+        appInfoService: const FakeAppInfoService(
+          info: AppVersionInfo(version: '1.3.0-alpha.2', buildNumber: '42'),
+        ),
+        urlLauncherService: fakeUrlLauncher,
+      );
+
+      await Future<void>.delayed(Duration.zero);
+
+      check(vm.appVersionInfo?.formatted).equals('1.3.0-alpha.2+42');
+
+      const withoutBuild = AppVersionInfo(version: '1.3.0', buildNumber: '');
+      check(withoutBuild.formatted).equals('1.3.0');
+
+      final opened = await vm.openUrl(PreferencesViewModel.sourceCodeUri);
+      check(opened).isTrue();
+      check(launchedUris).deepEquals([PreferencesViewModel.sourceCodeUri]);
+    });
   });
+}
+
+class _FakeUrlLauncherService implements UrlLauncherService {
+  _FakeUrlLauncherService({required this.onOpen});
+
+  final bool Function(Uri uri) onOpen;
+
+  @override
+  Future<bool> openUrl(Uri uri) async => onOpen(uri);
 }

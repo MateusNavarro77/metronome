@@ -638,6 +638,24 @@ abstract class AppLocalizations {
   /// **'{label} volume'**
   String volumeSliderSemantics(String label);
 
+  /// Section header for playback behavior settings
+  ///
+  /// In en, this message translates to:
+  /// **'Playback'**
+  String get playbackSectionHeader;
+
+  /// Title for the keep screen awake switch
+  ///
+  /// In en, this message translates to:
+  /// **'Keep screen awake'**
+  String get keepScreenAwakeTitle;
+
+  /// Subtitle explaining keep screen awake while playing
+  ///
+  /// In en, this message translates to:
+  /// **'Prevent the screen from turning off automatically while the metronome is playing.'**
+  String get keepScreenAwakeSubtitle;
+
   /// Section header for background playback and notification settings
   ///
   /// In en, this message translates to:
@@ -1045,6 +1063,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No presets saved yet. Create a preset in the Presets tab first.'**
   String get addPresetPickerEmpty;
+
+  /// Snackbar action label to undo the last operation
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undoAction;
+
+  /// Snackbar shortcut action label to jump to the Metronome screen
+  ///
+  /// In en, this message translates to:
+  /// **'Metronome'**
+  String get goToMetronomeAction;
+
+  /// Tooltip for three-dot overflow menu button
+  ///
+  /// In en, this message translates to:
+  /// **'More actions for {name}'**
+  String moreActionsTooltip(String name);
+
+  /// Menu action label to edit an item
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editAction;
+
+  /// Menu action label to rename a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get renameAction;
+
+  /// Menu action label to duplicate an item
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate'**
+  String get duplicateAction;
+
+  /// Short action label for swipe-to-remove
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeAction;
+
+  /// Short action label to mark an item as favorite
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get favoriteAction;
+
+  /// Short action label to remove an item from favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Unfavorite'**
+  String get unfavoriteAction;
+
+  /// Menu action label to add a preset to a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'Add to setlist'**
+  String get addToSetlistAction;
+
+  /// Menu action label to open the songs list of a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'Open songs'**
+  String get openSetlistAction;
+
+  /// Menu action label to activate setlist starting from this song
+  ///
+  /// In en, this message translates to:
+  /// **'Play from here'**
+  String get playFromHereAction;
+
+  /// Menu action label to remove a song from a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from setlist'**
+  String get removeFromSetlistAction;
+
+  /// Filter chip label showing all presets
+  ///
+  /// In en, this message translates to:
+  /// **'All ({count})'**
+  String filterAllLabel(int count);
+
+  /// Filter chip label showing favorite presets only
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites ({count})'**
+  String filterFavoritesLabel(int count);
+
+  /// Empty state title when filtering by favorites and none exist
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite presets yet'**
+  String get noFavoritePresetsTitle;
+
+  /// Empty state subtitle when filtering by favorites and none exist
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the star or swipe right on any preset to pin your favorites here.'**
+  String get noFavoritePresetsSubtitle;
+
+  /// CTA button to clear the favorites filter
+  ///
+  /// In en, this message translates to:
+  /// **'Show All Presets'**
+  String get showAllPresetsButton;
+
+  /// Snackbar confirmation when a preset is loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Loaded \"{name}\"'**
+  String presetLoadedSnackbar(String name);
+
+  /// Snackbar confirmation when a preset is duplicated
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicated \"{name}\"'**
+  String presetDuplicatedSnackbar(String name);
+
+  /// Snackbar confirmation when a preset is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted \"{name}\"'**
+  String presetDeletedSnackbar(String name);
+
+  /// Snackbar confirmation when a deleted preset was also removed from setlists
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Deleted \"{name}\" (removed from 1 setlist)} other{Deleted \"{name}\" (removed from {count} setlists)}}'**
+  String presetDeletedWithSetlistsSnackbar(String name, int count);
+
+  /// Snackbar confirmation when adding a preset to a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'Added \"{presetName}\" to \"{setlistName}\"'**
+  String presetAddedToSetlistSnackbar(String presetName, String setlistName);
+
+  /// Title of bottom sheet to pick a setlist for a preset
+  ///
+  /// In en, this message translates to:
+  /// **'Add \"{name}\" to setlist'**
+  String selectSetlistForPresetTitle(String name);
+
+  /// Option label to create a new setlist inline
+  ///
+  /// In en, this message translates to:
+  /// **'Create new setlist'**
+  String get createNewSetlistOption;
+
+  /// Name template when duplicating a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'{originalName} (Copy)'**
+  String setlistCopyName(String originalName);
+
+  /// Snackbar confirmation when a setlist is activated
+  ///
+  /// In en, this message translates to:
+  /// **'Activated \"{name}\"'**
+  String setlistActivatedSnackbar(String name);
+
+  /// Snackbar confirmation when a setlist is duplicated
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicated \"{name}\"'**
+  String setlistDuplicatedSnackbar(String name);
+
+  /// Snackbar confirmation when a setlist is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted \"{name}\"'**
+  String setlistDeletedSnackbar(String name);
+
+  /// Snackbar confirmation when removing a song from a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'Removed \"{name}\" from setlist'**
+  String songRemovedFromSetlistSnackbar(String name);
+
+  /// Snackbar confirmation after adding one or more songs to a setlist
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Added 1 song to setlist} other{Added {count} songs to setlist}}'**
+  String songsAddedToSetlistSnackbar(int count);
+
+  /// Confirm button label in multi-select preset picker
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Add selected} =1{Add 1 song} other{Add {count} songs}}'**
+  String addSelectedPresetsButton(int count);
+
+  /// Search input placeholder inside the add-preset picker sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Search presets...'**
+  String get searchPresetsInPickerPlaceholder;
+
+  /// Prominent button label on an already active setlist card
+  ///
+  /// In en, this message translates to:
+  /// **'Active · Restart'**
+  String get activateSetlistActiveButton;
+
+  /// Disabled button label on an empty setlist card
+  ///
+  /// In en, this message translates to:
+  /// **'Add songs to activate'**
+  String get setlistEmptyActionHint;
+
+  /// Section header for app information in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutSectionHeader;
+
+  /// Title for the app version row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'App version'**
+  String get aboutAppVersionTitle;
+
+  /// Title for the GitHub source code link row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'Source code'**
+  String get aboutSourceCodeTitle;
+
+  /// Subtitle for the GitHub source code link row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'View on GitHub'**
+  String get aboutSourceCodeSubtitle;
+
+  /// Title for the developer credit row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'Developed by Mateus Navarro'**
+  String get aboutDeveloperTitle;
+
+  /// Subtitle for the developer credit row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub profile'**
+  String get aboutDeveloperSubtitle;
+
+  /// Title for the privacy policy link row in Preferences
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get aboutPrivacyPolicyTitle;
+
+  /// Snackbar error shown when an external link fails to launch
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open link'**
+  String get aboutOpenLinkError;
 }
 
 class _AppLocalizationsDelegate

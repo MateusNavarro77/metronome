@@ -324,6 +324,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get playbackSectionHeader => 'Playback';
+
+  @override
+  String get keepScreenAwakeTitle => 'Keep screen awake';
+
+  @override
+  String get keepScreenAwakeSubtitle =>
+      'Prevent the screen from turning off automatically while the metronome is playing.';
+
+  @override
   String get backgroundPlaybackSectionHeader => 'Background playback';
 
   @override
@@ -585,4 +595,185 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get addPresetPickerEmpty =>
       'No presets saved yet. Create a preset in the Presets tab first.';
+
+  @override
+  String get undoAction => 'Undo';
+
+  @override
+  String get goToMetronomeAction => 'Metronome';
+
+  @override
+  String moreActionsTooltip(String name) {
+    return 'More actions for $name';
+  }
+
+  @override
+  String get editAction => 'Edit';
+
+  @override
+  String get renameAction => 'Rename';
+
+  @override
+  String get duplicateAction => 'Duplicate';
+
+  @override
+  String get removeAction => 'Remove';
+
+  @override
+  String get favoriteAction => 'Favorite';
+
+  @override
+  String get unfavoriteAction => 'Unfavorite';
+
+  @override
+  String get addToSetlistAction => 'Add to setlist';
+
+  @override
+  String get openSetlistAction => 'Open songs';
+
+  @override
+  String get playFromHereAction => 'Play from here';
+
+  @override
+  String get removeFromSetlistAction => 'Remove from setlist';
+
+  @override
+  String filterAllLabel(int count) {
+    return 'All ($count)';
+  }
+
+  @override
+  String filterFavoritesLabel(int count) {
+    return 'Favorites ($count)';
+  }
+
+  @override
+  String get noFavoritePresetsTitle => 'No favorite presets yet';
+
+  @override
+  String get noFavoritePresetsSubtitle =>
+      'Tap the star or swipe right on any preset to pin your favorites here.';
+
+  @override
+  String get showAllPresetsButton => 'Show All Presets';
+
+  @override
+  String presetLoadedSnackbar(String name) {
+    return 'Loaded \"$name\"';
+  }
+
+  @override
+  String presetDuplicatedSnackbar(String name) {
+    return 'Duplicated \"$name\"';
+  }
+
+  @override
+  String presetDeletedSnackbar(String name) {
+    return 'Deleted \"$name\"';
+  }
+
+  @override
+  String presetDeletedWithSetlistsSnackbar(String name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Deleted \"$name\" (removed from $count setlists)',
+      one: 'Deleted \"$name\" (removed from 1 setlist)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String presetAddedToSetlistSnackbar(String presetName, String setlistName) {
+    return 'Added \"$presetName\" to \"$setlistName\"';
+  }
+
+  @override
+  String selectSetlistForPresetTitle(String name) {
+    return 'Add \"$name\" to setlist';
+  }
+
+  @override
+  String get createNewSetlistOption => 'Create new setlist';
+
+  @override
+  String setlistCopyName(String originalName) {
+    return '$originalName (Copy)';
+  }
+
+  @override
+  String setlistActivatedSnackbar(String name) {
+    return 'Activated \"$name\"';
+  }
+
+  @override
+  String setlistDuplicatedSnackbar(String name) {
+    return 'Duplicated \"$name\"';
+  }
+
+  @override
+  String setlistDeletedSnackbar(String name) {
+    return 'Deleted \"$name\"';
+  }
+
+  @override
+  String songRemovedFromSetlistSnackbar(String name) {
+    return 'Removed \"$name\" from setlist';
+  }
+
+  @override
+  String songsAddedToSetlistSnackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Added $count songs to setlist',
+      one: 'Added 1 song to setlist',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String addSelectedPresetsButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add $count songs',
+      one: 'Add 1 song',
+      zero: 'Add selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchPresetsInPickerPlaceholder => 'Search presets...';
+
+  @override
+  String get activateSetlistActiveButton => 'Active · Restart';
+
+  @override
+  String get setlistEmptyActionHint => 'Add songs to activate';
+
+  @override
+  String get aboutSectionHeader => 'About';
+
+  @override
+  String get aboutAppVersionTitle => 'App version';
+
+  @override
+  String get aboutSourceCodeTitle => 'Source code';
+
+  @override
+  String get aboutSourceCodeSubtitle => 'View on GitHub';
+
+  @override
+  String get aboutDeveloperTitle => 'Developed by Mateus Navarro';
+
+  @override
+  String get aboutDeveloperSubtitle => 'GitHub profile';
+
+  @override
+  String get aboutPrivacyPolicyTitle => 'Privacy policy';
+
+  @override
+  String get aboutOpenLinkError => 'Could not open link';
 }

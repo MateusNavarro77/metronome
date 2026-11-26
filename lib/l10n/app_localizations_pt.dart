@@ -326,6 +326,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get playbackSectionHeader => 'Reprodução';
+
+  @override
+  String get keepScreenAwakeTitle => 'Manter tela ligada';
+
+  @override
+  String get keepScreenAwakeSubtitle =>
+      'Evita que a tela desligue automaticamente enquanto o metrônomo estiver tocando.';
+
+  @override
   String get backgroundPlaybackSectionHeader => 'Segundo plano';
 
   @override
@@ -588,4 +598,185 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get addPresetPickerEmpty =>
       'Nenhum preset salvo ainda. Crie um preset na aba Presets primeiro.';
+
+  @override
+  String get undoAction => 'Desfazer';
+
+  @override
+  String get goToMetronomeAction => 'Metrônomo';
+
+  @override
+  String moreActionsTooltip(String name) {
+    return 'Mais ações para $name';
+  }
+
+  @override
+  String get editAction => 'Editar';
+
+  @override
+  String get renameAction => 'Renomear';
+
+  @override
+  String get duplicateAction => 'Duplicar';
+
+  @override
+  String get removeAction => 'Remover';
+
+  @override
+  String get favoriteAction => 'Favoritar';
+
+  @override
+  String get unfavoriteAction => 'Desfavoritar';
+
+  @override
+  String get addToSetlistAction => 'Adicionar à setlist';
+
+  @override
+  String get openSetlistAction => 'Ver músicas';
+
+  @override
+  String get playFromHereAction => 'Tocar a partir desta';
+
+  @override
+  String get removeFromSetlistAction => 'Remover da setlist';
+
+  @override
+  String filterAllLabel(int count) {
+    return 'Todos ($count)';
+  }
+
+  @override
+  String filterFavoritesLabel(int count) {
+    return 'Favoritos ($count)';
+  }
+
+  @override
+  String get noFavoritePresetsTitle => 'Nenhum preset favorito ainda';
+
+  @override
+  String get noFavoritePresetsSubtitle =>
+      'Toque na estrela ou deslize para a direita em qualquer preset para fixar seus favoritos aqui.';
+
+  @override
+  String get showAllPresetsButton => 'Ver Todos os Presets';
+
+  @override
+  String presetLoadedSnackbar(String name) {
+    return 'Preset \"$name\" carregado';
+  }
+
+  @override
+  String presetDuplicatedSnackbar(String name) {
+    return 'Preset \"$name\" duplicado';
+  }
+
+  @override
+  String presetDeletedSnackbar(String name) {
+    return 'Preset \"$name\" excluído';
+  }
+
+  @override
+  String presetDeletedWithSetlistsSnackbar(String name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Preset \"$name\" excluído (removido de $count setlists)',
+      one: 'Preset \"$name\" excluído (removido de 1 setlist)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String presetAddedToSetlistSnackbar(String presetName, String setlistName) {
+    return '\"$presetName\" adicionado à \"$setlistName\"';
+  }
+
+  @override
+  String selectSetlistForPresetTitle(String name) {
+    return 'Adicionar \"$name\" à setlist';
+  }
+
+  @override
+  String get createNewSetlistOption => 'Criar nova setlist';
+
+  @override
+  String setlistCopyName(String originalName) {
+    return '$originalName (Cópia)';
+  }
+
+  @override
+  String setlistActivatedSnackbar(String name) {
+    return 'Setlist \"$name\" ativada';
+  }
+
+  @override
+  String setlistDuplicatedSnackbar(String name) {
+    return 'Setlist \"$name\" duplicada';
+  }
+
+  @override
+  String setlistDeletedSnackbar(String name) {
+    return 'Setlist \"$name\" excluída';
+  }
+
+  @override
+  String songRemovedFromSetlistSnackbar(String name) {
+    return '\"$name\" removida da setlist';
+  }
+
+  @override
+  String songsAddedToSetlistSnackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count músicas adicionadas à setlist',
+      one: '1 música adicionada à setlist',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String addSelectedPresetsButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Adicionar $count músicas',
+      one: 'Adicionar 1 música',
+      zero: 'Adicionar selecionados',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchPresetsInPickerPlaceholder => 'Buscar presets...';
+
+  @override
+  String get activateSetlistActiveButton => 'Ativa · Reiniciar';
+
+  @override
+  String get setlistEmptyActionHint => 'Adicione músicas para ativar';
+
+  @override
+  String get aboutSectionHeader => 'Sobre';
+
+  @override
+  String get aboutAppVersionTitle => 'Versão do app';
+
+  @override
+  String get aboutSourceCodeTitle => 'Código fonte';
+
+  @override
+  String get aboutSourceCodeSubtitle => 'Ver no GitHub';
+
+  @override
+  String get aboutDeveloperTitle => 'Desenvolvido por Mateus Navarro';
+
+  @override
+  String get aboutDeveloperSubtitle => 'Perfil no GitHub';
+
+  @override
+  String get aboutPrivacyPolicyTitle => 'Política de privacidade';
+
+  @override
+  String get aboutOpenLinkError => 'Não foi possível abrir o link';
 }

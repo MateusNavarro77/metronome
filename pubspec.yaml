@@ -26,6 +26,9 @@ dependencies:
   material_3_expressive: ^1.2.1
   audio_service: ^0.18.19
   audio_session: ^0.2.4
+  wakelock_plus: ^1.8.2
+  package_info_plus: ^10.2.2
+  url_launcher: ^6.3.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

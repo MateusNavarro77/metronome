@@ -129,8 +129,12 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                   viewModel: widget.metronomeViewModel,
                   onOpenSettings: () => _onDestinationSelected(3),
                 ),
-                const PresetsView(),
-                const SetlistsView(),
+                PresetsView(
+                  onNavigateToMetronome: () => _onDestinationSelected(0),
+                ),
+                SetlistsView(
+                  onNavigateToMetronome: () => _onDestinationSelected(0),
+                ),
                 const PreferencesView(showBackButton: false),
               ],
             ),
@@ -218,6 +222,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
 
             return Scaffold(
               backgroundColor: context.colorScheme.surface,
+              extendBody: true,
               body: content,
               bottomNavigationBar: SafeArea(
                 top: false,

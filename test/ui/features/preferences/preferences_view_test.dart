@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:metronome/data/repositories/metronome_repository.dart';
 import 'package:metronome/data/repositories/preferences_repository.dart';
+import 'package:metronome/data/services/app_info_service.dart';
 import 'package:metronome/data/services/simulated_metronome_engine.dart';
+import 'package:metronome/data/services/url_launcher_service.dart';
 import 'package:metronome/domain/models/app_language.dart';
 import 'package:metronome/domain/models/app_theme_mode.dart';
 import 'package:metronome/domain/models/metronome_sound.dart';
@@ -257,7 +259,7 @@ void main() {
       expect(find.text('Open Settings'), findsOneWidget);
     });
 
-    testWidgets('renders and toggles background playback switch', (
+    testWidgets('renders and toggles playback switches', (
       WidgetTester tester,
     ) async {
       final repo = PreferencesRepository(preferences: null);
@@ -281,15 +283,30 @@ void main() {
         ),
       );
 
-      final switchFinder = find.byKey(const Key('background_playback_switch'));
-      await tester.ensureVisible(switchFinder);
+      final keepAwakeFinder = find.byKey(const Key('keep_screen_awake_switch'));
+      await tester.ensureVisible(keepAwakeFinder);
       await tester.pumpAndSettle();
 
-      expect(find.text('Background playback'), findsOneWidget);
+      expect(find.text('Playback'), findsOneWidget);
+      expect(find.text('Keep screen awake'), findsOneWidget);
+      check(viewModel.isKeepScreenAwakeEnabled).isTrue();
+
+      await tester.tap(keepAwakeFinder);
+      await tester.pumpAndSettle();
+
+      check(viewModel.isKeepScreenAwakeEnabled).isFalse();
+      check(repo.getKeepScreenAwake()).isFalse();
+
+      final bgSwitchFinder = find.byKey(
+        const Key('background_playback_switch'),
+      );
+      await tester.ensureVisible(bgSwitchFinder);
+      await tester.pumpAndSettle();
+
       expect(find.text('Play in background'), findsOneWidget);
       check(viewModel.isBackgroundPlaybackEnabled).isTrue();
 
-      await tester.tap(switchFinder);
+      await tester.tap(bgSwitchFinder);
       await tester.pumpAndSettle();
 
       check(viewModel.isBackgroundPlaybackEnabled).isFalse();
@@ -298,5 +315,80 @@ void main() {
       await tester.runAsync(() => GoogleFonts.pendingFonts());
       await tester.pump();
     });
+
+    testWidgets('renders about section and launches external links', (
+      WidgetTester tester,
+    ) async {
+      final launchedUris = <Uri>[];
+      var shouldLaunchSucceed = true;
+      final repo = PreferencesRepository(preferences: null);
+      final viewModel = PreferencesViewModel(
+        repository: repo,
+        appInfoService: const FakeAppInfoService(
+          info: AppVersionInfo(version: '1.3.0-alpha.2', buildNumber: '7'),
+        ),
+        urlLauncherService: _TestUrlLauncherService(
+          onOpen: (uri) {
+            launchedUris.add(uri);
+            return shouldLaunchSucceed;
+          },
+        ),
+      );
+
+      await tester.pumpWidget(
+        ChangeNotifierProvider<PreferencesViewModel>.value(
+          value: viewModel,
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            localizationsDelegates: appLocalizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const PreferencesView(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final aboutCardFinder = find.byKey(const Key('about_section_card'));
+      await tester.ensureVisible(aboutCardFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.text('About'), findsOneWidget);
+      expect(find.text('App version'), findsOneWidget);
+      expect(find.text('1.3.0-alpha.2+7'), findsOneWidget);
+      expect(find.text('Source code'), findsOneWidget);
+      expect(find.text('Developed by Mateus Navarro'), findsOneWidget);
+      expect(find.text('Privacy policy'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('about_source_code_row')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('about_developer_row')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('about_privacy_policy_row')));
+      await tester.pumpAndSettle();
+
+      check(launchedUris).deepEquals([
+        PreferencesViewModel.sourceCodeUri,
+        PreferencesViewModel.developerProfileUri,
+        PreferencesViewModel.privacyPolicyUri,
+      ]);
+
+      shouldLaunchSucceed = false;
+      await tester.tap(find.byKey(const Key('about_privacy_policy_row')));
+      await tester.pumpAndSettle();
+      expect(find.text('Could not open link'), findsOneWidget);
+
+      await tester.runAsync(() => GoogleFonts.pendingFonts());
+      await tester.pump();
+    });
   });
+}
+
+class _TestUrlLauncherService implements UrlLauncherService {
+  _TestUrlLauncherService({required this.onOpen});
+
+  final bool Function(Uri uri) onOpen;
+
+  @override
+  Future<bool> openUrl(Uri uri) async => onOpen(uri);
 }

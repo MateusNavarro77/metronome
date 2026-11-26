@@ -20,6 +20,7 @@ class PreferencesRepository {
   AppLanguage _inMemoryLanguage = AppLanguage.system;
   bool _inMemoryAccentEnabled = true;
   bool _inMemoryBackgroundPlaybackEnabled = true;
+  bool _inMemoryKeepScreenAwake = true;
   SoundSettings _inMemorySoundSettings = const SoundSettings();
 
   static const String _keyThemeMode = 'app_theme_mode';
@@ -27,6 +28,7 @@ class PreferencesRepository {
   static const String _keyAccentEnabled = 'accent_enabled';
   static const String _keyBackgroundPlaybackEnabled =
       'background_playback_enabled';
+  static const String _keyKeepScreenAwake = 'keep_screen_awake';
   static const String _keySound = 'metronome_sound';
   static const String _keyStrongVolume = 'sound_strong_volume';
   static const String _keyWeakVolume = 'sound_weak_volume';
@@ -118,6 +120,22 @@ class PreferencesRepository {
     final prefs = _preferences;
     if (prefs == null) return;
     await prefs.setBool(_keyBackgroundPlaybackEnabled, enabled);
+  }
+
+  /// Loads whether the device screen should stay awake while playing,
+  /// defaulting to `true` (FR-CFG-02).
+  bool getKeepScreenAwake() {
+    final prefs = _preferences;
+    if (prefs == null) return _inMemoryKeepScreenAwake;
+    return prefs.getBool(_keyKeepScreenAwake) ?? true;
+  }
+
+  /// Persists whether the device screen should stay awake while playing.
+  Future<void> setKeepScreenAwake(bool enabled) async {
+    _inMemoryKeepScreenAwake = enabled;
+    final prefs = _preferences;
+    if (prefs == null) return;
+    await prefs.setBool(_keyKeepScreenAwake, enabled);
   }
 
   /// Loads persisted [SoundSettings], falling back to defaults (FR-SND-01..08, FR-CFG-03).

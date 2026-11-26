@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart'
 
 import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_snackbar.dart';
 import '../../presets/views/widgets/preset_editor_sheet.dart';
 import '../view_models/metronome_view_model.dart';
 import 'widgets/active_setlist_stepper_bar.dart';
@@ -46,7 +47,7 @@ class MetronomeView extends StatelessWidget {
     if (saved == null || !context.mounted) return;
 
     final l10n = context.l10n;
-    M3ESnackbar.show(
+    showAppSnackbar(
       context,
       message: l10n.savedPresetSnackbar(saved.displayName(l10n)),
       duration: const Duration(seconds: 2),
@@ -55,9 +56,12 @@ class MetronomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+
     return Scaffold(
       backgroundColor: context.colorScheme.surface,
       body: SafeArea(
+        bottom: false,
         child: ListenableBuilder(
           listenable: viewModel,
           builder: (context, _) {
@@ -71,12 +75,19 @@ class MetronomeView extends StatelessWidget {
               builder: (context, constraints) {
                 final isWide =
                     constraints.maxWidth > context.dimens.wideBreakpoint;
+                final availableHeight = (constraints.maxHeight - bottomInset)
+                    .clamp(0.0, double.infinity);
                 final isCompactHeight =
-                    constraints.maxHeight <
-                    context.dimens.compactHeightBreakpoint;
+                    availableHeight < context.dimens.compactHeightBreakpoint;
                 final gap = isCompactHeight
                     ? context.dimens.spaceXs + 2
                     : context.dimens.spaceMd;
+                final horizontalPadding = isWide
+                    ? context.dimens.spaceLg
+                    : context.dimens.spaceMd;
+                final verticalPadding = isCompactHeight
+                    ? context.dimens.spaceXs
+                    : context.dimens.spaceSm;
 
                 return Center(
                   child: ConstrainedBox(
@@ -90,13 +101,11 @@ class MetronomeView extends StatelessWidget {
                           minHeight: constraints.maxHeight,
                         ),
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isWide
-                                ? context.dimens.spaceLg
-                                : context.dimens.spaceMd,
-                            vertical: isCompactHeight
-                                ? context.dimens.spaceXs
-                                : context.dimens.spaceSm,
+                          padding: EdgeInsets.fromLTRB(
+                            horizontalPadding,
+                            verticalPadding,
+                            horizontalPadding,
+                            bottomInset + verticalPadding,
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

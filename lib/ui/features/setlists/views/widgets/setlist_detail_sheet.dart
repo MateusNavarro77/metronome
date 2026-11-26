@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/services.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
@@ -5,6 +8,8 @@ import 'package:material_ui/material_ui.dart'
 import '../../../../../domain/models/preset.dart';
 import '../../../../core/l10n/l10n_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_snackbar.dart';
+import '../../../../core/widgets/swipeable_action_card.dart';
 import '../../view_models/setlists_view_model.dart';
 import 'setlist_name_dialog.dart';
 
@@ -14,14 +19,18 @@ Future<void> showSetlistDetailSheet(
   BuildContext context, {
   required SetlistsViewModel viewModel,
   required String setlistId,
+  VoidCallback? onNavigateToMetronome,
 }) {
   return M3EBottomSheet.show<void>(
     context,
     showDragHandle: true,
     isDismissible: true,
     initialValue: M3EBottomSheetValue.expanded,
-    builder: (_) =>
-        SetlistDetailSheet(viewModel: viewModel, setlistId: setlistId),
+    builder: (_) => SetlistDetailSheet(
+      viewModel: viewModel,
+      setlistId: setlistId,
+      onNavigateToMetronome: onNavigateToMetronome,
+    ),
   );
 }
 
@@ -32,10 +41,12 @@ class SetlistDetailSheet extends StatelessWidget {
     super.key,
     required this.viewModel,
     required this.setlistId,
+    this.onNavigateToMetronome,
   });
 
   final SetlistsViewModel viewModel;
   final String setlistId;
+  final VoidCallback? onNavigateToMetronome;
 
   Future<void> _renameSetlist(BuildContext context, String currentName) async {
     final l10n = context.l10n;
@@ -50,7 +61,7 @@ class SetlistDetailSheet extends StatelessWidget {
   }
 
   Future<void> _openAddPresetPicker(BuildContext context) async {
-    final selectedPresetId = await M3EBottomSheet.show<String>(
+    final selectedIds = await M3EBottomSheet.show<List<String>>(
       context,
       showDragHandle: true,
       isDismissible: true,
@@ -58,8 +69,71 @@ class SetlistDetailSheet extends StatelessWidget {
       builder: (_) =>
           _AddPresetPickerSheet(presets: viewModel.availablePresets),
     );
-    if (selectedPresetId == null) return;
-    await viewModel.addPresetToSetlist(setlistId, selectedPresetId);
+    if (selectedIds == null || selectedIds.isEmpty) return;
+
+    final previousLength =
+        viewModel.getSetlistById(setlistId)?.presetIds.length ?? 0;
+    await viewModel.addPresetsToSetlist(setlistId, selectedIds);
+    if (!context.mounted) return;
+
+    final l10n = context.l10n;
+    HapticFeedback.selectionClick();
+    showAppSnackbar(
+      context,
+      message: l10n.songsAddedToSetlistSnackbar(selectedIds.length),
+      actionLabel: l10n.undoAction,
+      onAction: () {
+        HapticFeedback.selectionClick();
+        viewModel.removePresetRangeFromSetlist(
+          setlistId,
+          previousLength,
+          selectedIds.length,
+        );
+      },
+      showCloseButton: true,
+      clearFloatingToolbar: false,
+    );
+  }
+
+  Future<void> _removePresetWithUndo(
+    BuildContext context,
+    int index,
+    String presetName,
+  ) async {
+    final record = await viewModel.removePresetAtWithUndo(setlistId, index);
+    if (record == null || !context.mounted) return;
+
+    final l10n = context.l10n;
+    showAppSnackbar(
+      context,
+      message: l10n.songRemovedFromSetlistSnackbar(presetName),
+      actionLabel: l10n.undoAction,
+      onAction: () {
+        HapticFeedback.selectionClick();
+        viewModel.restoreRemovedPreset(record);
+      },
+      showCloseButton: true,
+      clearFloatingToolbar: false,
+    );
+  }
+
+  void _playFromIndex(BuildContext context, int index) {
+    final setlist = viewModel.getSetlistById(setlistId);
+    if (setlist == null) return;
+    HapticFeedback.selectionClick();
+    viewModel.activateSetlist(setlist, initialIndex: index);
+    final l10n = context.l10n;
+    final setlistName = setlist.displayName(l10n);
+    Navigator.of(context).pop();
+    showAppSnackbar(
+      context,
+      message: l10n.setlistActivatedSnackbar(setlistName),
+      actionLabel: onNavigateToMetronome != null
+          ? l10n.goToMetronomeAction
+          : null,
+      onAction: onNavigateToMetronome,
+      duration: const Duration(seconds: 3),
+    );
   }
 
   @override
@@ -76,6 +150,16 @@ class SetlistDetailSheet extends StatelessWidget {
         }
         final presets = viewModel.resolvePresetsForSetlist(setlist);
         final isActiveSetlist = viewModel.activeSetlistId == setlist.id;
+
+        // Assign stable per-occurrence keys so duplicate presets in the same
+        // setlist animate and dismiss independently without key collisions.
+        final occurrenceCounts = <String, int>{};
+        final rowKeys = List<String>.generate(presets.length, (index) {
+          final id = presets[index].id;
+          final count = (occurrenceCounts[id] ?? 0) + 1;
+          occurrenceCounts[id] = count;
+          return '${setlist.id}_${id}_$count';
+        });
 
         return ConstrainedBox(
           constraints: BoxConstraints(
@@ -139,7 +223,7 @@ class SetlistDetailSheet extends StatelessWidget {
                         size: M3EButtonSize.sm,
                         icon: const Icon(Icons.add_rounded, size: 18),
                         onPressed: () => _openAddPresetPicker(context),
-                        child: Text(l10n.addPresetButton),
+                        label: Text(l10n.addPresetButton),
                       ),
                     ],
                   ),
@@ -189,7 +273,12 @@ class SetlistDetailSheet extends StatelessWidget {
                             buildDefaultDragHandles: false,
                             itemCount: presets.length,
                             proxyDecorator: _proxyDecorator,
+                            onReorderStart: (_) =>
+                                HapticFeedback.mediumImpact(),
+                            onReorderEnd: (_) =>
+                                HapticFeedback.selectionClick(),
                             onReorderItem: (oldIndex, newIndex) {
+                              HapticFeedback.selectionClick();
                               // `onReorderItem` provides the post-removal target index,
                               // while `Setlist.reorder` expects pre-removal `onReorder` indices.
                               final rawNewIndex = oldIndex < newIndex
@@ -207,134 +296,194 @@ class SetlistDetailSheet extends StatelessWidget {
                               final isCurrentSong =
                                   isActiveSetlist &&
                                   viewModel.activeSetlistIndex == index;
+                              final stableKey = rowKeys[index];
 
                               return Padding(
-                                key: ValueKey(
-                                  'setlist_row_${setlist.id}_$index',
-                                ),
+                                key: ValueKey('setlist_row_$stableKey'),
                                 padding: EdgeInsets.only(
                                   bottom: context.dimens.spaceSm,
                                 ),
-                                child: M3ECard(
-                                  key: Key('setlist_item_tap_$index'),
-                                  variant: isCurrentSong
-                                      ? M3ECardVariant.filled
-                                      : M3ECardVariant.elevated,
-                                  borderRadius: BorderRadius.circular(
-                                    context.dimens.radiusDefault,
+                                child: SwipeableActionCard(
+                                  dismissKey: ValueKey(
+                                    'setlist_row_swipe_$stableKey',
                                   ),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: context.dimens.spaceSmPlus4,
-                                    vertical: context.dimens.spaceSm,
+                                  borderRadius: context.dimens.radiusDefault,
+                                  endToStartAction: SwipeActionConfig(
+                                    label: l10n.removeAction,
+                                    icon: Icons.remove_circle_outline_rounded,
+                                    backgroundColor:
+                                        context.colorScheme.errorContainer,
+                                    activeBackgroundColor:
+                                        context.colorScheme.error,
+                                    foregroundColor:
+                                        context.colorScheme.onErrorContainer,
+                                    activeForegroundColor:
+                                        context.colorScheme.onError,
+                                    dismissOnTrigger: true,
+                                    onTrigger: () => _removePresetWithUndo(
+                                      context,
+                                      index,
+                                      presetName,
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    viewModel.activateSetlist(
-                                      setlist,
-                                      initialIndex: index,
-                                    );
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 30,
-                                        height: 30,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: isCurrentSong
-                                              ? context.colorScheme.primary
-                                              : context
-                                                    .colorScheme
-                                                    .surfaceContainerHigh,
-                                          shape: BoxShape.circle,
+                                  child: M3ECard(
+                                    key: Key('setlist_item_tap_$index'),
+                                    variant: isCurrentSong
+                                        ? M3ECardVariant.filled
+                                        : M3ECardVariant.elevated,
+                                    borderRadius: BorderRadius.circular(
+                                      context.dimens.radiusDefault,
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: context.dimens.spaceSmPlus4,
+                                      vertical: context.dimens.spaceSm,
+                                    ),
+                                    onPressed: () =>
+                                        _playFromIndex(context, index),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 30,
+                                          height: 30,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: isCurrentSong
+                                                ? context.colorScheme.primary
+                                                : context
+                                                      .colorScheme
+                                                      .surfaceContainerHigh,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            '${index + 1}',
+                                            style: context.textTheme.labelMedium
+                                                ?.copyWith(
+                                                  letterSpacing: 0,
+                                                  color: isCurrentSong
+                                                      ? context
+                                                            .colorScheme
+                                                            .onPrimary
+                                                      : context
+                                                            .colorScheme
+                                                            .onSurface,
+                                                ),
+                                          ),
                                         ),
-                                        child: Text(
-                                          '${index + 1}',
-                                          style: context.textTheme.labelMedium
-                                              ?.copyWith(
-                                                letterSpacing: 0,
-                                                color: isCurrentSong
-                                                    ? context
-                                                          .colorScheme
-                                                          .onPrimary
-                                                    : context
+                                        SizedBox(
+                                          width: context.dimens.spaceSmPlus4,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                presetName,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: context
+                                                    .textTheme
+                                                    .titleSmall
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: context
                                                           .colorScheme
                                                           .onSurface,
+                                                    ),
                                               ),
+                                              Text(
+                                                '${l10n.bpmWithUnit(preset.bpm.value)} · ${preset.timeSignature.label} · ${preset.subdivision.localizedLabel(l10n)}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: context
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontSize: 12,
+                                                      color: context
+                                                          .colorScheme
+                                                          .onSurfaceVariant,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: context.dimens.spaceSmPlus4,
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                        M3EMenu(
+                                          position:
+                                              M3EMenuAnchorPosition.bottomEnd,
+                                          anchorBuilder: (context, open) =>
+                                              M3EIconButton(
+                                                key: Key(
+                                                  'setlist_item_menu_$index',
+                                                ),
+                                                variant: M3EIconButtonVariant
+                                                    .standard,
+                                                tooltip: l10n
+                                                    .moreActionsTooltip(
+                                                      presetName,
+                                                    ),
+                                                onPressed: () {
+                                                  HapticFeedback.selectionClick();
+                                                  open();
+                                                },
+                                                icon: Icon(
+                                                  Icons.more_vert_rounded,
+                                                  size: 20,
+                                                  color: context
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
                                           children: [
-                                            Text(
-                                              presetName,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: context
-                                                  .textTheme
-                                                  .titleSmall
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.w700,
-                                                    color: context
-                                                        .colorScheme
-                                                        .onSurface,
-                                                  ),
+                                            M3EMenuEntry(
+                                              label: l10n.playFromHereAction,
+                                              leading: const Icon(
+                                                Icons.play_arrow_rounded,
+                                                size: 20,
+                                              ),
+                                              onPressed: () => _playFromIndex(
+                                                context,
+                                                index,
+                                              ),
                                             ),
-                                            Text(
-                                              '${l10n.bpmWithUnit(preset.bpm.value)} · ${preset.timeSignature.label} · ${preset.subdivision.localizedLabel(l10n)}',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: context
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                    fontSize: 12,
-                                                    color: context
-                                                        .colorScheme
-                                                        .onSurfaceVariant,
+                                            const M3EMenuDivider(),
+                                            M3EMenuEntry(
+                                              label:
+                                                  l10n.removeFromSetlistAction,
+                                              leading: const Icon(
+                                                Icons
+                                                    .remove_circle_outline_rounded,
+                                                size: 20,
+                                              ),
+                                              isDestructive: true,
+                                              onPressed: () =>
+                                                  _removePresetWithUndo(
+                                                    context,
+                                                    index,
+                                                    presetName,
                                                   ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      M3EIconButton(
-                                        key: Key('setlist_item_remove_$index'),
-                                        variant: M3EIconButtonVariant.standard,
-                                        tooltip: l10n.removePresetTooltip(
-                                          presetName,
-                                        ),
-                                        onPressed: () {
-                                          viewModel.removePresetAt(
-                                            setlist.id,
-                                            index,
-                                          );
-                                        },
-                                        icon: Icon(
-                                          Icons.remove_circle_outline_rounded,
-                                          size: 20,
-                                          color: context.colorScheme.error,
-                                        ),
-                                      ),
-                                      ReorderableDragStartListener(
-                                        key: Key('setlist_item_drag_$index'),
-                                        index: index,
-                                        child: SizedBox(
-                                          width: context.dimens.minTouchTarget,
-                                          height: context.dimens.minTouchTarget,
-                                          child: Icon(
-                                            Icons.drag_handle_rounded,
-                                            color: context
-                                                .colorScheme
-                                                .onSurfaceVariant,
+                                        ReorderableDragStartListener(
+                                          key: Key('setlist_item_drag_$index'),
+                                          index: index,
+                                          child: SizedBox(
+                                            width:
+                                                context.dimens.minTouchTarget,
+                                            height:
+                                                context.dimens.minTouchTarget,
+                                            child: Icon(
+                                              Icons.drag_handle_rounded,
+                                              color: context
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -354,22 +503,80 @@ class SetlistDetailSheet extends StatelessWidget {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget? child) {
-        return Material(elevation: 0, color: Colors.transparent, child: child);
+        final t = Curves.easeOutCubic.transform(animation.value);
+        final scale = lerpDouble(1.0, 1.03, t) ?? 1.0;
+        final elevation = lerpDouble(0.0, 8.0, t) ?? 0.0;
+        return Transform.scale(
+          scale: scale,
+          child: Material(
+            elevation: elevation,
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(context.dimens.radiusDefault),
+            shadowColor: context.colorScheme.shadow.withValues(alpha: 0.35),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                  context.dimens.radiusDefault,
+                ),
+                border: Border.all(
+                  color: context.colorScheme.primary.withValues(alpha: 0.7 * t),
+                  width: 1.5,
+                ),
+              ),
+              child: child,
+            ),
+          ),
+        );
       },
       child: child,
     );
   }
 }
 
-class _AddPresetPickerSheet extends StatelessWidget {
+class _AddPresetPickerSheet extends StatefulWidget {
   const _AddPresetPickerSheet({required this.presets});
 
   final List<Preset> presets;
 
   @override
+  State<_AddPresetPickerSheet> createState() => _AddPresetPickerSheetState();
+}
+
+class _AddPresetPickerSheetState extends State<_AddPresetPickerSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  final List<String> _selectedIds = [];
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Preset> get _filteredPresets {
+    final normalized = _query.trim().toLowerCase();
+    if (normalized.isEmpty) return widget.presets;
+    return widget.presets
+        .where((preset) => preset.name.toLowerCase().contains(normalized))
+        .toList(growable: false);
+  }
+
+  void _toggleSelection(String presetId) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      if (_selectedIds.contains(presetId)) {
+        _selectedIds.remove(presetId);
+      } else {
+        _selectedIds.add(presetId);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final maxHeight = MediaQuery.sizeOf(context).height * 0.65;
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.72;
+    final filtered = _filteredPresets;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -392,8 +599,8 @@ class _AddPresetPickerSheet extends StatelessWidget {
                   color: context.colorScheme.onSurface,
                 ),
               ),
-              SizedBox(height: context.dimens.spaceMd),
-              if (presets.isEmpty)
+              SizedBox(height: context.dimens.spaceSmPlus4),
+              if (widget.presets.isEmpty)
                 Padding(
                   padding: EdgeInsets.symmetric(
                     vertical: context.dimens.spaceMd,
@@ -405,63 +612,152 @@ class _AddPresetPickerSheet extends StatelessWidget {
                     ),
                   ),
                 )
-              else
+              else ...[
+                M3ETextField(
+                  key: const Key('add_preset_picker_search_field'),
+                  controller: _searchController,
+                  variant: M3ETextFieldVariant.outlined,
+                  placeholder: l10n.searchPresetsInPickerPlaceholder,
+                  density: -1,
+                  leading: const Icon(Icons.search_rounded, size: 20),
+                  trailing: _query.isNotEmpty
+                      ? M3EIconButton(
+                          variant: M3EIconButtonVariant.standard,
+                          size: M3EIconButtonSize.sm,
+                          tooltip: l10n.clearSearchTooltip,
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _query = '');
+                          },
+                          icon: const Icon(Icons.close_rounded, size: 18),
+                        )
+                      : null,
+                  onChanged: (value) => setState(() => _query = value),
+                ),
+                SizedBox(height: context.dimens.spaceSmPlus4),
                 Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: presets.length,
-                    separatorBuilder: (_, _) =>
-                        SizedBox(height: context.dimens.spaceSm),
-                    itemBuilder: (context, index) {
-                      final preset = presets[index];
-                      return M3ECard(
-                        key: Key('add_preset_picker_item_${preset.id}'),
-                        variant: M3ECardVariant.elevated,
-                        borderRadius: BorderRadius.circular(
-                          context.dimens.radiusDefault,
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.dimens.spaceMd,
-                          vertical: context.dimens.spaceSmPlus2,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(preset.id),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                  child: filtered.isEmpty
+                      ? Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: context.dimens.spaceMd,
+                          ),
+                          child: Text(
+                            l10n.noPresetsMatchQuery(_query),
+                            textAlign: TextAlign.center,
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: context.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, _) =>
+                              SizedBox(height: context.dimens.spaceSm),
+                          itemBuilder: (context, index) {
+                            final preset = filtered[index];
+                            final orderIndex = _selectedIds.indexOf(preset.id);
+                            final isSelected = orderIndex != -1;
+
+                            return M3ECard(
+                              key: Key('add_preset_picker_item_${preset.id}'),
+                              variant: isSelected
+                                  ? M3ECardVariant.filled
+                                  : M3ECardVariant.elevated,
+                              borderRadius: BorderRadius.circular(
+                                context.dimens.radiusDefault,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.dimens.spaceMd,
+                                vertical: context.dimens.spaceSmPlus2,
+                              ),
+                              onPressed: () => _toggleSelection(preset.id),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    preset.displayName(l10n),
-                                    style: context.textTheme.titleSmall
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: context.colorScheme.onSurface,
-                                        ),
+                                  M3ECheckbox(
+                                    value: isSelected,
+                                    onChanged: (_) =>
+                                        _toggleSelection(preset.id),
                                   ),
-                                  Text(
-                                    '${l10n.bpmWithUnit(preset.bpm.value)} · ${preset.timeSignature.label} · ${preset.subdivision.localizedLabel(l10n)}',
-                                    style: context.textTheme.bodyMedium
-                                        ?.copyWith(
-                                          fontSize: 12,
-                                          color: context
-                                              .colorScheme
-                                              .onSurfaceVariant,
+                                  SizedBox(width: context.dimens.spaceSm),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          preset.displayName(l10n),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: context.textTheme.titleSmall
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: context
+                                                    .colorScheme
+                                                    .onSurface,
+                                              ),
                                         ),
+                                        Text(
+                                          '${l10n.bpmWithUnit(preset.bpm.value)} · ${preset.timeSignature.label} · ${preset.subdivision.localizedLabel(l10n)}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: context.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                fontSize: 12,
+                                                color: context
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
+                                  if (isSelected)
+                                    Container(
+                                      width: 24,
+                                      height: 24,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: context.colorScheme.primary,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Text(
+                                        '${orderIndex + 1}',
+                                        style: context.textTheme.labelSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              color:
+                                                  context.colorScheme.onPrimary,
+                                            ),
+                                      ),
+                                    ),
                                 ],
                               ),
-                            ),
-                            Icon(
-                              Icons.add_circle_outline_rounded,
-                              color: context.colorScheme.primary,
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    },
+                ),
+                SizedBox(height: context.dimens.spaceMd),
+                SizedBox(
+                  width: double.infinity,
+                  child: M3EButton.filled(
+                    key: const Key('add_preset_picker_confirm_button'),
+                    size: M3EButtonSize.md,
+                    icon: const Icon(
+                      Icons.playlist_add_check_rounded,
+                      size: 20,
+                    ),
+                    onPressed: _selectedIds.isEmpty
+                        ? null
+                        : () =>
+                              Navigator.of(context)
+                                  .pop(List<String>.unmodifiable(_selectedIds)),
+                    label: Text(
+                      l10n.addSelectedPresetsButton(_selectedIds.length),
+                    ),
                   ),
                 ),
+              ],
             ],
           ),
         ),

@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../data/repositories/metronome_repository.dart';
 import '../../../../data/repositories/preferences_repository.dart';
+import '../../../../data/services/app_info_service.dart';
 import '../../../../data/services/background_playback_coordinator.dart';
+import '../../../../data/services/url_launcher_service.dart';
+import '../../../../data/services/wakelock_coordinator.dart';
 import '../../../../domain/models/app_language.dart';
 import '../../../../domain/models/app_theme_mode.dart';
 import '../../../../domain/models/metronome_sound.dart';
@@ -41,24 +46,53 @@ class PreferencesViewModel extends ChangeNotifier {
     required PreferencesRepository repository,
     MetronomeRepository? metronomeRepository,
     BackgroundPlaybackCoordinator? backgroundPlaybackCoordinator,
+    WakelockCoordinator? wakelockCoordinator,
+    AppInfoService? appInfoService,
+    UrlLauncherService? urlLauncherService,
   }) : _repository = repository,
        _metronomeRepository = metronomeRepository,
        _backgroundPlaybackCoordinator = backgroundPlaybackCoordinator,
+       _wakelockCoordinator = wakelockCoordinator,
+       _appInfoService = appInfoService ?? const PackageInfoAppInfoService(),
+       _urlLauncherService =
+           urlLauncherService ?? const ExternalUrlLauncherService(),
        _themeMode = repository.getThemeMode(),
        _language = repository.getLanguage(),
        _soundSettings = repository.getSoundSettings(),
-       _isBackgroundPlaybackEnabled = repository
-           .getBackgroundPlaybackEnabled() {
+       _isBackgroundPlaybackEnabled = repository.getBackgroundPlaybackEnabled(),
+       _isKeepScreenAwakeEnabled = repository.getKeepScreenAwake() {
     _metronomeRepository?.setSoundSettings(_soundSettings);
+    unawaited(_loadAppVersion());
   }
+
+  /// Repository URL for the app's source code on GitHub.
+  static final Uri sourceCodeUri = Uri.parse(
+    'https://github.com/MateusNavarro77/metronome',
+  );
+
+  /// Developer's GitHub profile URL.
+  static final Uri developerProfileUri = Uri.parse(
+    'https://github.com/MateusNavarro77',
+  );
+
+  /// Privacy policy URL.
+  static final Uri privacyPolicyUri = Uri.parse(
+    'https://mateusnavarro77.github.io/metronome/privacy-policy.html',
+  );
 
   final PreferencesRepository _repository;
   final MetronomeRepository? _metronomeRepository;
   final BackgroundPlaybackCoordinator? _backgroundPlaybackCoordinator;
+  final WakelockCoordinator? _wakelockCoordinator;
+  final AppInfoService _appInfoService;
+  final UrlLauncherService _urlLauncherService;
   AppThemeMode _themeMode;
   AppLanguage _language;
   SoundSettings _soundSettings;
   bool _isBackgroundPlaybackEnabled;
+  bool _isKeepScreenAwakeEnabled;
+  AppVersionInfo? _appVersionInfo;
+  bool _isDisposed = false;
 
   /// Current active domain [AppThemeMode].
   AppThemeMode get themeMode => _themeMode;
@@ -100,6 +134,19 @@ class PreferencesViewModel extends ChangeNotifier {
     notifyListeners();
     await _repository.setBackgroundPlaybackEnabled(enabled);
     await _backgroundPlaybackCoordinator?.setBackgroundPlaybackEnabled(enabled);
+  }
+
+  /// Whether the device screen stays awake while the metronome is playing
+  /// (FR-CFG-02).
+  bool get isKeepScreenAwakeEnabled => _isKeepScreenAwakeEnabled;
+
+  /// Enables or disables keeping the device screen awake while playing.
+  Future<void> setKeepScreenAwake(bool enabled) async {
+    if (_isKeepScreenAwakeEnabled == enabled) return;
+    _isKeepScreenAwakeEnabled = enabled;
+    notifyListeners();
+    await _repository.setKeepScreenAwake(enabled);
+    await _wakelockCoordinator?.syncPreference();
   }
 
   /// Updates the theme mode, notifies listeners, and persists the choice.
@@ -155,6 +202,31 @@ class PreferencesViewModel extends ChangeNotifier {
   /// Enables or disables mute mode while preserving saved volume levels (FR-SND-08).
   Future<void> setMuted(bool muted) =>
       _updateSoundSettings(_soundSettings.copyWith(isMuted: muted));
+
+  /// Application version and build number (`versionCode`), or `null` while
+  /// loading or unavailable.
+  AppVersionInfo? get appVersionInfo => _appVersionInfo;
+
+  /// Opens an external [uri] via the configured [UrlLauncherService].
+  Future<bool> openUrl(Uri uri) => _urlLauncherService.openUrl(uri);
+
+  Future<void> _loadAppVersion() async {
+    try {
+      final info = await _appInfoService.getAppVersion();
+      if (_isDisposed) return;
+      _appVersionInfo = info;
+      notifyListeners();
+    } on Object {
+      // Ignore platform channel errors in headless/test environments without
+      // a registered package_info_plus implementation.
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
 
   Future<void> _updateSoundSettings(SoundSettings next) async {
     if (_soundSettings == next) return;
