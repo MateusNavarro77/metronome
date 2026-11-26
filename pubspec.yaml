@@ -8,7 +8,7 @@ screenshots:
   - path: "./readme-assets/app-screenshots/dark.png"
     description: "Dark theme"
 publish_to: 'none' 
-version: 1.3.0-alpha.2
+version: 1.3.0-alpha.3
 environment:
   sdk: ^3.13.7
 dependencies:
