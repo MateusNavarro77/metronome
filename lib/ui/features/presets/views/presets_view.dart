@@ -137,10 +137,12 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
     final allPresets = vm.allPresets;
     final presets = vm.filteredPresets;
     final activePresetId = vm.activePresetId;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       backgroundColor: context.colorScheme.surface,
       body: SafeArea(
+        bottom: false,
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
@@ -212,7 +214,12 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                 Expanded(
                   child: presets.isEmpty
                       ? SingleChildScrollView(
-                          padding: EdgeInsets.all(context.dimens.spaceMd),
+                          padding: EdgeInsets.fromLTRB(
+                            context.dimens.spaceMd,
+                            context.dimens.spaceMd,
+                            context.dimens.spaceMd,
+                            context.dimens.spaceMd + bottomInset,
+                          ),
                           child: _EmptyPresetsCard(
                             hasAnyPresets: allPresets.isNotEmpty,
                             searchQuery: vm.searchQuery,
@@ -228,7 +235,7 @@ class _PresetsViewBodyState extends State<_PresetsViewBody> {
                             context.dimens.spaceMd,
                             0,
                             context.dimens.spaceMd,
-                            context.dimens.spaceLg,
+                            context.dimens.spaceLg + bottomInset,
                           ),
                           itemCount: presets.length,
                           separatorBuilder: (_, _) =>

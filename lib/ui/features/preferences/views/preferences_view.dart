@@ -25,19 +25,23 @@ class PreferencesView extends StatelessWidget {
     final l10n = context.l10n;
     final viewModel = context.watch<PreferencesViewModel>();
     final canPop = showBackButton ?? (ModalRoute.of(context)?.canPop ?? false);
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       backgroundColor: context.colorScheme.surface,
       body: SafeArea(
+        bottom: false,
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: context.dimens.maxContentWidth,
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.dimens.spaceMd,
-                vertical: context.dimens.spaceSm,
+              padding: EdgeInsets.fromLTRB(
+                context.dimens.spaceMd,
+                context.dimens.spaceSm,
+                context.dimens.spaceMd,
+                0,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -47,6 +51,9 @@ class PreferencesView extends StatelessWidget {
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const ClampingScrollPhysics(),
+                      padding: EdgeInsets.only(
+                        bottom: bottomInset + context.dimens.spaceMd,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -120,7 +127,6 @@ class PreferencesView extends StatelessWidget {
                           ),
                           SizedBox(height: context.dimens.spaceSm),
                           _BackgroundPlaybackSectionCard(viewModel: viewModel),
-                          SizedBox(height: context.dimens.spaceMd),
                         ],
                       ),
                     ),

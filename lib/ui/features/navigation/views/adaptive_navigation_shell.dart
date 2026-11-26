@@ -218,6 +218,7 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
 
             return Scaffold(
               backgroundColor: context.colorScheme.surface,
+              extendBody: true,
               body: content,
               bottomNavigationBar: SafeArea(
                 top: false,

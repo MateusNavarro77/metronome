@@ -55,9 +55,12 @@ class MetronomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+
     return Scaffold(
       backgroundColor: context.colorScheme.surface,
       body: SafeArea(
+        bottom: false,
         child: ListenableBuilder(
           listenable: viewModel,
           builder: (context, _) {
@@ -71,12 +74,19 @@ class MetronomeView extends StatelessWidget {
               builder: (context, constraints) {
                 final isWide =
                     constraints.maxWidth > context.dimens.wideBreakpoint;
+                final availableHeight = (constraints.maxHeight - bottomInset)
+                    .clamp(0.0, double.infinity);
                 final isCompactHeight =
-                    constraints.maxHeight <
-                    context.dimens.compactHeightBreakpoint;
+                    availableHeight < context.dimens.compactHeightBreakpoint;
                 final gap = isCompactHeight
                     ? context.dimens.spaceXs + 2
                     : context.dimens.spaceMd;
+                final horizontalPadding = isWide
+                    ? context.dimens.spaceLg
+                    : context.dimens.spaceMd;
+                final verticalPadding = isCompactHeight
+                    ? context.dimens.spaceXs
+                    : context.dimens.spaceSm;
 
                 return Center(
                   child: ConstrainedBox(
@@ -90,13 +100,11 @@ class MetronomeView extends StatelessWidget {
                           minHeight: constraints.maxHeight,
                         ),
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isWide
-                                ? context.dimens.spaceLg
-                                : context.dimens.spaceMd,
-                            vertical: isCompactHeight
-                                ? context.dimens.spaceXs
-                                : context.dimens.spaceSm,
+                          padding: EdgeInsets.fromLTRB(
+                            horizontalPadding,
+                            verticalPadding,
+                            horizontalPadding,
+                            bottomInset + verticalPadding,
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

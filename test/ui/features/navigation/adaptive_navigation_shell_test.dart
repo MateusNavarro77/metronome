@@ -14,6 +14,7 @@ import 'package:metronome/ui/core/theme/app_theme.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/navigation/views/adaptive_navigation_shell.dart';
 import 'package:metronome/ui/features/preferences/view_models/preferences_view_model.dart';
+import 'package:metronome/ui/features/preferences/views/preferences_view.dart';
 import 'package:metronome/ui/features/presets/view_models/presets_view_model.dart';
 import 'package:metronome/ui/features/setlists/view_models/setlists_view_model.dart';
 import 'package:provider/provider.dart';
@@ -382,5 +383,63 @@ void main() {
 
       check(harness.engine.isPlaying).isTrue();
     });
+
+    testWidgets(
+      'floating toolbar extends over scrollable content without clipping and keeps last item reachable',
+      (WidgetTester tester) async {
+        final harness = _ShellTestHarness.create();
+        addTearDown(harness.dispose);
+
+        tester.view.physicalSize = const Size(390, 700);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(harness.buildApp());
+        await tester.pumpAndSettle();
+
+        // Outer shell Scaffold extends body behind the floating toolbar
+        final shellScaffold = tester.widget<Scaffold>(
+          find
+              .descendant(
+                of: find.byType(AdaptiveNavigationShell),
+                matching: find.byType(Scaffold),
+              )
+              .first,
+        );
+        check(shellScaffold.extendBody).isTrue();
+
+        // Switch to Settings (scrollable PreferencesView)
+        await tester.tap(find.bySemanticsLabel('Settings'));
+        await tester.pumpAndSettle();
+
+        final scrollViewFinder = find.descendant(
+          of: find.byType(PreferencesView),
+          matching: find.byType(SingleChildScrollView),
+        );
+        final scrollViewRect = tester.getRect(scrollViewFinder);
+        final toolbarRect = tester.getRect(
+          find.byKey(const Key('adaptive_navigation_toolbar')),
+        );
+
+        // Scrollable viewport extends behind the floating toolbar to screen bottom
+        check(scrollViewRect.bottom).equals(700.0);
+        check(scrollViewRect.bottom > toolbarRect.top).isTrue();
+
+        // Scrolling to the end clears the last card above the floating toolbar
+        final scrollable = tester.state<ScrollableState>(
+          find.descendant(
+            of: scrollViewFinder,
+            matching: find.byType(Scrollable),
+          ),
+        );
+        scrollable.position.jumpTo(scrollable.position.maxScrollExtent);
+        await tester.pumpAndSettle();
+
+        final lastCardRect = tester.getRect(
+          find.byKey(const Key('background_playback_section_card')),
+        );
+        check(lastCardRect.bottom <= toolbarRect.top).isTrue();
+      },
+    );
   });
 }

@@ -108,10 +108,12 @@ class _SetlistsViewBody extends StatelessWidget {
     final l10n = context.l10n;
     final setlists = viewModel.setlists;
     final activeSetlistId = viewModel.activeSetlistId;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       backgroundColor: context.colorScheme.surface,
       body: SafeArea(
+        bottom: false,
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
@@ -151,7 +153,12 @@ class _SetlistsViewBody extends StatelessWidget {
                 Expanded(
                   child: setlists.isEmpty
                       ? SingleChildScrollView(
-                          padding: EdgeInsets.all(context.dimens.spaceMd),
+                          padding: EdgeInsets.fromLTRB(
+                            context.dimens.spaceMd,
+                            context.dimens.spaceMd,
+                            context.dimens.spaceMd,
+                            context.dimens.spaceMd + bottomInset,
+                          ),
                           child: _EmptySetlistsCard(
                             onCreateSetlist: () => _createSetlist(context),
                           ),
@@ -161,7 +168,7 @@ class _SetlistsViewBody extends StatelessWidget {
                             context.dimens.spaceMd,
                             0,
                             context.dimens.spaceMd,
-                            context.dimens.spaceLg,
+                            context.dimens.spaceLg + bottomInset,
                           ),
                           itemCount: setlists.length,
                           separatorBuilder: (_, _) =>
