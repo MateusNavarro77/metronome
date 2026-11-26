@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart'
     hide CornerRounding, RoundedPolygon;
@@ -7,6 +9,10 @@ import '../../../../domain/models/preset.dart';
 import '../../../../domain/models/setlist.dart';
 import '../../../core/l10n/l10n_extensions.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/active_status_badge.dart';
+import '../../../core/widgets/app_snackbar.dart';
+import '../../../core/widgets/list_action_sheet.dart';
+import '../../../core/widgets/swipeable_action_card.dart';
 import '../view_models/setlists_view_model.dart';
 import 'widgets/setlist_detail_sheet.dart';
 import 'widgets/setlist_name_dialog.dart';
@@ -14,10 +20,13 @@ import 'widgets/setlist_name_dialog.dart';
 /// Setlists management screen using Material 3 Expressive theming
 /// and PRD section 3.7 (FR-PRE-06..09, UI-05..06).
 class SetlistsView extends StatelessWidget {
-  const SetlistsView({super.key, this.viewModel});
+  const SetlistsView({super.key, this.viewModel, this.onNavigateToMetronome});
 
   /// Optional explicit ViewModel for isolated testing; defaults to Provider lookup.
   final SetlistsViewModel? viewModel;
+
+  /// Optional callback to jump directly to the Metronome tab from feedback snackbars.
+  final VoidCallback? onNavigateToMetronome;
 
   @override
   Widget build(BuildContext context) {
@@ -25,18 +34,27 @@ class SetlistsView extends StatelessWidget {
     if (explicitViewModel != null) {
       return ListenableBuilder(
         listenable: explicitViewModel,
-        builder: (context, _) =>
-            _SetlistsViewBody(viewModel: explicitViewModel),
+        builder: (context, _) => _SetlistsViewBody(
+          viewModel: explicitViewModel,
+          onNavigateToMetronome: onNavigateToMetronome,
+        ),
       );
     }
-    return _SetlistsViewBody(viewModel: context.watch<SetlistsViewModel>());
+    return _SetlistsViewBody(
+      viewModel: context.watch<SetlistsViewModel>(),
+      onNavigateToMetronome: onNavigateToMetronome,
+    );
   }
 }
 
 class _SetlistsViewBody extends StatelessWidget {
-  const _SetlistsViewBody({required this.viewModel});
+  const _SetlistsViewBody({
+    required this.viewModel,
+    this.onNavigateToMetronome,
+  });
 
   final SetlistsViewModel viewModel;
+  final VoidCallback? onNavigateToMetronome;
 
   Future<void> _createSetlist(BuildContext context) async {
     final l10n = context.l10n;
@@ -52,6 +70,7 @@ class _SetlistsViewBody extends StatelessWidget {
       context,
       viewModel: viewModel,
       setlistId: created.id,
+      onNavigateToMetronome: onNavigateToMetronome,
     );
   }
 
@@ -67,40 +86,121 @@ class _SetlistsViewBody extends StatelessWidget {
     await viewModel.renameSetlist(setlist.id, newName);
   }
 
-  Future<void> _confirmDeleteSetlist(
+  void _activateSetlist(BuildContext context, Setlist setlist) {
+    HapticFeedback.selectionClick();
+    viewModel.activateSetlist(setlist, initialIndex: 0);
+    final l10n = context.l10n;
+    showAppSnackbar(
+      context,
+      message: l10n.setlistActivatedSnackbar(setlist.displayName(l10n)),
+      actionLabel: onNavigateToMetronome != null
+          ? l10n.goToMetronomeAction
+          : null,
+      onAction: onNavigateToMetronome,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  Future<void> _duplicateSetlist(BuildContext context, Setlist setlist) async {
+    final l10n = context.l10n;
+    final copyName = l10n.setlistCopyName(setlist.displayName(l10n));
+    final created = await viewModel.duplicateSetlist(
+      setlist.id,
+      duplicatedName: copyName,
+    );
+    if (!context.mounted) return;
+    HapticFeedback.selectionClick();
+    showAppSnackbar(
+      context,
+      message: l10n.setlistDuplicatedSnackbar(created.displayName(l10n)),
+      actionLabel: l10n.undoAction,
+      onAction: () {
+        viewModel.deleteSetlist(created.id);
+      },
+      showCloseButton: true,
+    );
+  }
+
+  Future<void> _deleteSetlistWithUndo(
     BuildContext context,
     Setlist setlist,
   ) async {
     final l10n = context.l10n;
-    final confirmed = await M3EDialog.show<bool>(
+    final setlistName = setlist.displayName(l10n);
+    final wasActive = viewModel.activeSetlistId == setlist.id;
+    final previousActiveIndex = viewModel.activeSetlistIndex;
+
+    final record = await viewModel.deleteSetlistWithUndo(setlist.id);
+    if (record == null || !context.mounted) return;
+
+    showAppSnackbar(
       context,
-      dialog: M3EDialog(
-        key: const Key('delete_setlist_confirm_dialog'),
-        title: l10n.deleteSetlistDialogTitle,
-        content: Text(
-          l10n.deleteSetlistDialogMessage(setlist.displayName(l10n)),
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: context.colorScheme.onSurfaceVariant,
+      message: l10n.setlistDeletedSnackbar(setlistName),
+      actionLabel: l10n.undoAction,
+      onAction: () {
+        HapticFeedback.selectionClick();
+        viewModel.restoreDeletedSetlist(
+          record,
+          wasActive: wasActive,
+          previousActiveIndex: previousActiveIndex,
+        );
+      },
+      showCloseButton: true,
+    );
+  }
+
+  void _openSetlistActionSheet(
+    BuildContext context,
+    Setlist setlist,
+    List<Preset> presets,
+  ) {
+    final l10n = context.l10n;
+    final setlistName = setlist.displayName(l10n);
+    showListItemActionSheet(
+      context,
+      sheetKey: Key('setlist_action_sheet_${setlist.id}'),
+      title: setlistName,
+      subtitle: l10n.songCount(presets.length),
+      actions: [
+        ListActionItem(
+          key: Key('setlist_sheet_activate_${setlist.id}'),
+          icon: Icons.playlist_play_rounded,
+          label: l10n.activateSetlistButton,
+          enabled: presets.isNotEmpty,
+          onTap: () => _activateSetlist(context, setlist),
+        ),
+        ListActionItem(
+          key: Key('setlist_sheet_open_${setlist.id}'),
+          icon: Icons.queue_music_rounded,
+          label: l10n.openSetlistAction,
+          onTap: () => showSetlistDetailSheet(
+            context,
+            viewModel: viewModel,
+            setlistId: setlist.id,
+            onNavigateToMetronome: onNavigateToMetronome,
           ),
         ),
-        actions: [
-          M3EButton.text(
-            key: const Key('cancel_delete_setlist_button'),
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          M3EButton.filled(
-            key: const Key('confirm_delete_setlist_button'),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.delete),
-          ),
-        ],
-      ),
+        ListActionItem(
+          key: Key('setlist_sheet_rename_${setlist.id}'),
+          icon: Icons.edit_outlined,
+          label: l10n.renameAction,
+          onTap: () => _renameSetlist(context, setlist),
+        ),
+        ListActionItem(
+          key: Key('setlist_sheet_duplicate_${setlist.id}'),
+          icon: Icons.copy_rounded,
+          label: l10n.duplicateAction,
+          onTap: () => _duplicateSetlist(context, setlist),
+        ),
+        ListActionItem(
+          key: Key('setlist_sheet_delete_${setlist.id}'),
+          icon: Icons.delete_outline_rounded,
+          label: l10n.delete,
+          isDestructive: true,
+          onTap: () => _deleteSetlistWithUndo(context, setlist),
+        ),
+      ],
     );
-
-    if (confirmed == true) {
-      await viewModel.deleteSetlist(setlist.id);
-    }
   }
 
   @override
@@ -144,7 +244,7 @@ class _SetlistsViewBody extends StatelessWidget {
                         size: M3EButtonSize.sm,
                         icon: const Icon(Icons.add_rounded, size: 20),
                         onPressed: () => _createSetlist(context),
-                        child: Text(l10n.newSetlistButton),
+                        label: Text(l10n.newSetlistButton),
                       ),
                     ],
                   ),
@@ -180,22 +280,70 @@ class _SetlistsViewBody extends StatelessWidget {
                             );
                             final isActive = setlist.id == activeSetlistId;
 
-                            return _SetlistCard(
-                              setlist: setlist,
-                              presets: presets,
-                              isActive: isActive,
-                              onTap: () => showSetlistDetailSheet(
-                                context,
-                                viewModel: viewModel,
-                                setlistId: setlist.id,
+                            return SwipeableActionCard(
+                              dismissKey: ValueKey(
+                                'setlist_swipe_${setlist.id}',
                               ),
-                              onActivate: () => viewModel.activateSetlist(
-                                setlist,
-                                initialIndex: 0,
+                              borderRadius: context.dimens.radiusMd,
+                              startToEndAction: presets.isNotEmpty
+                                  ? SwipeActionConfig(
+                                      label: l10n.activateSetlistButton,
+                                      icon: Icons.playlist_play_rounded,
+                                      backgroundColor:
+                                          context.colorScheme.primaryContainer,
+                                      activeBackgroundColor:
+                                          context.colorScheme.primary,
+                                      foregroundColor: context
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                      activeForegroundColor:
+                                          context.colorScheme.onPrimary,
+                                      dismissOnTrigger: false,
+                                      onTrigger: () =>
+                                          _activateSetlist(context, setlist),
+                                    )
+                                  : null,
+                              endToStartAction: SwipeActionConfig(
+                                label: l10n.delete,
+                                icon: Icons.delete_outline_rounded,
+                                backgroundColor:
+                                    context.colorScheme.errorContainer,
+                                activeBackgroundColor:
+                                    context.colorScheme.error,
+                                foregroundColor:
+                                    context.colorScheme.onErrorContainer,
+                                activeForegroundColor:
+                                    context.colorScheme.onError,
+                                dismissOnTrigger: true,
+                                onTrigger: () =>
+                                    _deleteSetlistWithUndo(context, setlist),
                               ),
-                              onRename: () => _renameSetlist(context, setlist),
-                              onDelete: () =>
-                                  _confirmDeleteSetlist(context, setlist),
+                              child: _SetlistCard(
+                                setlist: setlist,
+                                presets: presets,
+                                isActive: isActive,
+                                isPlayingListenable:
+                                    viewModel.isPlayingListenable,
+                                onTap: () => showSetlistDetailSheet(
+                                  context,
+                                  viewModel: viewModel,
+                                  setlistId: setlist.id,
+                                  onNavigateToMetronome: onNavigateToMetronome,
+                                ),
+                                onLongPress: () => _openSetlistActionSheet(
+                                  context,
+                                  setlist,
+                                  presets,
+                                ),
+                                onActivate: () =>
+                                    _activateSetlist(context, setlist),
+                                onRename: () =>
+                                    _renameSetlist(context, setlist),
+                                onDuplicate: () =>
+                                    _duplicateSetlist(context, setlist),
+                                onDelete: () =>
+                                    _deleteSetlistWithUndo(context, setlist),
+                              ),
                             );
                           },
                         ),
@@ -214,18 +362,24 @@ class _SetlistCard extends StatelessWidget {
     required this.setlist,
     required this.presets,
     required this.isActive,
+    required this.isPlayingListenable,
     required this.onTap,
+    required this.onLongPress,
     required this.onActivate,
     required this.onRename,
+    required this.onDuplicate,
     required this.onDelete,
   });
 
   final Setlist setlist;
   final List<Preset> presets;
   final bool isActive;
+  final ValueListenable<bool> isPlayingListenable;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
   final VoidCallback onActivate;
   final VoidCallback onRename;
+  final VoidCallback onDuplicate;
   final VoidCallback onDelete;
 
   @override
@@ -242,110 +396,161 @@ class _SetlistCard extends StatelessWidget {
       button: true,
       selected: isActive,
       label: l10n.setlistCardSemantics(setlistName, songCountLabel),
-      child: M3ECard(
-        key: Key('setlist_card_${setlist.id}'),
-        variant: isActive ? M3ECardVariant.filled : M3ECardVariant.elevated,
-        borderRadius: BorderRadius.circular(context.dimens.radiusMd),
-        padding: EdgeInsets.all(context.dimens.spaceMd),
-        onPressed: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
+          border: Border.all(
+            color: isActive
+                ? context.colorScheme.primary.withValues(alpha: 0.72)
+                : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: M3ECard(
+          key: Key('setlist_card_${setlist.id}'),
+          variant: isActive ? M3ECardVariant.filled : M3ECardVariant.elevated,
+          borderRadius: BorderRadius.circular(context.dimens.radiusMd),
+          padding: EdgeInsets.fromLTRB(
+            context.dimens.spaceMd,
+            context.dimens.spaceSmPlus4,
+            context.dimens.spaceSm,
+            context.dimens.spaceMd,
+          ),
+          onPressed: onTap,
+          onLongPress: onLongPress,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: context.dimens.spaceXs),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: Text(
-                              setlistName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: context.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: context.colorScheme.onSurface,
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  setlistName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: context.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: context.colorScheme.onSurface,
+                                  ),
+                                ),
                               ),
+                              if (isActive) ...[
+                                SizedBox(width: context.dimens.spaceSm),
+                                ActiveStatusBadge(
+                                  key: Key(
+                                    'setlist_active_badge_${setlist.id}',
+                                  ),
+                                  label: l10n.activeBadge,
+                                  isPlayingListenable: isPlayingListenable,
+                                ),
+                              ],
+                            ],
+                          ),
+                          SizedBox(height: context.dimens.spaceXs),
+                          Text(
+                            l10n.setlistCardSubtitle(
+                              songCountLabel,
+                              previewText,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              fontSize: 13,
+                              color: context.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          if (isActive) ...[
-                            SizedBox(width: context.dimens.spaceSm),
-                            Container(
-                              key: Key('setlist_active_badge_${setlist.id}'),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: context.dimens.spaceSm,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: context.colorScheme.primary,
-                                borderRadius: BorderRadius.circular(
-                                  context.dimens.radiusFull,
-                                ),
-                              ),
-                              child: Text(
-                                l10n.activeBadge,
-                                style: context.textTheme.labelSmall?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: context.colorScheme.onPrimary,
-                                ),
-                              ),
-                            ),
-                          ],
                         ],
                       ),
-                      SizedBox(height: context.dimens.spaceXs),
-                      Text(
-                        l10n.setlistCardSubtitle(songCountLabel, previewText),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          fontSize: 13,
-                          color: context.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  M3EMenu(
+                    position: M3EMenuAnchorPosition.bottomEnd,
+                    anchorBuilder: (context, open) => M3EIconButton(
+                      key: Key('setlist_menu_button_${setlist.id}'),
+                      variant: M3EIconButtonVariant.standard,
+                      tooltip: l10n.moreActionsTooltip(setlistName),
+                      onPressed: () {
+                        HapticFeedback.selectionClick();
+                        open();
+                      },
+                      icon: Icon(
+                        Icons.more_vert_rounded,
+                        size: 20,
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    children: [
+                      M3EMenuEntry(
+                        label: l10n.openSetlistAction,
+                        leading: const Icon(
+                          Icons.queue_music_rounded,
+                          size: 20,
                         ),
+                        onPressed: onTap,
+                      ),
+                      M3EMenuEntry(
+                        label: l10n.renameAction,
+                        leading: const Icon(Icons.edit_outlined, size: 20),
+                        onPressed: onRename,
+                      ),
+                      M3EMenuEntry(
+                        label: l10n.duplicateAction,
+                        leading: const Icon(Icons.copy_rounded, size: 20),
+                        onPressed: onDuplicate,
+                      ),
+                      const M3EMenuDivider(),
+                      M3EMenuEntry(
+                        label: l10n.delete,
+                        leading: const Icon(
+                          Icons.delete_outline_rounded,
+                          size: 20,
+                        ),
+                        isDestructive: true,
+                        onPressed: onDelete,
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: context.dimens.spaceSmPlus2),
-            Row(
-              children: [
-                M3EButton.filled(
-                  key: Key('setlist_activate_button_${setlist.id}'),
-                  size: M3EButtonSize.sm,
-                  icon: const Icon(Icons.playlist_play_rounded, size: 20),
-                  onPressed: presets.isEmpty ? null : onActivate,
-                  child: Text(l10n.activateSetlistButton),
-                ),
-                const Spacer(),
-                M3EIconButton(
-                  key: Key('setlist_rename_button_${setlist.id}'),
-                  variant: M3EIconButtonVariant.standard,
-                  tooltip: l10n.renameSetlistTooltip(setlistName),
-                  onPressed: onRename,
-                  icon: Icon(
-                    Icons.edit_outlined,
-                    size: 20,
-                    color: context.colorScheme.onSurfaceVariant,
+                ],
+              ),
+              SizedBox(height: context.dimens.spaceSmPlus4),
+              // High-prominence full-width Activate CTA for effortless stage use
+              Padding(
+                padding: EdgeInsets.only(right: context.dimens.spaceSm),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: M3EButton.filled(
+                    key: Key('setlist_activate_button_${setlist.id}'),
+                    size: M3EButtonSize.md,
+                    icon: Icon(
+                      isActive
+                          ? Icons.replay_rounded
+                          : Icons.playlist_play_rounded,
+                      size: 22,
+                    ),
+                    onPressed: presets.isEmpty ? null : onActivate,
+                    label: Text(
+                      presets.isEmpty
+                          ? l10n.setlistEmptyActionHint
+                          : isActive
+                          ? l10n.activateSetlistActiveButton
+                          : l10n.activateSetlistButton,
+                    ),
                   ),
                 ),
-                M3EIconButton(
-                  key: Key('setlist_delete_button_${setlist.id}'),
-                  variant: M3EIconButtonVariant.standard,
-                  tooltip: l10n.deleteSetlistTooltip(setlistName),
-                  onPressed: onDelete,
-                  icon: Icon(
-                    Icons.delete_outline_rounded,
-                    size: 20,
-                    color: context.colorScheme.error,
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

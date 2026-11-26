@@ -16,7 +16,8 @@ class PresetsViewModel extends ChangeNotifier {
     required PresetLibraryRepository repository,
     required MetronomeViewModel metronomeViewModel,
   }) : _repository = repository,
-       _metronomeViewModel = metronomeViewModel {
+       _metronomeViewModel = metronomeViewModel,
+       _isPlayingNotifier = ValueNotifier<bool>(metronomeViewModel.isPlaying) {
     _lastActivePresetId = _metronomeViewModel.activePresetId;
     _librarySubscription = _repository.changes.listen((_) {
       notifyListeners();
@@ -26,20 +27,42 @@ class PresetsViewModel extends ChangeNotifier {
 
   final PresetLibraryRepository _repository;
   final MetronomeViewModel _metronomeViewModel;
+  final ValueNotifier<bool> _isPlayingNotifier;
 
   StreamSubscription<void>? _librarySubscription;
   String _searchQuery = '';
+  bool _favoritesOnly = false;
   String? _lastActivePresetId;
+
+  /// Reactive playback flag for subtle live indicators on the active card
+  /// without rebuilding the entire preset list on beat ticks or play toggles.
+  ValueListenable<bool> get isPlayingListenable => _isPlayingNotifier;
 
   /// Current search query entered by the user (FR-PRE-05).
   String get searchQuery => _searchQuery;
 
+  /// Whether the list is filtered to show only favorite presets.
+  bool get favoritesOnly => _favoritesOnly;
+
   /// All presets sorted with favorites first (FR-PRE-04).
   List<Preset> get allPresets => _repository.presets;
 
-  /// Filtered presets matching [searchQuery], with favorites listed first
-  /// (FR-PRE-04, FR-PRE-05).
-  List<Preset> get filteredPresets => _repository.searchPresets(_searchQuery);
+  /// All saved setlists so a preset can be added directly to one.
+  List<Setlist> get setlists => _repository.setlists;
+
+  /// Number of presets marked as favorite.
+  int get favoriteCount =>
+      _repository.presets.where((preset) => preset.isFavorite).length;
+
+  /// Filtered presets matching [searchQuery] and [favoritesOnly], with
+  /// favorites listed first (FR-PRE-04, FR-PRE-05).
+  List<Preset> get filteredPresets {
+    final matching = _repository.searchPresets(_searchQuery);
+    if (!_favoritesOnly) return matching;
+    return List<Preset>.unmodifiable(
+      matching.where((preset) => preset.isFavorite),
+    );
+  }
 
   /// Identifier of the currently loaded preset, if any.
   String? get activePresetId => _metronomeViewModel.activePresetId;
@@ -55,6 +78,21 @@ class PresetsViewModel extends ChangeNotifier {
   void setSearchQuery(String query) {
     if (_searchQuery == query) return;
     _searchQuery = query;
+    notifyListeners();
+  }
+
+  /// Toggles filtering by favorites only.
+  void setFavoritesOnly(bool value) {
+    if (_favoritesOnly == value) return;
+    _favoritesOnly = value;
+    notifyListeners();
+  }
+
+  /// Clears active search query and favorites filter.
+  void clearFilters() {
+    if (_searchQuery.isEmpty && !_favoritesOnly) return;
+    _searchQuery = '';
+    _favoritesOnly = false;
     notifyListeners();
   }
 
@@ -105,13 +143,59 @@ class PresetsViewModel extends ChangeNotifier {
     return _repository.deletePreset(id);
   }
 
-  /// Returns all setlists referencing [id] so delete confirmation can warn the
-  /// user (FR-PRE-10).
+  /// Deletes [id] and returns a [DeletedPresetRecord] so the deletion can be
+  /// undone losslessly.
+  Future<DeletedPresetRecord?> deletePresetWithUndo(String id) {
+    return _repository.deletePresetWithUndo(id);
+  }
+
+  /// Restores a deleted preset along with its setlist references and optional
+  /// active state.
+  Future<void> restoreDeletedPreset(
+    DeletedPresetRecord record, {
+    bool wasActive = false,
+  }) async {
+    await _repository.restoreDeletedPreset(record);
+    if (wasActive) {
+      _metronomeViewModel.loadPreset(record.preset);
+    }
+  }
+
+  /// Appends [presetId] to [setlistId] and returns the updated setlist.
+  Future<Setlist> addPresetToSetlist(String setlistId, String presetId) {
+    return _repository.addPresetToSetlist(setlistId, presetId);
+  }
+
+  /// Removes the preset entry at [index] from [setlistId] (used for Undo).
+  Future<Setlist> removePresetAtFromSetlist(String setlistId, int index) {
+    return _repository.removePresetAtFromSetlist(setlistId, index);
+  }
+
+  /// Creates a new setlist (optionally pre-populated with [presetIds]).
+  Future<Setlist> createSetlist({
+    required String name,
+    List<String> presetIds = const [],
+  }) {
+    return _repository.createSetlist(name: name, presetIds: presetIds);
+  }
+
+  /// Deletes [setlistId] (used for Undo when a new setlist was created inline).
+  Future<void> deleteSetlist(String setlistId) {
+    return _repository.deleteSetlist(setlistId);
+  }
+
+  /// Returns all setlists referencing [id] so delete flows can inform the user
+  /// (FR-PRE-10).
   List<Setlist> setlistsContainingPreset(String id) {
     return _repository.findSetlistsContainingPreset(id);
   }
 
   void _onMetronomeChanged() {
+    final playing = _metronomeViewModel.isPlaying;
+    if (_isPlayingNotifier.value != playing) {
+      _isPlayingNotifier.value = playing;
+    }
+
     final currentActivePresetId = _metronomeViewModel.activePresetId;
     if (currentActivePresetId == _lastActivePresetId) return;
     _lastActivePresetId = currentActivePresetId;
@@ -122,6 +206,7 @@ class PresetsViewModel extends ChangeNotifier {
   void dispose() {
     _librarySubscription?.cancel();
     _metronomeViewModel.removeListener(_onMetronomeChanged);
+    _isPlayingNotifier.dispose();
     super.dispose();
   }
 }

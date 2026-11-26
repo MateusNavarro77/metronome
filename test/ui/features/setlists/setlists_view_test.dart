@@ -13,6 +13,7 @@ import 'package:metronome/domain/models/time_signature.dart';
 import 'package:metronome/l10n/app_localizations.dart';
 import 'package:metronome/ui/core/l10n/l10n_extensions.dart';
 import 'package:metronome/ui/core/theme/app_theme.dart';
+import 'package:metronome/ui/core/widgets/app_snackbar.dart';
 import 'package:metronome/ui/features/metronome/view_models/metronome_view_model.dart';
 import 'package:metronome/ui/features/metronome/views/metronome_view.dart';
 import 'package:metronome/ui/features/setlists/view_models/setlists_view_model.dart';
@@ -46,6 +47,7 @@ void main() {
           metronomeViewModel: metronomeVm,
         );
         addTearDown(() async {
+          dismissAppSnackbar(immediate: true);
           setlistsVm.dispose();
           metronomeVm.dispose();
           await libraryRepo.dispose();
@@ -61,7 +63,7 @@ void main() {
       }
 
       testWidgets(
-        'creates setlist, adds presets, reorders via drag, removes, renames, activates, and deletes',
+        'creates setlist, batch-adds presets with search, reorders via drag, removes with undo, renames, duplicates, activates, and deletes with undo',
         (WidgetTester tester) async {
           final (
             :libraryRepo,
@@ -85,12 +87,19 @@ void main() {
             isAccentEnabled: true,
           );
 
+          var navigatedToMetronome = false;
           await tester.pumpWidget(
-            MaterialApp(
-              theme: AppTheme.darkTheme,
-              localizationsDelegates: appLocalizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: SetlistsView(viewModel: setlistsVm),
+            M3ETheme(
+              data: AppTheme.darkThemeData,
+              child: MaterialApp(
+                theme: AppTheme.darkTheme,
+                localizationsDelegates: appLocalizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: SetlistsView(
+                  viewModel: setlistsVm,
+                  onNavigateToMetronome: () => navigatedToMetronome = true,
+                ),
+              ),
             ),
           );
           await tester.pumpAndSettle();
@@ -115,21 +124,26 @@ void main() {
           );
           expect(find.byType(BackdropFilter), findsNothing);
 
-          // Add Song A and Song B
+          // Multi-select Song A and Song B in one batch via picker
           await tester.tap(find.byKey(const Key('setlist_add_preset_button')));
           await tester.pumpAndSettle();
           expect(find.byType(BackdropFilter), findsNothing);
           await tester.tap(find.byKey(Key('add_preset_picker_item_${p1.id}')));
           await tester.pumpAndSettle();
-
-          await tester.tap(find.byKey(const Key('setlist_add_preset_button')));
-          await tester.pumpAndSettle();
           await tester.tap(find.byKey(Key('add_preset_picker_item_${p2.id}')));
+          await tester.pumpAndSettle();
+          expect(find.text('Add 2 songs'), findsOneWidget);
+          await tester.tap(
+            find.byKey(const Key('add_preset_picker_confirm_button')),
+          );
           await tester.pumpAndSettle();
 
           check(libraryRepo.getSetlistById(setlistId)?.presetIds)
               .isNotNull()
               .deepEquals([p1.id, p2.id]);
+          expect(find.text('Added 2 songs to setlist'), findsOneWidget);
+          dismissAppSnackbar(immediate: true);
+          await tester.pumpAndSettle();
 
           // Drag Song B (index 1) above Song A (index 0) via drag handle
           final dragHandle = find.byKey(const Key('setlist_item_drag_1'));
@@ -155,22 +169,48 @@ void main() {
           check(metronomeVm.state.activeSetlistId).equals(setlistId);
           check(metronomeVm.activeSetlistIndex).equals(1);
           check(metronomeVm.bpmValue).equals(100);
+          dismissAppSnackbar(immediate: true);
+          await tester.pumpAndSettle();
 
-          // Reopen detail sheet, remove first item (Song B), close sheet
+          // Reopen detail sheet, remove first item (Song B) via overflow menu + Undo, then swipe left to remove
           await tester.tap(find.byKey(Key('setlist_card_$setlistId')));
           await tester.pumpAndSettle();
-          await tester.tap(find.byKey(const Key('setlist_item_remove_0')));
+          await tester.tap(find.byKey(const Key('setlist_item_menu_0')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Remove from setlist'));
           await tester.pumpAndSettle();
           check(libraryRepo.getSetlistById(setlistId)?.presetIds)
               .isNotNull()
               .deepEquals([p1.id]);
+          expect(find.text('Removed "Song B" from setlist'), findsOneWidget);
+
+          // Undo restores Song B back at index 0
+          await tester.tap(find.text('Undo'));
+          await tester.pumpAndSettle();
+          check(libraryRepo.getSetlistById(setlistId)?.presetIds)
+              .isNotNull()
+              .deepEquals([p2.id, p1.id]);
+
+          // Swipe left on Song B row -> removes immediately with Undo snackbar
+          await tester.drag(
+            find.byKey(const Key('setlist_item_tap_0')),
+            const Offset(-360, 0),
+          );
+          await tester.pumpAndSettle();
+          check(libraryRepo.getSetlistById(setlistId)?.presetIds)
+              .isNotNull()
+              .deepEquals([p1.id]);
+          dismissAppSnackbar(immediate: true);
+          await tester.pumpAndSettle();
 
           // Dismiss sheet
           await tester.tapAt(const Offset(10, 10));
           await tester.pumpAndSettle();
 
-          // Rename setlist (FR-PRE-06)
-          await tester.tap(find.byKey(Key('setlist_rename_button_$setlistId')));
+          // Overflow menu: Rename setlist (FR-PRE-06)
+          await tester.tap(find.byKey(Key('setlist_menu_button_$setlistId')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Rename'));
           await tester.pumpAndSettle();
           await tester.enterText(
             find.byKey(const Key('setlist_name_input')),
@@ -180,30 +220,122 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.text('Main Stage'), findsOneWidget);
 
-          // Quick activate from card button
+          // Overflow menu: Duplicate setlist + Undo
+          await tester.tap(find.byKey(Key('setlist_menu_button_$setlistId')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Duplicate'));
+          await tester.pumpAndSettle();
+          expect(find.text('Main Stage (Copy)'), findsOneWidget);
+          await tester.tap(find.text('Undo'));
+          await tester.pumpAndSettle();
+          expect(find.text('Main Stage (Copy)'), findsNothing);
+
+          // Prominent Activate CTA on card shows Metronome shortcut
+          final activateBtn = tester.widget<M3EButton>(
+            find.byKey(Key('setlist_activate_button_$setlistId')),
+          );
+          check(activateBtn.size).equals(M3EButtonSize.md);
           await tester.tap(
             find.byKey(Key('setlist_activate_button_$setlistId')),
           );
           await tester.pumpAndSettle();
           check(metronomeVm.activeSetlistIndex).equals(0);
-
-          // Delete setlist with confirmation dialog
-          await tester.tap(find.byKey(Key('setlist_delete_button_$setlistId')));
+          expect(find.text('Activated "Main Stage"'), findsOneWidget);
+          await tester.tap(find.text('Metronome'));
           await tester.pumpAndSettle();
-          expect(
-            find.byKey(const Key('delete_setlist_confirm_dialog')),
-            findsOneWidget,
-          );
-          await tester.tap(
-            find.byKey(const Key('confirm_delete_setlist_button')),
-          );
+          check(navigatedToMetronome).isTrue();
+
+          // Overflow menu: Delete setlist immediately + Undo restores setlist & active state
+          await tester.tap(find.byKey(Key('setlist_menu_button_$setlistId')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Delete'));
           await tester.pumpAndSettle();
 
           check(libraryRepo.setlists).isEmpty();
           check(metronomeVm.activeSetlist).isNull();
+          expect(find.text('Deleted "Main Stage"'), findsOneWidget);
+
+          await tester.tap(find.text('Undo'));
+          await tester.pumpAndSettle();
+          check(libraryRepo.setlists).length.equals(1);
+          check(metronomeVm.state.activeSetlistId).equals(setlistId);
 
           await tester.runAsync(() => GoogleFonts.pendingFonts());
           await tester.pump();
+        },
+      );
+
+      testWidgets(
+        'supports swipe right to activate, swipe left to delete with undo, and long-press action sheet on setlist cards',
+        (WidgetTester tester) async {
+          final (
+            :libraryRepo,
+            :metronomeVm,
+            :setlistsVm,
+            engine: _,
+            metronomeRepo: _,
+          ) = createHarness();
+          final p1 = await libraryRepo.createPreset(
+            name: 'Warmup',
+            bpm: const Bpm(116),
+            timeSignature: TimeSignature.fourFour,
+            subdivision: Subdivision.none,
+            isAccentEnabled: true,
+          );
+          final setlist = await libraryRepo.createSetlist(
+            name: 'Club Night',
+            presetIds: [p1.id],
+          );
+
+          await tester.pumpWidget(
+            M3ETheme(
+              data: AppTheme.darkThemeData,
+              child: MaterialApp(
+                theme: AppTheme.darkTheme,
+                localizationsDelegates: appLocalizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: SetlistsView(viewModel: setlistsVm),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          // Swipe right -> activates setlist and springs back
+          await tester.drag(
+            find.byKey(Key('setlist_card_${setlist.id}')),
+            const Offset(320, 0),
+          );
+          await tester.pumpAndSettle();
+          check(metronomeVm.state.activeSetlistId).equals(setlist.id);
+          expect(find.byKey(Key('setlist_card_${setlist.id}')), findsOneWidget);
+          dismissAppSnackbar(immediate: true);
+          await tester.pumpAndSettle();
+
+          // Long-press opens thumb-zone action sheet
+          await tester.longPress(find.byKey(Key('setlist_card_${setlist.id}')));
+          await tester.pumpAndSettle();
+          expect(
+            find.byKey(Key('setlist_action_sheet_${setlist.id}')),
+            findsOneWidget,
+          );
+          await tester.tap(
+            find.byKey(Key('setlist_sheet_duplicate_${setlist.id}')),
+          );
+          await tester.pumpAndSettle();
+          check(libraryRepo.setlists).length.equals(2);
+          dismissAppSnackbar(immediate: true);
+          await tester.pumpAndSettle();
+
+          // Swipe left on original -> deletes immediately + Undo restores
+          await tester.drag(
+            find.byKey(Key('setlist_card_${setlist.id}')),
+            const Offset(-360, 0),
+          );
+          await tester.pumpAndSettle();
+          check(libraryRepo.getSetlistById(setlist.id)).isNull();
+          await tester.tap(find.text('Undo'));
+          await tester.pumpAndSettle();
+          check(libraryRepo.getSetlistById(setlist.id)).isNotNull();
         },
       );
 
@@ -239,11 +371,14 @@ void main() {
           );
 
           await tester.pumpWidget(
-            MaterialApp(
-              theme: AppTheme.darkTheme,
-              localizationsDelegates: appLocalizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: MetronomeView(viewModel: metronomeVm),
+            M3ETheme(
+              data: AppTheme.darkThemeData,
+              child: MaterialApp(
+                theme: AppTheme.darkTheme,
+                localizationsDelegates: appLocalizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: MetronomeView(viewModel: metronomeVm),
+              ),
             ),
           );
           await tester.pumpAndSettle();
@@ -355,7 +490,7 @@ void main() {
         },
       );
 
-      test('SetlistsViewModel ignores beat tick updates and notifies on active setlist changes', () async {
+      test('SetlistsViewModel ignores beat tick updates and notifies on active setlist changes while tracking playback via isPlayingListenable', () async {
         final (
           :engine,
           :libraryRepo,
@@ -386,9 +521,11 @@ void main() {
         var notifications = 0;
         setlistsVm.addListener(() => notifications++);
 
+        check(setlistsVm.isPlayingListenable.value).isFalse();
         metronomeVm.togglePlayStop();
         await Future<void>.delayed(Duration.zero);
         check(notifications).equals(0);
+        check(setlistsVm.isPlayingListenable.value).isTrue();
 
         engine.advancePulses(3);
         await Future<void>.delayed(Duration.zero);

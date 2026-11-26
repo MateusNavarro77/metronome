@@ -187,5 +187,105 @@ void main() {
       addTearDown(repo3.dispose);
       check(repo3.presets).isEmpty();
     });
+
+    test('supports lossless undo for deleting presets, setlists, and setlist entries plus setlist duplication and batch adds', () async {
+      final repo = PresetLibraryRepository(clock: tick);
+      addTearDown(repo.dispose);
+
+      final p1 = await repo.createPreset(
+        name: 'Opener',
+        bpm: const Bpm(120),
+        timeSignature: TimeSignature.fourFour,
+        subdivision: Subdivision.none,
+        isAccentEnabled: true,
+      );
+      final p2 = await repo.createPreset(
+        name: 'Bridge',
+        bpm: const Bpm(136),
+        timeSignature: TimeSignature.threeFour,
+        subdivision: Subdivision.eighth,
+        isAccentEnabled: true,
+      );
+      final p3 = await repo.createPreset(
+        name: 'Finale',
+        bpm: const Bpm(152),
+        timeSignature: TimeSignature.sixEight,
+        subdivision: Subdivision.triplet,
+        isAccentEnabled: false,
+      );
+
+      final s1 = await repo.createSetlist(
+        name: 'Main Show',
+        presetIds: [p1.id, p2.id, p1.id],
+      );
+      final s2 = await repo.createSetlist(name: 'Encore', presetIds: [p1.id]);
+
+      // Delete p1 with undo -> removes from both setlists (including duplicate occurrences)
+      final deletedPreset = await repo.deletePresetWithUndo(p1.id);
+      check(deletedPreset).isNotNull();
+      check(deletedPreset!.affectedSetlists.map((s) => s.id).toList())
+          .deepEquals([s1.id, s2.id]);
+      check(repo.getPresetById(p1.id)).isNull();
+      check(repo.getSetlistById(s1.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p2.id]);
+      check(repo.getSetlistById(s2.id)?.presetIds).isNotNull().isEmpty();
+
+      // Restore deleted preset -> exact indices restored across both setlists
+      await repo.restoreDeletedPreset(deletedPreset);
+      check(repo.getPresetById(p1.id)).equals(p1);
+      check(repo.getSetlistById(s1.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p1.id, p2.id, p1.id]);
+      check(repo.getSetlistById(s2.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p1.id]);
+
+      // Duplicate setlist -> inserted right after original with identical preset order
+      final duplicated = await repo.duplicateSetlist(
+        s1.id,
+        duplicatedName: 'Main Show (Copy)',
+      );
+      check(repo.setlists.map((s) => s.id).toList())
+          .deepEquals([s1.id, duplicated.id, s2.id]);
+      check(duplicated.presetIds).deepEquals([p1.id, p2.id, p1.id]);
+
+      // Delete setlist with undo -> restores to exact original index
+      final deletedSetlist = await repo.deleteSetlistWithUndo(duplicated.id);
+      check(deletedSetlist).isNotNull();
+      check(deletedSetlist!.originalIndex).equals(1);
+      check(repo.setlists.map((s) => s.id).toList()).deepEquals([s1.id, s2.id]);
+
+      await repo.restoreDeletedSetlist(deletedSetlist);
+      check(repo.setlists.map((s) => s.id).toList())
+          .deepEquals([s1.id, duplicated.id, s2.id]);
+
+      // Batch add multiple presets and undo range
+      await repo.addPresetsToSetlist(s2.id, [p2.id, p3.id]);
+      check(repo.getSetlistById(s2.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p1.id, p2.id, p3.id]);
+
+      await repo.removePresetRangeFromSetlist(s2.id, 1, 2);
+      check(repo.getSetlistById(s2.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p1.id]);
+
+      // Remove single entry with undo -> reinserts at exact index
+      final removedEntry = await repo.removePresetAtWithUndo(s1.id, 1);
+      check(removedEntry).isNotNull();
+      check(repo.getSetlistById(s1.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p1.id, p1.id]);
+
+      await repo.insertPresetInSetlist(
+        removedEntry!.setlistId,
+        removedEntry.index,
+        removedEntry.presetId,
+      );
+      check(repo.getSetlistById(s1.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p1.id, p2.id, p1.id]);
+    });
   });
 }

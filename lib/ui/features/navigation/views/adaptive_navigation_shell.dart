@@ -129,8 +129,12 @@ class _AdaptiveNavigationShellState extends State<AdaptiveNavigationShell>
                   viewModel: widget.metronomeViewModel,
                   onOpenSettings: () => _onDestinationSelected(3),
                 ),
-                const PresetsView(),
-                const SetlistsView(),
+                PresetsView(
+                  onNavigateToMetronome: () => _onDestinationSelected(0),
+                ),
+                SetlistsView(
+                  onNavigateToMetronome: () => _onDestinationSelected(0),
+                ),
                 const PreferencesView(showBackButton: false),
               ],
             ),

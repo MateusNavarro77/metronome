@@ -13,7 +13,8 @@ class SetlistsViewModel extends ChangeNotifier {
     required PresetLibraryRepository repository,
     required MetronomeViewModel metronomeViewModel,
   }) : _repository = repository,
-       _metronomeViewModel = metronomeViewModel {
+       _metronomeViewModel = metronomeViewModel,
+       _isPlayingNotifier = ValueNotifier<bool>(metronomeViewModel.isPlaying) {
     _lastActiveSetlistId = _metronomeViewModel.state.activeSetlistId;
     _lastActiveSetlistIndex = _metronomeViewModel.activeSetlistIndex;
     _librarySubscription = _repository.changes.listen((_) {
@@ -24,10 +25,15 @@ class SetlistsViewModel extends ChangeNotifier {
 
   final PresetLibraryRepository _repository;
   final MetronomeViewModel _metronomeViewModel;
+  final ValueNotifier<bool> _isPlayingNotifier;
 
   StreamSubscription<void>? _librarySubscription;
   String? _lastActiveSetlistId;
   int _lastActiveSetlistIndex = 0;
+
+  /// Reactive playback flag for subtle live indicators on the active card
+  /// without rebuilding the entire setlist screen on beat ticks or play toggles.
+  ValueListenable<bool> get isPlayingListenable => _isPlayingNotifier;
 
   /// All saved setlists.
   List<Setlist> get setlists => _repository.setlists;
@@ -69,9 +75,40 @@ class SetlistsViewModel extends ChangeNotifier {
     return _repository.renameSetlist(setlistId, newName);
   }
 
+  /// Duplicates an existing setlist with [duplicatedName].
+  Future<Setlist> duplicateSetlist(
+    String setlistId, {
+    required String duplicatedName,
+  }) {
+    return _repository.duplicateSetlist(
+      setlistId,
+      duplicatedName: duplicatedName,
+    );
+  }
+
   /// Deletes a setlist without deleting its referenced presets (FR-PRE-06).
   Future<void> deleteSetlist(String setlistId) {
     return _repository.deleteSetlist(setlistId);
+  }
+
+  /// Deletes a setlist and returns a [DeletedSetlistRecord] for lossless Undo.
+  Future<DeletedSetlistRecord?> deleteSetlistWithUndo(String setlistId) {
+    return _repository.deleteSetlistWithUndo(setlistId);
+  }
+
+  /// Restores a previously deleted setlist (and re-activates it if needed).
+  Future<void> restoreDeletedSetlist(
+    DeletedSetlistRecord record, {
+    bool wasActive = false,
+    int previousActiveIndex = 0,
+  }) async {
+    await _repository.restoreDeletedSetlist(record);
+    if (wasActive) {
+      _metronomeViewModel.activateSetlist(
+        record.setlist,
+        initialIndex: previousActiveIndex,
+      );
+    }
   }
 
   /// Appends [presetId] to [setlistId] (FR-PRE-07).
@@ -79,9 +116,47 @@ class SetlistsViewModel extends ChangeNotifier {
     return _repository.addPresetToSetlist(setlistId, presetId);
   }
 
+  /// Appends multiple [presetIds] to [setlistId] in one batch operation.
+  Future<Setlist> addPresetsToSetlist(
+    String setlistId,
+    List<String> presetIds,
+  ) {
+    return _repository.addPresetsToSetlist(setlistId, presetIds);
+  }
+
+  /// Removes [count] entries starting at [startIndex] from [setlistId] (for Undo).
+  Future<Setlist> removePresetRangeFromSetlist(
+    String setlistId,
+    int startIndex,
+    int count,
+  ) {
+    return _repository.removePresetRangeFromSetlist(
+      setlistId,
+      startIndex,
+      count,
+    );
+  }
+
   /// Removes the preset entry at [index] from [setlistId] (FR-PRE-07).
   Future<Setlist> removePresetAt(String setlistId, int index) {
     return _repository.removePresetAtFromSetlist(setlistId, index);
+  }
+
+  /// Removes the preset entry at [index] from [setlistId] and returns an undo record.
+  Future<RemovedSetlistEntryRecord?> removePresetAtWithUndo(
+    String setlistId,
+    int index,
+  ) {
+    return _repository.removePresetAtWithUndo(setlistId, index);
+  }
+
+  /// Restores a previously removed preset entry back to its exact index.
+  Future<Setlist> restoreRemovedPreset(RemovedSetlistEntryRecord record) {
+    return _repository.insertPresetInSetlist(
+      record.setlistId,
+      record.index,
+      record.presetId,
+    );
   }
 
   /// Reorders presets inside [setlistId] (FR-PRE-07).
@@ -100,6 +175,11 @@ class SetlistsViewModel extends ChangeNotifier {
   }
 
   void _onMetronomeChanged() {
+    final playing = _metronomeViewModel.isPlaying;
+    if (_isPlayingNotifier.value != playing) {
+      _isPlayingNotifier.value = playing;
+    }
+
     final currentSetlistId = activeSetlistId;
     final currentSetlistIndex = activeSetlistIndex;
     if (currentSetlistId == _lastActiveSetlistId &&
@@ -115,6 +195,7 @@ class SetlistsViewModel extends ChangeNotifier {
   void dispose() {
     _librarySubscription?.cancel();
     _metronomeViewModel.removeListener(_onMetronomeChanged);
+    _isPlayingNotifier.dispose();
     super.dispose();
   }
 }
