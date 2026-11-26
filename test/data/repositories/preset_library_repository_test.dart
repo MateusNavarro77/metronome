@@ -1,12 +1,14 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:metronome/data/repositories/preset_library_repository.dart';
+import 'package:metronome/data/services/database/app_database.dart';
 import 'package:metronome/domain/models/bpm.dart';
 import 'package:metronome/domain/models/subdivision.dart';
 import 'package:metronome/domain/models/time_signature.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  sqfliteFfiInit();
   group('PresetLibraryRepository', () {
     late DateTime now;
 
@@ -151,12 +153,14 @@ void main() {
       check(repo.getPresetById(p3.id)).isNotNull();
     });
 
-    test('persists presets and setlists to SharedPreferences and survives malformed entries', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
+    test('persists presets, setlists, ordering, and undo flows in SQLite across repository reloads', () async {
+      final appDb = await AppDatabase.openInMemory(factory: databaseFactoryFfi);
+      addTearDown(appDb.close);
 
-      final repo1 = PresetLibraryRepository(preferences: prefs, clock: tick);
-      final preset = await repo1.createPreset(
+      final repo1 = PresetLibraryRepository(database: appDb, clock: tick);
+      await repo1.initialize();
+
+      final p1 = await repo1.createPreset(
         name: 'Saved Groove',
         bpm: const Bpm(128),
         timeSignature: const TimeSignature(7, 8),
@@ -165,27 +169,50 @@ void main() {
         isFavorite: true,
         note: '2+2+3 feel',
       );
-      final setlist = await repo1.createSetlist(
-        name: 'Studio Session',
-        presetIds: [preset.id],
+      final p2 = await repo1.createPreset(
+        name: 'Ballad',
+        bpm: const Bpm(72),
+        timeSignature: TimeSignature.threeFour,
+        subdivision: Subdivision.none,
+        isAccentEnabled: false,
       );
+
+      final s1 = await repo1.createSetlist(
+        name: 'Studio Session',
+        presetIds: [p1.id, p2.id, p1.id],
+      );
+      final s2 = await repo1.createSetlist(name: 'Encore', presetIds: [p2.id]);
+      final s1Copy = await repo1.duplicateSetlist(
+        s1.id,
+        duplicatedName: 'Studio Session (Copy)',
+      );
+
+      // Delete and restore a preset to verify atomic SQLite undo persistence.
+      final deletedPreset = await repo1.deletePresetWithUndo(p1.id);
+      check(deletedPreset).isNotNull();
+      await repo1.restoreDeletedPreset(deletedPreset!);
+
+      // Delete and restore a setlist to verify persisted position ordering.
+      final deletedSetlist = await repo1.deleteSetlistWithUndo(s1Copy.id);
+      check(deletedSetlist).isNotNull();
+      await repo1.restoreDeletedSetlist(deletedSetlist!);
+
+      final expectedPresets = repo1.presets;
+      final expectedSetlists = repo1.setlists;
       await repo1.dispose();
 
-      // Reload in a fresh repository instance
-      final repo2 = PresetLibraryRepository(preferences: prefs);
+      // Reload in a fresh repository instance backed by the same SQLite DB.
+      final repo2 = PresetLibraryRepository(database: appDb);
       addTearDown(repo2.dispose);
+      await repo2.initialize();
 
-      check(repo2.presets).deepEquals([preset]);
-      check(repo2.setlists).deepEquals([setlist]);
-
-      // Verify malformed JSON doesn't crash initialization
-      await prefs.setString(
-        PresetLibraryRepository.keyPresets,
-        '{not valid json',
-      );
-      final repo3 = PresetLibraryRepository(preferences: prefs);
-      addTearDown(repo3.dispose);
-      check(repo3.presets).isEmpty();
+      check(repo2.presets).deepEquals(expectedPresets);
+      check(repo2.setlists).deepEquals(expectedSetlists);
+      check(repo2.setlists.map((s) => s.id).toList())
+          .deepEquals([s1.id, s1Copy.id, s2.id]);
+      check(repo2.getSetlistById(s1.id)?.presetIds)
+          .isNotNull()
+          .deepEquals([p1.id, p2.id, p1.id]);
     });
 
     test('supports lossless undo for deleting presets, setlists, and setlist entries plus setlist duplication and batch adds', () async {

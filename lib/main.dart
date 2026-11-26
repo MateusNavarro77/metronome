@@ -13,6 +13,7 @@ import 'data/services/app_info_service.dart';
 import 'data/services/audio_service_background_playback_service.dart';
 import 'data/services/background_playback_coordinator.dart';
 import 'data/services/background_playback_service.dart';
+import 'data/services/database/app_database.dart';
 import 'data/services/metronome_engine.dart';
 import 'data/services/soloud_metronome_engine.dart';
 import 'data/services/url_launcher_service.dart';
@@ -32,7 +33,16 @@ import 'ui/features/setlists/view_models/setlists_view_model.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final preferences = await SharedPreferences.getInstance();
-  runApp(MetronomeApp(preferences: preferences));
+  final database = await AppDatabase.open();
+  final presetLibraryRepository = PresetLibraryRepository(database: database);
+  await presetLibraryRepository.initialize();
+  runApp(
+    MetronomeApp(
+      preferences: preferences,
+      database: database,
+      presetLibraryRepositoryOverride: presetLibraryRepository,
+    ),
+  );
 }
 
 /// Root application widget wiring Dependency Injection via `package:provider`
@@ -48,6 +58,7 @@ class MetronomeApp extends StatelessWidget {
     this.appInfoServiceOverride,
     this.urlLauncherServiceOverride,
     this.preferences,
+    this.database,
   });
 
   /// Optional [MetronomeEngine] override for widget and integration testing.
@@ -74,10 +85,18 @@ class MetronomeApp extends StatelessWidget {
   /// Optional [SharedPreferences] instance from entrypoint.
   final SharedPreferences? preferences;
 
+  /// Optional [AppDatabase] instance from entrypoint.
+  final AppDatabase? database;
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        if (database != null)
+          Provider<AppDatabase>(
+            create: (_) => database!,
+            dispose: (_, db) => db.close(),
+          ),
         Provider<MetronomeEngine>(
           create: (_) => engineOverride ?? SoloudMetronomeEngine(),
           dispose: (_, engine) => engine.dispose(),
@@ -95,7 +114,7 @@ class MetronomeApp extends StatelessWidget {
         Provider<PresetLibraryRepository>(
           create: (_) =>
               presetLibraryRepositoryOverride ??
-              PresetLibraryRepository(preferences: preferences),
+              PresetLibraryRepository(database: database),
           dispose: (_, repo) => repo.dispose(),
         ),
         Provider<BackgroundPlaybackService>(

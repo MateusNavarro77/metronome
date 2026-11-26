@@ -1,13 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../domain/models/bpm.dart';
 import '../../domain/models/preset.dart';
 import '../../domain/models/setlist.dart';
 import '../../domain/models/subdivision.dart';
 import '../../domain/models/time_signature.dart';
+import '../services/database/app_database.dart';
+import '../services/database/preset_dao.dart';
+import '../services/database/setlist_dao.dart';
 
 /// Snapshot returned when deleting a [Preset] so the operation can be undone
 /// without losing any setlist placements.
@@ -56,27 +58,32 @@ class RemovedSetlistEntryRecord {
   final int index;
 }
 
-/// Single source of truth and local persistence for [Preset]s and [Setlist]s
-/// (FR-PRE-01..11, Section 6.1–6.3, NFR-REL-02).
+/// Single source of truth and local SQLite persistence for [Preset]s and
+/// [Setlist]s (FR-PRE-01..11, Section 6.1–6.3, NFR-REL-02).
 ///
-/// Accepts an optional [SharedPreferences] instance. When `null`, operates
-/// safely in-memory (ideal for unit/widget tests).
+/// Maintains an in-memory cache for synchronous reads, hydrated once via
+/// [initialize] from SQLite. When no [AppDatabase] / DAOs are provided,
+/// operates safely in-memory (ideal for unit and widget tests).
 class PresetLibraryRepository {
   PresetLibraryRepository({
-    SharedPreferences? preferences,
+    AppDatabase? database,
+    PresetDao? presetDao,
+    SetlistDao? setlistDao,
     DateTime Function()? clock,
     String Function()? idGenerator,
-  }) : _preferences = preferences,
+  }) : _database = database,
+       _presetDao =
+           presetDao ??
+           (database != null ? PresetDao(database.database) : null),
+       _setlistDao =
+           setlistDao ??
+           (database != null ? SetlistDao(database.database) : null),
        _clock = clock ?? DateTime.now,
-       _idGenerator = idGenerator {
-    _loadFromPreferences();
-  }
+       _idGenerator = idGenerator;
 
-  static const int currentSchemaVersion = 1;
-  static const String keyPresets = 'presets_storage_v1';
-  static const String keySetlists = 'setlists_storage_v1';
-
-  final SharedPreferences? _preferences;
+  final AppDatabase? _database;
+  final PresetDao? _presetDao;
+  final SetlistDao? _setlistDao;
   final DateTime Function() _clock;
   final String Function()? _idGenerator;
 
@@ -86,6 +93,25 @@ class PresetLibraryRepository {
   final List<Preset> _presets = [];
   final List<Setlist> _setlists = [];
   int _idCounter = 0;
+
+  /// Hydrates the in-memory cache from SQLite.
+  ///
+  /// Must be called once on startup when backed by an [AppDatabase].
+  /// Safe to call as a no-op when running in-memory.
+  Future<void> initialize() async {
+    if (_presetDao == null && _setlistDao == null) return;
+
+    final loadedPresets = await _presetDao?.getAll() ?? const <Preset>[];
+    final loadedSetlists = await _setlistDao?.getAll() ?? const <Setlist>[];
+
+    _presets
+      ..clear()
+      ..addAll(loadedPresets);
+    _setlists
+      ..clear()
+      ..addAll(loadedSetlists);
+    _notifyChanges();
+  }
 
   /// Reactive stream emitting whenever presets or setlists change.
   Stream<void> get changes => _changesController.stream;
@@ -97,7 +123,7 @@ class PresetLibraryRepository {
     return List<Preset>.unmodifiable(sorted);
   }
 
-  /// All saved setlists in creation order.
+  /// All saved setlists in persisted order.
   List<Setlist> get setlists => List<Setlist>.unmodifiable(_setlists);
 
   /// Finds a preset by [id], or `null` if none exists.
@@ -160,13 +186,13 @@ class PresetLibraryRepository {
       createdAt: now,
       updatedAt: now,
     );
+    await _presetDao?.insert(preset);
     _presets.add(preset);
-    await _persistPresets();
     _notifyChanges();
     return preset;
   }
 
-  /// Updates an existing [Preset] and persists the library (FR-PRE-03).
+  /// Updates an existing [Preset] and persists the change (FR-PRE-03).
   Future<Preset> updatePreset(Preset updated) async {
     final index = _presets.indexWhere((item) => item.id == updated.id);
     if (index == -1) {
@@ -178,8 +204,8 @@ class PresetLibraryRepository {
       note: updated.note.trim(),
       updatedAt: _clock(),
     );
+    await _presetDao?.update(saved);
     _presets[index] = saved;
-    await _persistPresets();
     _notifyChanges();
     return saved;
   }
@@ -201,8 +227,8 @@ class PresetLibraryRepository {
       createdAt: now,
       updatedAt: now,
     );
+    await _presetDao?.insert(copy);
     _presets.add(copy);
-    await _persistPresets();
     _notifyChanges();
     return copy;
   }
@@ -216,8 +242,8 @@ class PresetLibraryRepository {
       isFavorite: !existing.isFavorite,
       updatedAt: _clock(),
     );
+    await _presetDao?.update(updated);
     _presets[index] = updated;
-    await _persistPresets();
     _notifyChanges();
     return updated;
   }
@@ -233,11 +259,13 @@ class PresetLibraryRepository {
   Future<DeletedPresetRecord?> deletePresetWithUndo(String presetId) async {
     final presetIndex = _presets.indexWhere((item) => item.id == presetId);
     if (presetIndex == -1) return null;
-    final deletedPreset = _presets.removeAt(presetIndex);
+    final deletedPreset = _presets[presetIndex];
 
     final now = _clock();
     final removedPositions = <String, List<int>>{};
     final affectedSetlists = <Setlist>[];
+    final updatedSetlistsByIndex = <int, Setlist>{};
+
     for (var i = 0; i < _setlists.length; i++) {
       final current = _setlists[i];
       if (current.containsPreset(presetId)) {
@@ -249,13 +277,23 @@ class PresetLibraryRepository {
         }
         removedPositions[current.id] = List<int>.unmodifiable(indices);
         affectedSetlists.add(current);
-        _setlists[i] = current.removePresetReferences(presetId, updatedAt: now);
+        updatedSetlistsByIndex[i] = current.removePresetReferences(
+          presetId,
+          updatedAt: now,
+        );
       }
     }
 
-    await _persistPresets();
-    if (affectedSetlists.isNotEmpty) {
-      await _persistSetlists();
+    await _runAtomic((executor) async {
+      await _presetDao?.delete(presetId, executor: executor);
+      for (final updatedSetlist in updatedSetlistsByIndex.values) {
+        await _setlistDao?.update(updatedSetlist, executor: executor);
+      }
+    });
+
+    _presets.removeAt(presetIndex);
+    for (final entry in updatedSetlistsByIndex.entries) {
+      _setlists[entry.key] = entry.value;
     }
     _notifyChanges();
 
@@ -271,13 +309,10 @@ class PresetLibraryRepository {
   /// Restores a previously deleted [Preset] along with its exact placements in
   /// any still-existing setlists.
   Future<void> restoreDeletedPreset(DeletedPresetRecord record) async {
-    final exists = _presets.any((item) => item.id == record.preset.id);
-    if (!exists) {
-      _presets.add(record.preset);
-    }
+    final alreadyExists = _presets.any((item) => item.id == record.preset.id);
 
     final now = _clock();
-    var setlistsModified = false;
+    final updatedSetlistsByIndex = <int, Setlist>{};
     for (final entry in record.removedSetlistPositions.entries) {
       final setlistIndex = _setlists.indexWhere((s) => s.id == entry.key);
       if (setlistIndex == -1) continue;
@@ -289,16 +324,26 @@ class PresetLibraryRepository {
         final clamped = targetIndex.clamp(0, nextIds.length);
         nextIds.insert(clamped, record.preset.id);
       }
-      _setlists[setlistIndex] = current.copyWith(
+      updatedSetlistsByIndex[setlistIndex] = current.copyWith(
         presetIds: List<String>.unmodifiable(nextIds),
         updatedAt: now,
       );
-      setlistsModified = true;
     }
 
-    await _persistPresets();
-    if (setlistsModified) {
-      await _persistSetlists();
+    await _runAtomic((executor) async {
+      if (!alreadyExists) {
+        await _presetDao?.insert(record.preset, executor: executor);
+      }
+      for (final updatedSetlist in updatedSetlistsByIndex.values) {
+        await _setlistDao?.update(updatedSetlist, executor: executor);
+      }
+    });
+
+    if (!alreadyExists) {
+      _presets.add(record.preset);
+    }
+    for (final entry in updatedSetlistsByIndex.entries) {
+      _setlists[entry.key] = entry.value;
     }
     _notifyChanges();
   }
@@ -317,13 +362,13 @@ class PresetLibraryRepository {
       createdAt: now,
       updatedAt: now,
     );
+    await _setlistDao?.insert(setlist, position: _setlists.length);
     _setlists.add(setlist);
-    await _persistSetlists();
     _notifyChanges();
     return setlist;
   }
 
-  /// Updates an existing [Setlist] and persists the library (FR-PRE-06).
+  /// Updates an existing [Setlist] and persists the change (FR-PRE-06).
   Future<Setlist> updateSetlist(Setlist updated) async {
     final index = _setlists.indexWhere((item) => item.id == updated.id);
     if (index == -1) {
@@ -331,8 +376,8 @@ class PresetLibraryRepository {
     }
     final trimmedName = updated.name.trim();
     final saved = updated.copyWith(name: trimmedName, updatedAt: _clock());
+    await _setlistDao?.update(saved);
     _setlists[index] = saved;
-    await _persistSetlists();
     _notifyChanges();
     return saved;
   }
@@ -365,8 +410,16 @@ class PresetLibraryRepository {
       createdAt: now,
       updatedAt: now,
     );
+    final nextOrderedIds = [
+      ..._setlists.take(index + 1).map((s) => s.id),
+      copy.id,
+      ..._setlists.skip(index + 1).map((s) => s.id),
+    ];
+    await _setlistDao?.insertAndSyncPositions(
+      copy,
+      orderedSetlistIds: nextOrderedIds,
+    );
     _setlists.insert(index + 1, copy);
-    await _persistSetlists();
     _notifyChanges();
     return copy;
   }
@@ -392,8 +445,8 @@ class PresetLibraryRepository {
       ...presetIds,
     ]);
     final updated = existing.copyWith(presetIds: nextIds, updatedAt: _clock());
+    await _setlistDao?.update(updated);
     _setlists[index] = updated;
-    await _persistSetlists();
     _notifyChanges();
     return updated;
   }
@@ -415,8 +468,8 @@ class PresetLibraryRepository {
       presetIds: List<String>.unmodifiable(nextIds),
       updatedAt: _clock(),
     );
+    await _setlistDao?.update(updated);
     _setlists[listIndex] = updated;
-    await _persistSetlists();
     _notifyChanges();
     return updated;
   }
@@ -447,8 +500,8 @@ class PresetLibraryRepository {
       presetIds: List<String>.unmodifiable(nextIds),
       updatedAt: _clock(),
     );
+    await _setlistDao?.update(updated);
     _setlists[listIndex] = updated;
-    await _persistSetlists();
     _notifyChanges();
     return updated;
   }
@@ -468,8 +521,8 @@ class PresetLibraryRepository {
       presetIds: List<String>.unmodifiable(nextIds),
       updatedAt: _clock(),
     );
+    await _setlistDao?.update(updated);
     _setlists[listIndex] = updated;
-    await _persistSetlists();
     _notifyChanges();
     return updated;
   }
@@ -508,8 +561,8 @@ class PresetLibraryRepository {
     final updated = existing.reorder(oldIndex, newIndex, updatedAt: _clock());
     if (updated == existing) return existing;
 
+    await _setlistDao?.update(updated);
     _setlists[listIndex] = updated;
-    await _persistSetlists();
     _notifyChanges();
     return updated;
   }
@@ -523,9 +576,17 @@ class PresetLibraryRepository {
   Future<DeletedSetlistRecord?> deleteSetlistWithUndo(String setlistId) async {
     final index = _setlists.indexWhere((item) => item.id == setlistId);
     if (index == -1) return null;
-    final deleted = _setlists.removeAt(index);
+    final deleted = _setlists[index];
+    final remainingIds = [
+      for (var i = 0; i < _setlists.length; i++)
+        if (i != index) _setlists[i].id,
+    ];
 
-    await _persistSetlists();
+    await _setlistDao?.deleteAndSyncPositions(
+      setlistId,
+      remainingOrderedIds: remainingIds,
+    );
+    _setlists.removeAt(index);
     _notifyChanges();
     return DeletedSetlistRecord(setlist: deleted, originalIndex: index);
   }
@@ -533,16 +594,36 @@ class PresetLibraryRepository {
   /// Restores a previously deleted [Setlist] to its original index.
   Future<void> restoreDeletedSetlist(DeletedSetlistRecord record) async {
     final exists = _setlists.any((item) => item.id == record.setlist.id);
-    if (!exists) {
-      final targetIndex = record.originalIndex.clamp(0, _setlists.length);
-      _setlists.insert(targetIndex, record.setlist);
-    }
-    await _persistSetlists();
+    if (exists) return;
+
+    final targetIndex = record.originalIndex.clamp(0, _setlists.length);
+    final nextOrderedIds = [
+      ..._setlists.take(targetIndex).map((s) => s.id),
+      record.setlist.id,
+      ..._setlists.skip(targetIndex).map((s) => s.id),
+    ];
+
+    await _setlistDao?.insertAndSyncPositions(
+      record.setlist,
+      orderedSetlistIds: nextOrderedIds,
+    );
+    _setlists.insert(targetIndex, record.setlist);
     _notifyChanges();
   }
 
   Future<void> dispose() async {
     await _changesController.close();
+  }
+
+  Future<void> _runAtomic(
+    Future<void> Function(DatabaseExecutor? executor) work,
+  ) async {
+    final database = _database;
+    if (database != null) {
+      await database.transaction((txn) => work(txn));
+      return;
+    }
+    await work(null);
   }
 
   String _nextId(String prefix, DateTime now) {
@@ -561,72 +642,6 @@ class PresetLibraryRepository {
     final createdOrder = a.createdAt.compareTo(b.createdAt);
     if (createdOrder != 0) return createdOrder;
     return a.id.compareTo(b.id);
-  }
-
-  void _loadFromPreferences() {
-    final prefs = _preferences;
-    if (prefs == null) return;
-
-    final rawPresets = prefs.getString(keyPresets);
-    if (rawPresets != null && rawPresets.isNotEmpty) {
-      _presets.addAll(_decodeItems(rawPresets, Preset.fromJson));
-    }
-
-    final rawSetlists = prefs.getString(keySetlists);
-    if (rawSetlists != null && rawSetlists.isNotEmpty) {
-      _setlists.addAll(_decodeItems(rawSetlists, Setlist.fromJson));
-    }
-  }
-
-  List<T> _decodeItems<T>(
-    String rawJson,
-    T Function(Map<String, Object?>) fromJson,
-  ) {
-    try {
-      final decoded = jsonDecode(rawJson);
-      if (decoded is! Map<String, Object?>) return const [];
-      final rawVersion = decoded['schemaVersion'];
-      final schemaVersion = rawVersion is int ? rawVersion : 1;
-      if (schemaVersion > currentSchemaVersion) {
-        // Attempt forward-compatible read of items array if present.
-      }
-      final rawItems = decoded['items'];
-      if (rawItems is! List<Object?>) return const [];
-
-      final parsed = <T>[];
-      for (final entry in rawItems) {
-        if (entry is Map<String, Object?>) {
-          try {
-            parsed.add(fromJson(entry));
-          } catch (_) {
-            // Skip malformed item without losing the rest of the library.
-          }
-        }
-      }
-      return parsed;
-    } catch (_) {
-      return const [];
-    }
-  }
-
-  Future<void> _persistPresets() async {
-    final prefs = _preferences;
-    if (prefs == null) return;
-    final payload = jsonEncode({
-      'schemaVersion': currentSchemaVersion,
-      'items': _presets.map((preset) => preset.toJson()).toList(),
-    });
-    await prefs.setString(keyPresets, payload);
-  }
-
-  Future<void> _persistSetlists() async {
-    final prefs = _preferences;
-    if (prefs == null) return;
-    final payload = jsonEncode({
-      'schemaVersion': currentSchemaVersion,
-      'items': _setlists.map((setlist) => setlist.toJson()).toList(),
-    });
-    await prefs.setString(keySetlists, payload);
   }
 
   void _notifyChanges() {
